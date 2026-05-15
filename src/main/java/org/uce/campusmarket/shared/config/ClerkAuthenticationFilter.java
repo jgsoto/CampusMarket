@@ -1,4 +1,4 @@
-package org.uce.campusmarket.identity.infraestructure.security;
+package org.uce.campusmarket.shared.config;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

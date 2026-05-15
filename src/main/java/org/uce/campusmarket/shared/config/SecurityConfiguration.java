@@ -1,37 +1,39 @@
-package org.uce.campusmarket.identity.infraestructure.security;
+package org.uce.campusmarket.shared.config;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
-@RequiredArgsConstructor
 public class SecurityConfiguration {
-
-    private final ClerkAuthenticationFilter clerkAuthenticationFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
                 .csrf(csrf -> csrf.disable())
+
                 .authorizeHttpRequests(auth -> auth
+
                         .requestMatchers(
                                 "/",
-                                "/login.html",
-                                "/register.html",
+                                "/index.html",
+                                "/dashboard.html",
+                                "/sign-in.html",
+                                "/sign-up.html",
                                 "/css/**",
-                                "/js/**"
+                                "/js/**",
+                                "/images/**"
                         ).permitAll()
+
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(
-                        clerkAuthenticationFilter,
-                        org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class
-                );
+
+                .cors(Customizer.withDefaults());
 
         return http.build();
     }
+
 }

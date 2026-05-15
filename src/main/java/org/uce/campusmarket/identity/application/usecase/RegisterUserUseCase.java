@@ -1,7 +1,5 @@
 package org.uce.campusmarket.identity.application.usecase;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.uce.campusmarket.identity.domain.exception.EmailAlreadyExistsException;
 import org.uce.campusmarket.identity.domain.exception.InvalidEmailException;
 import org.uce.campusmarket.identity.domain.model.Role;
 import org.uce.campusmarket.identity.domain.model.User;
@@ -26,15 +24,9 @@ public class RegisterUserUseCase {
 
         validateEmail(user.getEmail());
 
-        validateEmailDoesNotExist(user.getEmail());
-
-        user.setRole(Role.STUDENT);
-        user.setStatus(UserStatus.PENDING_VERIFICATION);
-        user.setVerified(false);
-        user.setTrustScore(trustVerificationService.initialTrustScore());
-        user.setCreatedAt(LocalDateTime.now());
-
-        return userRepository.save(user);
+        return userRepository
+                .findByEmail(user.getEmail())
+                .orElseGet(() -> createUser(user));
     }
 
     private void validateEmail(String email) {
@@ -44,10 +36,14 @@ public class RegisterUserUseCase {
         }
     }
 
-    private void validateEmailDoesNotExist(String email) {
+    private User createUser(User user) {
 
-        if (userRepository.findByEmail(email).isPresent()) {
-            throw new EmailAlreadyExistsException();
-        }
+        user.setRole(Role.STUDENT);
+        user.setStatus(UserStatus.PENDING_VERIFICATION);
+        user.setVerified(false);
+        user.setTrustScore(trustVerificationService.initialTrustScore());
+        user.setCreatedAt(LocalDateTime.now());
+
+        return userRepository.save(user);
     }
 }

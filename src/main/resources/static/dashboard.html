@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+
+    <script
+            async
+            crossorigin="anonymous"
+            data-clerk-publishable-key="pk_test_ZnVubnktbXVza294LTU5LmNsZXJrLmFjY291bnRzLmRldiQ"
+            src="https://unpkg.com/@clerk/clerk-js@latest/dist/clerk.browser.js">
+    </script>
+
+</head>
+<body>
+
+<h1>Welcome to CampusMarket</h1>
+
+<div id="user-button"></div>
+
+<script>
+
+    window.addEventListener("load", async () => {
+
+        await Clerk.load();
+
+        if (!Clerk.user) {
+            window.location.href = "/sign-in.html";
+            return;
+        }
+
+        Clerk.mountUserButton(
+            document.getElementById("user-button")
+        );
+
+    });
+
+</script>
+
+</body>
+</html>
