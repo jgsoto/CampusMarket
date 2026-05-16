@@ -1,9 +1,7 @@
 package org.uce.campusmarket.identity.application.usecase;
 
 import org.uce.campusmarket.identity.domain.exception.InvalidEmailException;
-import org.uce.campusmarket.identity.domain.model.Role;
 import org.uce.campusmarket.identity.domain.model.User;
-import org.uce.campusmarket.identity.domain.model.UserStatus;
 import org.uce.campusmarket.identity.domain.repository.UserRepository;
 import org.uce.campusmarket.identity.domain.service.TrustVerificationService;
 import org.uce.campusmarket.identity.domain.service.EmailValidationService;
@@ -38,9 +36,6 @@ public class RegisterUserUseCase {
 
     private User createUser(User user) {
 
-        user.setRole(Role.STUDENT);
-        user.setStatus(UserStatus.PENDING_VERIFICATION);
-        user.setVerified(false);
         user.setTrustScore(trustVerificationService.initialTrustScore());
         user.setCreatedAt(LocalDateTime.now());
 

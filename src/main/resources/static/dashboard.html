@@ -25,7 +25,7 @@
 
     <h1>Dashboard</h1>
 
-    <div id="user-section">
+    <div id="user-section" style="display: none;">
 
         <h2>
             Welcome,
@@ -33,6 +33,11 @@
         </h2>
 
         <p id="user-email"></p>
+
+        <p>
+            Clerk ID:
+            <span id="user-id"></span>
+        </p>
 
         <button id="logout-button">
             Logout
@@ -50,16 +55,58 @@
 
         if (!Clerk.user) {
 
-            window.location.href = "/sign-in";
+            window.location.href = "/sign-in.html";
 
             return;
         }
+
+        const token = await Clerk.session.getToken();
+
+        try {
+
+            const response = await fetch(
+                "http://localhost:8080/api/v1/users/sync",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        clerkUserId: Clerk.user.id,
+                        fullName: Clerk.user.fullName,
+                        email: Clerk.user.primaryEmailAddress.emailAddress
+                    })
+                }
+            );
+
+            if (!response.ok) {
+
+                throw new Error("Failed to synchronize user");
+
+            }
+
+            const user = await response.json();
+
+            console.log("User synchronized:", user);
+
+        } catch (error) {
+
+            console.error(error);
+
+        }
+
+        document.getElementById("user-section").style.display = "block";
 
         document.getElementById("user-name").textContent =
             Clerk.user.fullName || "User";
 
         document.getElementById("user-email").textContent =
             Clerk.user.primaryEmailAddress.emailAddress;
+
+        document.getElementById("user-id").textContent =
+            Clerk.user.id;
 
         document
             .getElementById("logout-button")

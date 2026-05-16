@@ -7,15 +7,14 @@ import org.uce.campusmarket.identity.application.service.UserSyncService;
 import org.uce.campusmarket.identity.domain.model.User;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
-@CrossOrigin("*")
-public class UserController {
+public class UserSyncController {
 
     private final UserSyncService userSyncService;
 
     @PostMapping("/sync")
-    public ResponseEntity<User> syncUser(
+    public ResponseEntity<User> synchronizeUser(
             @RequestBody SyncUserRequest request
     ) {
 
@@ -28,10 +27,4 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    public record SyncUserRequest(
-            String clerkUserId,
-            String fullName,
-            String email
-    ) {
-    }
 }
