@@ -2,22 +2,45 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>CampusMarket | Dashboard</title>
+
+    <link rel="stylesheet" href="/css/styles.css">
 
     <script
             async
             crossorigin="anonymous"
             data-clerk-publishable-key="pk_test_ZnVubnktbXVza294LTU5LmNsZXJrLmFjY291bnRzLmRldiQ"
-            src="https://unpkg.com/@clerk/clerk-js@latest/dist/clerk.browser.js">
+            src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@4/dist/clerk.browser.js">
     </script>
-
 </head>
 <body>
 
-<h1>Welcome to CampusMarket</h1>
+<div class="container">
 
-<div id="user-button"></div>
+    <h1>Dashboard</h1>
+
+    <div id="user-section">
+
+        <h2>
+            Welcome,
+            <span id="user-name"></span>
+        </h2>
+
+        <p id="user-email"></p>
+
+        <button id="logout-button">
+            Logout
+        </button>
+
+    </div>
+
+</div>
 
 <script>
 
@@ -26,13 +49,27 @@
         await Clerk.load();
 
         if (!Clerk.user) {
-            window.location.href = "/sign-in.html";
+
+            window.location.href = "/sign-in";
+
             return;
         }
 
-        Clerk.mountUserButton(
-            document.getElementById("user-button")
-        );
+        document.getElementById("user-name").textContent =
+            Clerk.user.fullName || "User";
+
+        document.getElementById("user-email").textContent =
+            Clerk.user.primaryEmailAddress.emailAddress;
+
+        document
+            .getElementById("logout-button")
+            .addEventListener("click", async () => {
+
+                await Clerk.signOut();
+
+                window.location.href = "/";
+
+            });
 
     });
 

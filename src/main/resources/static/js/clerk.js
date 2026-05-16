@@ -6,7 +6,7 @@ window.addEventListener("load", async () => {
 
     button.addEventListener("click", () => {
 
-        window.location.href = "/sign-in.html";
+        window.location.href = "/signin.html";
 
     });
 
