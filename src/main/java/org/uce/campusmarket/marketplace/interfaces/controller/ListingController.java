@@ -9,6 +9,9 @@ import org.uce.campusmarket.marketplace.application.dto.UpdateListingRequest;
 import org.uce.campusmarket.marketplace.application.usecase.BrowseListingsUseCase;
 import org.uce.campusmarket.marketplace.application.usecase.CreateListingUseCase;
 import org.uce.campusmarket.marketplace.application.usecase.UpdateListingUseCase;
+import org.uce.campusmarket.marketplace.application.usecase.DeleteListingUseCase;
+import org.uce.campusmarket.marketplace.application.usecase.GetMyListingsUseCase;
+import org.uce.campusmarket.marketplace.application.usecase.PublishListingUseCase;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,13 +23,22 @@ public class ListingController {
     private final CreateListingUseCase createListingUseCase;
     private final UpdateListingUseCase updateListingUseCase;
     private final BrowseListingsUseCase browseListingsUseCase;
+    private final DeleteListingUseCase deleteListingUseCase;
+    private final GetMyListingsUseCase getMyListingsUseCase;
+    private final PublishListingUseCase publishListingUseCase;
 
     public ListingController(CreateListingUseCase createListingUseCase,
                              UpdateListingUseCase updateListingUseCase,
-                             BrowseListingsUseCase browseListingsUseCase) {
+                             BrowseListingsUseCase browseListingsUseCase,
+                             DeleteListingUseCase deleteListingUseCase,
+                             GetMyListingsUseCase getMyListingsUseCase,
+                             PublishListingUseCase publishListingUseCase) {
         this.createListingUseCase = createListingUseCase;
         this.updateListingUseCase = updateListingUseCase;
         this.browseListingsUseCase = browseListingsUseCase;
+        this.deleteListingUseCase = deleteListingUseCase;
+        this.getMyListingsUseCase = getMyListingsUseCase;
+        this.publishListingUseCase = publishListingUseCase;
     }
 
     @PostMapping
@@ -48,5 +60,27 @@ public class ListingController {
     public ResponseEntity<List<ListingResponse>> browseListings() {
         List<ListingResponse> response = browseListingsUseCase.execute();
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<List<ListingResponse>> getMyListings(@RequestHeader("X-User-Id") UUID ownerId) {
+        List<ListingResponse> response = getMyListingsUseCase.execute(ownerId);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteListing(
+            @PathVariable UUID id,
+            @RequestHeader("X-User-Id") UUID ownerId) {
+        deleteListingUseCase.execute(id, ownerId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/publish")
+    public ResponseEntity<Void> publishListing(
+            @PathVariable UUID id,
+            @RequestHeader("X-User-Id") UUID ownerId) {
+        publishListingUseCase.execute(id, ownerId);
+        return ResponseEntity.ok().build();
     }
 }
