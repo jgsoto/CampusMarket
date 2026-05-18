@@ -8,16 +8,18 @@ public class CreateListingRequest {
     private double price;
     private UUID categoryId;
     private UUID ownerId;
+    private boolean publish;
 
     public CreateListingRequest() {
     }
 
-    public CreateListingRequest(String title, String description, double price, UUID categoryId, UUID ownerId) {
+    public CreateListingRequest(String title, String description, double price, UUID categoryId, UUID ownerId, boolean publish) {
         this.title = title;
         this.description = description;
         this.price = price;
         this.categoryId = categoryId;
         this.ownerId = ownerId;
+        this.publish = publish;
     }
 
     public String getTitle() {
@@ -58,5 +60,13 @@ public class CreateListingRequest {
 
     public void setOwnerId(UUID ownerId) {
         this.ownerId = ownerId;
+    }
+
+    public boolean isPublish() {
+        return publish;
+    }
+
+    public void setPublish(boolean publish) {
+        this.publish = publish;
     }
 }

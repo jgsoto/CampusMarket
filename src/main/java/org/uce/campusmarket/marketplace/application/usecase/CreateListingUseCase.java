@@ -44,6 +44,10 @@ public class CreateListingUseCase {
                 request.getOwnerId()
         );
 
+        if (request.isPublish()) {
+            newListing.publish();
+        }
+
         Listing savedListing = listingRepository.save(newListing);
 
         return new ListingResponse(
