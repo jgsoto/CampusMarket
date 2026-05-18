@@ -51,9 +51,6 @@ public class Listing {
 
 
     public void publish() {
-        if (this.images.isEmpty()) {
-            throw new DomainException("No se puede publicar sin al menos una imagen");
-        }
         this.status = ListingStatus.PUBLICADA;
     }
 
@@ -67,6 +64,10 @@ public class Listing {
             throw new DomainException("Solo se pueden marcar como vendidas las publicaciones publicadas");
         }
         this.status = ListingStatus.VENDIDO;
+    }
+
+    public void markAsDeleted() {
+        this.status = ListingStatus.ELIMINADO;
     }
 
     public void updateDetails(ListingTitle title, ListingDescription description, Price price) {
