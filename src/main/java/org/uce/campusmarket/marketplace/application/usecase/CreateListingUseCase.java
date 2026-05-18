@@ -28,16 +28,13 @@ public class CreateListingUseCase {
     }
 
     public ListingResponse execute(CreateListingRequest request) {
-        // 1. Buscar la categoría
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new DomainException("La categoría especificada no existe"));
 
-        // 2. Construir los Objetos de Valor (aquí se validan las reglas de negocio)
         ListingTitle title = new ListingTitle(request.getTitle());
         ListingDescription description = new ListingDescription(request.getDescription());
         Price price = Price.of(request.getPrice());
 
-        // 3. Crear la entidad de dominio (Agregado)
         Listing newListing = new Listing(
                 UUID.randomUUID(),
                 title,
@@ -47,10 +44,8 @@ public class CreateListingUseCase {
                 request.getOwnerId()
         );
 
-        // 4. Guardar en el repositorio
         Listing savedListing = listingRepository.save(newListing);
 
-        // 5. Devolver la respuesta al frontend
         return new ListingResponse(
                 savedListing.getId(),
                 savedListing.getTitle().getValue(),

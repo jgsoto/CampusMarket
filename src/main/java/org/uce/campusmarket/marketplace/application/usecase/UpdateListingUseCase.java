@@ -24,27 +24,21 @@ public class UpdateListingUseCase {
     }
 
     public ListingResponse execute(UUID listingId, UUID requesterId, UpdateListingRequest request) {
-        // 1. Buscar la publicación
         Listing listing = listingRepository.findById(listingId)
                 .orElseThrow(() -> new DomainException("La publicación no existe"));
 
-        // 2. Validar que quien intenta actualizar es el dueño
         if (!listing.getOwnerId().equals(requesterId)) {
             throw new DomainException("No tienes permiso para editar esta publicación");
         }
 
-        // 3. Crear los nuevos objetos de valor
         ListingTitle newTitle = new ListingTitle(request.getTitle());
         ListingDescription newDescription = new ListingDescription(request.getDescription());
         Price newPrice = Price.of(request.getPrice());
 
-        // 4. Actualizar la entidad
         listing.updateDetails(newTitle, newDescription, newPrice);
 
-        // 5. Guardar los cambios
         Listing updatedListing = listingRepository.save(listing);
 
-        // 6. Devolver respuesta
         return new ListingResponse(
                 updatedListing.getId(),
                 updatedListing.getTitle().getValue(),

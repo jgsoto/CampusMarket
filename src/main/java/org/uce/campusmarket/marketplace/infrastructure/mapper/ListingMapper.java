@@ -61,10 +61,8 @@ public class ListingMapper {
                 entity.getOwnerId()
         );
 
-        // Actualizar el estado interno si no es BORRADOR por defecto
         if (entity.getStatus() != null && !entity.getStatus().equals("BORRADOR")) {
             if (entity.getStatus().equals("PUBLICADA")) {
-                // Simulación para restaurar estado sin romper invariantes
                 entity.getImages().forEach(img -> 
                     listing.addImage(new ListingImage(img.getId(), img.getUrl(), img.isThumbnail()))
                 );
@@ -74,7 +72,6 @@ public class ListingMapper {
             }
         }
 
-        // Si no se añadieron las imágenes arriba (caso BORRADOR), las añadimos aquí
         if (listing.getImages().isEmpty() && entity.getImages() != null) {
             entity.getImages().forEach(img -> 
                 listing.addImage(new ListingImage(img.getId(), img.getUrl(), img.isThumbnail()))

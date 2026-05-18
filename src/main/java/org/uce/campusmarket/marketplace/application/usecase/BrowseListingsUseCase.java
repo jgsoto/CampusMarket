@@ -20,10 +20,8 @@ public class BrowseListingsUseCase {
     }
 
     public List<ListingResponse> execute() {
-        // 1. Obtener todas las publicaciones del repositorio
         List<Listing> listings = listingRepository.findAll();
 
-        // 2. Convertir las entidades de dominio a DTOs para el frontend
         return listings.stream()
                 .map(listing -> new ListingResponse(
                         listing.getId(),
