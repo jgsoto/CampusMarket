@@ -69,6 +69,8 @@ public class ListingMapper {
                 listing.publish();
             } else if (entity.getStatus().equals("VENDIDO")) {
                 listing.markAsSold();
+            } else if (entity.getStatus().equals("ELIMINADO")) {
+                listing.markAsDeleted();
             }
         }
 
