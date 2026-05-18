@@ -1,14 +1,14 @@
-document.getElementById("create-listing-form")?.addEventListener("submit", async (e) => {
-    e.preventDefault(); 
-    
+async function submitForm(isPublish) {
+    const form = document.getElementById("create-listing-form");
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+
     const title = document.getElementById("listing-title").value;
     const desc = document.getElementById("listing-desc").value;
     const price = parseFloat(document.getElementById("listing-price").value);
-    
-    // Ahora obtenemos el ID de la categoría directamente de la lista desplegable
     const categoryId = document.getElementById("listing-category").value;
-    
-    // Obtenemos el UUID real que guardamos en el Dashboard
     const ownerId = localStorage.getItem("campusMarketUserId");
     
     if (!ownerId) {
@@ -26,7 +26,8 @@ document.getElementById("create-listing-form")?.addEventListener("submit", async
                 description: desc,
                 price: price,
                 categoryId: categoryId,
-                ownerId: ownerId
+                ownerId: ownerId,
+                publish: isPublish
             })
         });
         
@@ -34,13 +35,13 @@ document.getElementById("create-listing-form")?.addEventListener("submit", async
             throw new Error("El servidor rechazó la petición.");
         }
         
-        alert("¡Éxito! Publicación creada en estado BORRADOR.");
+        alert(`¡Éxito! Publicación creada en estado ${isPublish ? 'PUBLICADA' : 'BORRADOR'}.`);
         
-        // Redirigir al dashboard para ver el producto en el catálogo
-        window.location.href = "/dashboard.html";
+        // Redirigir a "Mis Publicaciones"
+        window.location.href = "/my-listings.html";
         
     } catch (error) {
         console.error(error);
         alert("Error al crear la publicación.");
     }
-});
+}

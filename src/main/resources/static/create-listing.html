@@ -46,10 +46,16 @@
                     <option value="123e4567-e89b-12d3-a456-426614174004">Insumos Universitarios</option>
                 </select>
 
-                <button type="submit"
-                    style="background: #007bff; color: white; padding: 12px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%;">
-                    Publicar (Borrador)
-                </button>
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" id="btn-draft" onclick="submitForm(false)"
+                        style="background: #ffc107; color: black; padding: 12px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; flex: 1;">
+                        Guardar en Borrador
+                    </button>
+                    <button type="button" id="btn-publish" onclick="submitForm(true)"
+                        style="background: #28a745; color: white; padding: 12px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; flex: 1;">
+                        Publicar
+                    </button>
+                </div>
             </form>
         </div>
     </div>
