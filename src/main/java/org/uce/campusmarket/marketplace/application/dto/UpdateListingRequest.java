@@ -1,40 +1,20 @@
 package org.uce.campusmarket.marketplace.application.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class UpdateListingRequest {
     private String title;
     private String description;
     private double price;
-
-    public UpdateListingRequest() {
-    }
-
-    public UpdateListingRequest(String title, String description, double price) {
-        this.title = title;
-        this.description = description;
-        this.price = price;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public double getPrice() {
-        return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
-    }
+    private List<MultipartFile> images;
 }

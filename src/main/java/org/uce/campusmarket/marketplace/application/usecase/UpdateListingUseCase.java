@@ -2,14 +2,17 @@ package org.uce.campusmarket.marketplace.application.usecase;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import org.uce.campusmarket.marketplace.application.dto.ListingImageResponse;
 import org.uce.campusmarket.marketplace.application.dto.ListingResponse;
 import org.uce.campusmarket.marketplace.application.dto.UpdateListingRequest;
 import org.uce.campusmarket.marketplace.domain.model.Listing;
+import org.uce.campusmarket.marketplace.domain.model.ListingImage;
 import org.uce.campusmarket.marketplace.domain.repository.ListingRepository;
 import org.uce.campusmarket.marketplace.domain.valueobject.ListingDescription;
 import org.uce.campusmarket.marketplace.domain.valueobject.ListingTitle;
 import org.uce.campusmarket.marketplace.domain.valueobject.Price;
+import org.uce.campusmarket.marketplace.infrastructure.storage.SupabaseStorageService;
 import org.uce.campusmarket.shared.exception.DomainException;
 
 import java.util.List;
@@ -20,9 +23,11 @@ import java.util.UUID;
 public class UpdateListingUseCase {
 
     private final ListingRepository listingRepository;
+    private final SupabaseStorageService storageService;
 
-    public UpdateListingUseCase(ListingRepository listingRepository) {
+    public UpdateListingUseCase(ListingRepository listingRepository, SupabaseStorageService storageService) {
         this.listingRepository = listingRepository;
+        this.storageService = storageService;
     }
 
     public ListingResponse execute(UUID listingId, UUID requesterId, UpdateListingRequest request) {
@@ -39,6 +44,21 @@ public class UpdateListingUseCase {
         Price newPrice = Price.of(request.getPrice());
 
         listing.updateDetails(newTitle, newDescription, newPrice);
+
+        List<MultipartFile> newImages = request.getImages();
+        if (newImages != null && !newImages.isEmpty()) {
+            listing.getImages().clear(); // Reemplaza las anteriores
+            for (int i = 0; i < newImages.size(); i++) {
+                MultipartFile file = newImages.get(i);
+                String imageUrl = storageService.upload(file);
+                ListingImage listingImage = new ListingImage(
+                        UUID.randomUUID(),
+                        imageUrl,
+                        i == 0
+                );
+                listing.addImage(listingImage);
+            }
+        }
 
         Listing updatedListing = listingRepository.save(listing);
 

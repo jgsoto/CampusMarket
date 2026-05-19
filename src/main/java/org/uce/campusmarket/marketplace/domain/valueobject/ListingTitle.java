@@ -1,8 +1,11 @@
 package org.uce.campusmarket.marketplace.domain.valueobject;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import org.uce.campusmarket.shared.exception.DomainException;
-import java.util.Objects;
 
+@Getter
+@EqualsAndHashCode
 public final class ListingTitle {
     private final String value;
 
@@ -14,22 +17,5 @@ public final class ListingTitle {
             throw new DomainException("El título debe tener entre 5 y 100 caracteres");
         }
         this.value = value;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ListingTitle that = (ListingTitle) o;
-        return Objects.equals(value, that.value);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(value);
     }
 }

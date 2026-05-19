@@ -50,6 +50,10 @@
                     <label>Precio:</label><br>
                     <input type="number" id="edit-price" step="0.01" required style="width: 100%; padding: 8px;">
                 </div>
+                <div style="margin-bottom: 15px;">
+                    <label>Imágenes (Opcional - Reemplaza las anteriores):</label><br>
+                    <input type="file" id="edit-images" multiple accept="image/*" style="width: 100%; padding: 8px;">
+                </div>
                 <div style="display: flex; justify-content: flex-end; gap: 10px;">
                     <button type="button" onclick="closeEditModal()" style="padding: 8px 15px; cursor: pointer;">Cancelar</button>
                     <button type="submit" style="background: #ffc107; color: black; padding: 8px 15px; border: none; font-weight: bold; cursor: pointer;">Guardar Cambios</button>

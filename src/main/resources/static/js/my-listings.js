@@ -44,12 +44,20 @@ async function loadMyListings() {
             // Color de estado
             let statusColor = listing.status === "BORRADOR" ? "orange" : (listing.status === "PUBLICADA" ? "green" : "gray");
 
+            // Obtener miniatura o primera imagen
+            const thumbnail = listing.images && listing.images.length > 0
+                ? listing.images.find(img => img.thumbnail)?.url || listing.images[0].url
+                : "/images/no-image.png";
+
             card.innerHTML = `
-                <h3 style="margin-top: 0;">${listing.title}</h3>
-                <p style="color: gray; font-size: 14px;">Categoría: ${listing.categoryName}</p>
-                <p>${listing.description}</p>
-                <h2 style="color: #28a745;">$${listing.price.toFixed(2)}</h2>
-                <p style="font-weight: bold; color: ${statusColor};">ESTADO: ${listing.status}</p>
+                <div style="width: 100%; height: 150px; background: #eee; border-radius: 4px; margin-bottom: 10px; display: flex; justify-content: center; align-items: center; overflow: hidden;">
+                    <img src="${thumbnail}" alt="${listing.title}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='https://placehold.co/250x150?text=Sin+Imagen'">
+                </div>
+                <h3 style="margin-top: 0; margin-bottom: 5px;">${listing.title}</h3>
+                <p style="color: gray; font-size: 14px; margin: 2px 0;">Categoría: ${listing.categoryName}</p>
+                <p style="margin: 8px 0; font-size: 14px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 40px;">${listing.description}</p>
+                <h2 style="color: #28a745; margin: 8px 0;">$${listing.price.toFixed(2)}</h2>
+                <p style="font-weight: bold; color: ${statusColor}; margin: 2px 0;">ESTADO: ${listing.status}</p>
                 
                 <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
                     <button onclick="openEditModal('${listing.id}', '${listing.title.replace(/'/g, "\\'")}', '${listing.description.replace(/'/g, "\\'")}', ${listing.price})" style="background: #ffc107; border: none; padding: 8px; border-radius: 4px; cursor: pointer; flex: 1;">Editar</button>
@@ -86,25 +94,34 @@ async function handleEditSubmit(e) {
     const title = document.getElementById("edit-title").value;
     const desc = document.getElementById("edit-desc").value;
     const price = parseFloat(document.getElementById("edit-price").value);
+    const imagesInput = document.getElementById("edit-images");
     const ownerId = localStorage.getItem("campusMarketUserId");
 
     try {
+        const formData = new FormData();
+        formData.append("title", title);
+        formData.append("description", desc);
+        formData.append("price", price);
+        
+        if (imagesInput.files.length > 0) {
+            for (const file of imagesInput.files) {
+                formData.append("images", file);
+            }
+        }
+
         const response = await fetch(`http://localhost:8080/api/listings/${id}`, {
             method: "PUT",
             headers: {
-                "Content-Type": "application/json",
                 "X-User-Id": ownerId
             },
-            body: JSON.stringify({
-                title: title,
-                description: desc,
-                price: price
-            })
+            body: formData
         });
 
         if (response.ok) {
             alert("Publicación actualizada con éxito");
             closeEditModal();
+            // Resetear input de imágenes
+            imagesInput.value = "";
             loadMyListings(); // Recargar lista
         } else {
             const err = await response.json();

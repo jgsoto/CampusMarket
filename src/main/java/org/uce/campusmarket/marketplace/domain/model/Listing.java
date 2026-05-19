@@ -1,6 +1,7 @@
 package org.uce.campusmarket.marketplace.domain.model;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.uce.campusmarket.marketplace.domain.valueobject.ListingDescription;
 import org.uce.campusmarket.marketplace.domain.valueobject.ListingTitle;
@@ -14,6 +15,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class Listing {
     private UUID id;
     private ListingTitle title;
@@ -24,9 +26,6 @@ public class Listing {
     private ListingStatus status;
     private LocalDateTime createdAt;
     private List<ListingImage> images = new ArrayList<>();
-
-    public Listing() {
-    }
 
     public Listing(UUID id, ListingTitle title, ListingDescription description, Price price, 
                    Category category, UUID ownerId) {

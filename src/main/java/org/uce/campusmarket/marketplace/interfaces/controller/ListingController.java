@@ -42,11 +42,11 @@ public class ListingController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}", consumes = "multipart/form-data")
     public ResponseEntity<ListingResponse> updateListing(
             @PathVariable UUID id,
             @RequestHeader("X-User-Id") UUID ownerId,
-            @RequestBody UpdateListingRequest request
+            @ModelAttribute UpdateListingRequest request
     ) {
 
         ListingResponse response =

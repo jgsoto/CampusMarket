@@ -1,10 +1,13 @@
 package org.uce.campusmarket.marketplace.domain.valueobject;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import org.uce.campusmarket.shared.exception.DomainException;
 
 import java.math.BigDecimal;
-import java.util.Objects;
 
+@Getter
+@EqualsAndHashCode
 public final class Price {
     private final BigDecimal value;
 
@@ -20,22 +23,5 @@ public final class Price {
 
     public static Price of(double value) {
         return new Price(BigDecimal.valueOf(value));
-    }
-
-    public BigDecimal getValue() {
-        return value;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Price price = (Price) o;
-        return Objects.equals(value, price.value);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(value);
     }
 }
