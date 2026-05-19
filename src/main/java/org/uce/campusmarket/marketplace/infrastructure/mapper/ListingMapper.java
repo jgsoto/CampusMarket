@@ -1,5 +1,6 @@
 package org.uce.campusmarket.marketplace.infrastructure.mapper;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.uce.campusmarket.marketplace.domain.model.Listing;
 import org.uce.campusmarket.marketplace.domain.model.ListingImage;
@@ -14,18 +15,19 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class ListingMapper {
 
     private final CategoryMapper categoryMapper;
 
-    public ListingMapper(CategoryMapper categoryMapper) {
-        this.categoryMapper = categoryMapper;
-    }
-
     public ListingJpaEntity toEntity(Listing domain) {
-        if (domain == null) return null;
+
+        if (domain == null) {
+            return null;
+        }
 
         ListingJpaEntity entity = new ListingJpaEntity();
+
         entity.setId(domain.getId());
         entity.setTitle(domain.getTitle().getValue());
         entity.setDescription(domain.getDescription().getValue());
@@ -35,22 +37,29 @@ public class ListingMapper {
         entity.setStatus(domain.getStatus().name());
         entity.setCreatedAt(domain.getCreatedAt());
 
-        List<ListingImageJpaEntity> imageEntities = domain.getImages().stream()
+        List<ListingImageJpaEntity> imageEntities = domain.getImages()
+                .stream()
                 .map(img -> {
-                    ListingImageJpaEntity imgEntity = new ListingImageJpaEntity();
-                    imgEntity.setId(img.getId());
-                    imgEntity.setUrl(img.getUrl());
-                    imgEntity.setThumbnail(img.isThumbnail());
-                    return imgEntity;
+                    ListingImageJpaEntity imageEntity = new ListingImageJpaEntity();
+
+                    imageEntity.setId(img.getId());
+                    imageEntity.setUrl(img.getUrl());
+                    imageEntity.setThumbnail(img.isThumbnail());
+
+                    return imageEntity;
                 })
                 .collect(Collectors.toList());
 
         entity.setImages(imageEntities);
+
         return entity;
     }
 
     public Listing toDomain(ListingJpaEntity entity) {
-        if (entity == null) return null;
+
+        if (entity == null) {
+            return null;
+        }
 
         Listing listing = new Listing(
                 entity.getId(),
@@ -61,24 +70,24 @@ public class ListingMapper {
                 entity.getOwnerId()
         );
 
-        if (entity.getStatus() != null && !entity.getStatus().equals("BORRADOR")) {
-            if (entity.getStatus().equals("PUBLICADA")) {
-                entity.getImages().forEach(img -> 
-                    listing.addImage(new ListingImage(img.getId(), img.getUrl(), img.isThumbnail()))
-                );
-                listing.publish();
-            } else if (entity.getStatus().equals("VENDIDO")) {
-                listing.markAsSold();
-            } else if (entity.getStatus().equals("ELIMINADO")) {
-                listing.markAsDeleted();
-            }
-        }
+        if (entity.getImages() != null) {
 
-        if (listing.getImages().isEmpty() && entity.getImages() != null) {
-            entity.getImages().forEach(img -> 
-                listing.addImage(new ListingImage(img.getId(), img.getUrl(), img.isThumbnail()))
+            entity.getImages().forEach(img ->
+                    listing.addImage(
+                            new ListingImage(
+                                    img.getId(),
+                                    img.getUrl(),
+                                    img.isThumbnail()
+                            )
+                    )
             );
         }
+
+        listing.setStatus(
+                ListingStatus.valueOf(entity.getStatus())
+        );
+
+        listing.setCreatedAt(entity.getCreatedAt());
 
         return listing;
     }

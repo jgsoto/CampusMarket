@@ -2,6 +2,7 @@ package org.uce.campusmarket.marketplace.application.usecase;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.uce.campusmarket.marketplace.application.dto.ListingImageResponse;
 import org.uce.campusmarket.marketplace.application.dto.ListingResponse;
 import org.uce.campusmarket.marketplace.application.dto.UpdateListingRequest;
 import org.uce.campusmarket.marketplace.domain.model.Listing;
@@ -11,6 +12,7 @@ import org.uce.campusmarket.marketplace.domain.valueobject.ListingTitle;
 import org.uce.campusmarket.marketplace.domain.valueobject.Price;
 import org.uce.campusmarket.shared.exception.DomainException;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -24,6 +26,7 @@ public class UpdateListingUseCase {
     }
 
     public ListingResponse execute(UUID listingId, UUID requesterId, UpdateListingRequest request) {
+
         Listing listing = listingRepository.findById(listingId)
                 .orElseThrow(() -> new DomainException("La publicación no existe"));
 
@@ -39,6 +42,14 @@ public class UpdateListingUseCase {
 
         Listing updatedListing = listingRepository.save(listing);
 
+        List<ListingImageResponse> images = updatedListing.getImages()
+                .stream()
+                .map(img -> new ListingImageResponse(
+                        img.getUrl(),
+                        img.isThumbnail()
+                ))
+                .toList();
+
         return new ListingResponse(
                 updatedListing.getId(),
                 updatedListing.getTitle().getValue(),
@@ -47,7 +58,8 @@ public class UpdateListingUseCase {
                 updatedListing.getCategory().getName(),
                 updatedListing.getOwnerId(),
                 updatedListing.getStatus().name(),
-                updatedListing.getCreatedAt()
+                updatedListing.getCreatedAt(),
+                images
         );
     }
 }

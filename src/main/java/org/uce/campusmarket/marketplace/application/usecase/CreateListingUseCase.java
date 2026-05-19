@@ -1,54 +1,83 @@
 package org.uce.campusmarket.marketplace.application.usecase;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import org.uce.campusmarket.marketplace.application.dto.CreateListingRequest;
 import org.uce.campusmarket.marketplace.application.dto.ListingResponse;
 import org.uce.campusmarket.marketplace.domain.model.Category;
 import org.uce.campusmarket.marketplace.domain.model.Listing;
+import org.uce.campusmarket.marketplace.domain.model.ListingImage;
 import org.uce.campusmarket.marketplace.domain.repository.CategoryRepository;
 import org.uce.campusmarket.marketplace.domain.repository.ListingRepository;
 import org.uce.campusmarket.marketplace.domain.valueobject.ListingDescription;
 import org.uce.campusmarket.marketplace.domain.valueobject.ListingTitle;
 import org.uce.campusmarket.marketplace.domain.valueobject.Price;
+import org.uce.campusmarket.marketplace.infrastructure.storage.SupabaseStorageService;
 import org.uce.campusmarket.shared.exception.DomainException;
+import org.uce.campusmarket.marketplace.application.dto.ListingImageResponse;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class CreateListingUseCase {
 
     private final ListingRepository listingRepository;
     private final CategoryRepository categoryRepository;
-
-    public CreateListingUseCase(ListingRepository listingRepository, CategoryRepository categoryRepository) {
-        this.listingRepository = listingRepository;
-        this.categoryRepository = categoryRepository;
-    }
+    private final SupabaseStorageService storageService;
 
     public ListingResponse execute(CreateListingRequest request) {
-        Category category = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new DomainException("La categoría especificada no existe"));
 
-        ListingTitle title = new ListingTitle(request.getTitle());
-        ListingDescription description = new ListingDescription(request.getDescription());
-        Price price = Price.of(request.getPrice());
+        Category category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() ->
+                        new DomainException("La categoría especificada no existe"));
 
         Listing newListing = new Listing(
                 UUID.randomUUID(),
-                title,
-                description,
-                price,
+                new ListingTitle(request.getTitle()),
+                new ListingDescription(request.getDescription()),
+                Price.of(request.getPrice()),
                 category,
                 request.getOwnerId()
         );
+
+        List<MultipartFile> images = request.getImages();
+
+        if (images != null && !images.isEmpty()) {
+
+            for (int i = 0; i < images.size(); i++) {
+
+                MultipartFile file = images.get(i);
+
+                String imageUrl = storageService.upload(file);
+
+                ListingImage listingImage = new ListingImage(
+                        UUID.randomUUID(),
+                        imageUrl,
+                        i == 0
+                );
+
+                newListing.addImage(listingImage);
+            }
+        }
 
         if (request.isPublish()) {
             newListing.publish();
         }
 
         Listing savedListing = listingRepository.save(newListing);
+
+        List<ListingImageResponse> imageResponses = savedListing.getImages()
+                .stream()
+                .map(img -> new ListingImageResponse(
+                        img.getUrl(),
+                        img.isThumbnail()
+                ))
+                .toList();
 
         return new ListingResponse(
                 savedListing.getId(),
@@ -58,7 +87,8 @@ public class CreateListingUseCase {
                 savedListing.getCategory().getName(),
                 savedListing.getOwnerId(),
                 savedListing.getStatus().name(),
-                savedListing.getCreatedAt()
+                savedListing.getCreatedAt(),
+                imageResponses
         );
     }
 }
