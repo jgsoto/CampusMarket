@@ -25,6 +25,7 @@ public class Listing {
     private UUID ownerId;
     private ListingStatus status;
     private LocalDateTime createdAt;
+    private Long version;
     private List<ListingImage> images = new ArrayList<>();
 
     public Listing(UUID id, ListingTitle title, ListingDescription description, Price price, 
@@ -61,9 +62,12 @@ public class Listing {
         this.images.add(image);
     }
 
-    public void markAsSold() {
+    public void markAsSold(UUID buyerId) {
         if (this.status != ListingStatus.PUBLICADA) {
-            throw new DomainException("Solo se pueden marcar como vendidas las publicaciones publicadas");
+            throw new DomainException("Solo se pueden comprar productos que estén publicados");
+        }
+        if (this.ownerId.equals(buyerId)) {
+            throw new DomainException("No puedes comprar tu propio producto");
         }
         this.status = ListingStatus.VENDIDO;
     }

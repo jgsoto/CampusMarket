@@ -42,11 +42,14 @@ public class ListingJpaEntity {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    @Version
+    private Long version;
+
     @OneToMany(
+            mappedBy = "listing",
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    @JoinColumn(name = "listing_id")
     @Builder.Default
     private List<ListingImageJpaEntity> images = new ArrayList<>();
 }
