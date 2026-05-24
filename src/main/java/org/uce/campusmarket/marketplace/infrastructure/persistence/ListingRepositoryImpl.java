@@ -23,6 +23,34 @@ public class ListingRepositoryImpl implements ListingRepository {
 
     @Override
     public Listing save(Listing listing) {
+        // Si el registro ya existe, actualizamos sus campos en la entidad
+        // gestionada por JPA para no perder el tracking de imágenes (orphanRemoval)
+        Optional<ListingJpaEntity> existing = jpaListingRepository.findById(listing.getId());
+
+        if (existing.isPresent()) {
+            ListingJpaEntity managed = existing.get();
+            ListingJpaEntity updated = listingMapper.toEntity(listing);
+
+            // Actualizar solo los campos editables
+            managed.setTitle(updated.getTitle());
+            managed.setDescription(updated.getDescription());
+            managed.setPrice(updated.getPrice());
+            managed.setStatus(updated.getStatus());
+
+            // Solo reemplazar imágenes si la nueva lista no está vacía
+            if (updated.getImages() != null && !updated.getImages().isEmpty()) {
+                managed.getImages().clear();
+                for (ListingImageJpaEntity img : updated.getImages()) {
+                    img.setListing(managed);
+                    managed.getImages().add(img);
+                }
+            }
+
+            ListingJpaEntity saved = jpaListingRepository.save(managed);
+            return listingMapper.toDomain(saved);
+        }
+
+        // Si es nuevo, lo creamos normalmente
         ListingJpaEntity entity = listingMapper.toEntity(listing);
         ListingJpaEntity saved = jpaListingRepository.save(entity);
         return listingMapper.toDomain(saved);

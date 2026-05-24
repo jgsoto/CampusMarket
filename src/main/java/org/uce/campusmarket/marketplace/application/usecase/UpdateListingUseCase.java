@@ -46,17 +46,28 @@ public class UpdateListingUseCase {
         listing.updateDetails(newTitle, newDescription, newPrice);
 
         List<MultipartFile> newImages = request.getImages();
-        if (newImages != null && !newImages.isEmpty()) {
-            listing.getImages().clear(); // Reemplaza las anteriores
+        boolean hasRealFiles = newImages != null && newImages.stream().anyMatch(f -> !f.isEmpty());
+
+        if (hasRealFiles) {
+            // 1. Eliminar las imágenes viejas del storage de Supabase
+            //    antes de reemplazarlas, para no dejar archivos huérfanos
+            listing.getImages().forEach(img -> storageService.delete(img.getUrl()));
+
+            // 2. Limpiar las referencias en la base de datos
+            listing.getImages().clear();
+
+            // 3. Subir las nuevas imágenes y registrarlas
             for (int i = 0; i < newImages.size(); i++) {
                 MultipartFile file = newImages.get(i);
-                String imageUrl = storageService.upload(file);
-                ListingImage listingImage = new ListingImage(
-                        UUID.randomUUID(),
-                        imageUrl,
-                        i == 0
-                );
-                listing.addImage(listingImage);
+                if (!file.isEmpty()) {
+                    String imageUrl = storageService.upload(file);
+                    ListingImage listingImage = new ListingImage(
+                            UUID.randomUUID(),
+                            imageUrl,
+                            i == 0
+                    );
+                    listing.addImage(listingImage);
+                }
             }
         }
 
