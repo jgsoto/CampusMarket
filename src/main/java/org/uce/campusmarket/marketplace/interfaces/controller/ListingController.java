@@ -16,6 +16,7 @@ import org.uce.campusmarket.marketplace.application.usecase.DeleteListingUseCase
 import org.uce.campusmarket.marketplace.application.usecase.GetMyListingsUseCase;
 import org.uce.campusmarket.marketplace.application.usecase.PublishListingUseCase;
 import org.uce.campusmarket.marketplace.application.usecase.UpdateListingUseCase;
+import org.uce.campusmarket.marketplace.application.usecase.GetListingUseCase;
 
 import java.util.List;
 import java.util.UUID;
@@ -31,6 +32,7 @@ public class ListingController {
     private final DeleteListingUseCase deleteListingUseCase;
     private final GetMyListingsUseCase getMyListingsUseCase;
     private final PublishListingUseCase publishListingUseCase;
+    private final GetListingUseCase getListingUseCase;
 
     @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<ListingResponse> createListing(
@@ -61,6 +63,12 @@ public class ListingController {
         List<ListingResponse> response =
                 browseListingsUseCase.execute();
 
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ListingResponse> getListing(@PathVariable UUID id) {
+        ListingResponse response = getListingUseCase.execute(id);
         return ResponseEntity.ok(response);
     }
 

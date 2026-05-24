@@ -81,6 +81,23 @@ async function loadCatalog() {
                 <p style="margin: 0; font-size: 12px; color: #888;">
                     Estado: ${listing.status}
                 </p>
+
+                <button
+                    onclick="window.location.href='/product-details.html?id=${listing.id}'"
+                    style="
+                        margin-top: 10px;
+                        padding: 8px;
+                        background-color: #007bff;
+                        color: white;
+                        border: none;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        width: 100%;
+                        font-weight: bold;
+                    "
+                >
+                    Ver Producto
+                </button>
             `;
 
             container.appendChild(card);
