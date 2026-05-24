@@ -60,10 +60,12 @@ async function loadMyListings() {
                 <p style="font-weight: bold; color: ${statusColor}; margin: 2px 0;">ESTADO: ${listing.status}</p>
                 
                 <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
-                    <button onclick="openEditModal('${listing.id}', '${listing.title.replace(/'/g, "\\'").replace(/\n/g, ' ')}', '${listing.description.replace(/'/g, "\\'").replace(/\n/g, '\\n').replace(/\r/g, '')}', ${listing.price})" style="background: #ffc107; border: none; padding: 8px; border-radius: 4px; cursor: pointer; flex: 1;">Editar</button>
-                    ${listing.status === "BORRADOR" ? `<button onclick="publishListing('${listing.id}')" style="background: #28a745; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; flex: 1;">Publicar</button>` : ""}
+                    ${listing.status !== 'VENDIDO' ? `<button onclick="openEditModal('${listing.id}', '${listing.title.replace(/'/g, "\\'").replace(/\n/g, ' ')}', '${listing.description.replace(/'/g, "\\'").replace(/\n/g, '\\n').replace(/\r/g, '')}', ${listing.price})" style="background: #ffc107; border: none; padding: 8px; border-radius: 4px; cursor: pointer; flex: 1;">Editar</button>` : ''}
+                    ${listing.status === 'BORRADOR' ? `<button onclick="publishListing('${listing.id}')" style="background: #28a745; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; flex: 1;">Publicar</button>` : ''}
+                    ${listing.status === 'VENDIDO' ? `<span style="background: #6c757d; color: white; padding: 8px; border-radius: 4px; flex: 1; text-align: center; font-size: 13px;">✅ Vendido</span>` : ''}
                     <button onclick="deleteListing('${listing.id}')" style="background: #dc3545; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; flex: 1;">Eliminar</button>
                 </div>
+
             `;
             container.appendChild(card);
         });

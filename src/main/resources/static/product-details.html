@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CampusMarket | Detalles del Producto</title>
     <link rel="stylesheet" href="/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
     <div class="container" style="max-width: 800px; margin: auto; padding: 20px;">
@@ -20,54 +21,6 @@
         </div>
     </div>
 
-    <script>
-        window.addEventListener("load", async () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const productId = urlParams.get('id');
-
-            if (!productId) {
-                document.getElementById('product-details-container').innerHTML = "<p style='color:red;'>ID de producto no proporcionado.</p>";
-                return;
-            }
-
-            try {
-                // Hacer la petición GET al endpoint recién creado
-                const response = await fetch(`http://localhost:8080/api/listings/${productId}`);
-                if (!response.ok) {
-                    throw new Error("Producto no encontrado o error en el servidor");
-                }
-                const product = await response.json();
-
-                const container = document.getElementById('product-details-container');
-                
-                // Procesar la imagen principal o una por defecto
-                const imageUrl = product.images && product.images.length > 0
-                    ? product.images[0].url
-                    : "https://via.placeholder.com/600x400?text=Sin+Imagen";
-
-                // Renderizar los detalles completos del producto
-                container.innerHTML = `
-                    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
-                        <div style="flex: 1; min-width: 300px;">
-                            <img src="${imageUrl}" alt="${product.title}" style="width: 100%; border-radius: 8px; object-fit: cover; max-height: 400px;">
-                        </div>
-                        <div style="flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 15px;">
-                            <h2 style="margin: 0;">${product.title}</h2>
-                            <p style="margin: 0; color: gray; font-size: 16px;">Categoría: ${product.categoryName}</p>
-                            <h1 style="margin: 0; color: #28a745;">$${product.price.toFixed(2)}</h1>
-                            <p style="font-size: 14px; color: #555; background: #fff; padding: 10px; border-radius: 5px; border: 1px solid #ddd;">${product.description}</p>
-                            <p style="margin: 0; font-size: 14px; color: #888;">Estado: <strong>${product.status}</strong></p>
-                            <p style="margin: 0; font-size: 12px; color: #aaa;">Publicado el: ${new Date(product.createdAt).toLocaleString()}</p>
-                        </div>
-                    </div>
-                `;
-            } catch (error) {
-                console.error(error);
-                document.getElementById('product-details-container').innerHTML = `
-                    <p style="color:red;">Error al cargar el producto. ${error.message}</p>
-                `;
-            }
-        });
-    </script>
+    <script src="/js/product-details.js"></script>
 </body>
 </html>
