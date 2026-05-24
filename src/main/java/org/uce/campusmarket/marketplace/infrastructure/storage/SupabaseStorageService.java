@@ -15,69 +15,98 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class SupabaseStorageService {
 
-    @Value("${supabase.url}")
-    private String supabaseUrl;
+        @Value("${supabase.url}")
+        private String supabaseUrl;
 
-    @Value("${supabase.bucket}")
-    private String bucket;
+        @Value("${supabase.bucket}")
+        private String bucket;
 
-    @Value("${supabase.key}")
-    private String supabaseKey;
+        @Value("${supabase.key}")
+        private String supabaseKey;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+        private final RestTemplate restTemplate = new RestTemplate();
 
-    public String upload(MultipartFile file) {
+        public String upload(MultipartFile file) {
 
-        try {
+                try {
 
-            String fileName = UUID.randomUUID() + "-" + file.getOriginalFilename();
+                        String fileName = UUID.randomUUID() + "-" + file.getOriginalFilename();
 
-            String uploadUrl =
-                    supabaseUrl +
-                            "/storage/v1/object/" +
-                            bucket +
-                            "/" +
-                            fileName;
+                        String uploadUrl = supabaseUrl +
+                                        "/storage/v1/object/" +
+                                        bucket +
+                                        "/" +
+                                        fileName;
 
-            HttpHeaders headers = new HttpHeaders();
+                        HttpHeaders headers = new HttpHeaders();
 
-            headers.setContentType(MediaType.parseMediaType(
-                    file.getContentType()
-            ));
+                        headers.setContentType(MediaType.parseMediaType(
+                                        file.getContentType()));
 
-            headers.setBearerAuth(supabaseKey);
+                        headers.setBearerAuth(supabaseKey);
 
-            headers.set("apikey", supabaseKey);
+                        headers.set("apikey", supabaseKey);
 
-            HttpEntity<byte[]> entity = new HttpEntity<>(
-                    file.getBytes(),
-                    headers
-            );
+                        HttpEntity<byte[]> entity = new HttpEntity<>(
+                                        file.getBytes(),
+                                        headers);
 
-            ResponseEntity<String> response = restTemplate.exchange(
-                    uploadUrl,
-                    HttpMethod.POST,
-                    entity,
-                    String.class
-            );
+                        ResponseEntity<String> response = restTemplate.exchange(
+                                        uploadUrl,
+                                        HttpMethod.POST,
+                                        entity,
+                                        String.class);
 
-            if (!response.getStatusCode().is2xxSuccessful()) {
-                throw new DomainException(
-                        "Error al subir imagen a Supabase"
-                );
-            }
+                        if (!response.getStatusCode().is2xxSuccessful()) {
+                                throw new DomainException(
+                                                "Error al subir imagen a Supabase");
+                        }
 
-            return supabaseUrl +
-                    "/storage/v1/object/public/" +
-                    bucket +
-                    "/" +
-                    fileName;
+                        return supabaseUrl +
+                                        "/storage/v1/object/public/" +
+                                        bucket +
+                                        "/" +
+                                        fileName;
 
-        } catch (IOException e) {
+                } catch (IOException e) {
 
-            throw new DomainException(
-                    "No se pudo procesar la imagen"
-            );
+                        throw new DomainException(
+                                        "No se pudo procesar la imagen");
+                }
         }
-    }
+
+        public void delete(String publicUrl) {
+                try {
+                        // Extraer el nombre del archivo desde la URL pública
+                        // URL pública: {supabaseUrl}/storage/v1/object/public/{bucket}/{fileName}
+                        String prefix = supabaseUrl + "/storage/v1/object/public/" + bucket + "/";
+                        String fileName = publicUrl.replace(prefix, "");
+
+                        // El endpoint correcto de Supabase para borrar archivos es:
+                        // DELETE /storage/v1/object/{bucket}
+                        // con un cuerpo JSON: { "prefixes": ["nombreDelArchivo"] }
+                        String deleteUrl = supabaseUrl + "/storage/v1/object/" + bucket;
+
+                        HttpHeaders headers = new HttpHeaders();
+                        headers.setContentType(MediaType.APPLICATION_JSON);
+                        headers.setBearerAuth(supabaseKey);
+                        headers.set("apikey", supabaseKey);
+
+                        // Construir el body JSON manualmente
+                        String body = "{\"prefixes\": [\"" + fileName + "\"]}";
+
+                        HttpEntity<String> entity = new HttpEntity<>(body, headers);
+
+                        restTemplate.exchange(
+                                        deleteUrl,
+                                        HttpMethod.DELETE,
+                                        entity,
+                                        String.class);
+
+                        System.out.println("Imagen eliminada de Supabase: " + fileName);
+
+                } catch (Exception e) {
+                        System.err.println("Advertencia: no se pudo eliminar la imagen de Supabase: " + e.getMessage());
+                }
+        }
 }
