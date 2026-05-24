@@ -9,8 +9,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.uce.campusmarket.marketplace.application.dto.CreateListingRequest;
 import org.uce.campusmarket.marketplace.application.dto.ListingResponse;
 import org.uce.campusmarket.marketplace.application.dto.UpdateListingRequest;
+import org.uce.campusmarket.marketplace.application.dto.CheckoutResponse;
 
 import org.uce.campusmarket.marketplace.application.usecase.BrowseListingsUseCase;
+import org.uce.campusmarket.marketplace.application.usecase.CheckoutUseCase;
 import org.uce.campusmarket.marketplace.application.usecase.CreateListingUseCase;
 import org.uce.campusmarket.marketplace.application.usecase.DeleteListingUseCase;
 import org.uce.campusmarket.marketplace.application.usecase.GetMyListingsUseCase;
@@ -33,6 +35,7 @@ public class ListingController {
     private final GetMyListingsUseCase getMyListingsUseCase;
     private final PublishListingUseCase publishListingUseCase;
     private final GetListingUseCase getListingUseCase;
+    private final CheckoutUseCase checkoutUseCase;
 
     @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<ListingResponse> createListing(
@@ -103,5 +106,18 @@ public class ListingController {
         publishListingUseCase.execute(id, ownerId);
 
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{id}/purchase")
+    public ResponseEntity<CheckoutResponse> purchaseListing(
+            @PathVariable UUID id,
+            @RequestHeader("X-User-Id") UUID buyerId
+    ) {
+        CheckoutResponse response = checkoutUseCase.execute(id, buyerId);
+        if (response.isSuccess()) {
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.badRequest().body(response);
+        }
     }
 }
