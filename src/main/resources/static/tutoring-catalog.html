@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CampusMarket | Catálogo de Tutorías</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <script async crossorigin="anonymous"
+        data-clerk-publishable-key="pk_test_ZnVubnktbXVza294LTU5LmNsZXJrLmFjY291bnRzLmRldiQ"
+        src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@4/dist/clerk.browser.js">
+        </script>
+</head>
+<body>
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h1 style="margin: 0;">📚 Catálogo de Tutorías</h1>
+            <div>
+                <button onclick="window.location.href='/dashboard.html'"
+                    style="background: #6c757d; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-right: 10px;">
+                    Volver a Marketplace
+                </button>
+                <button onclick="window.location.href='/create-tutoring.html'"
+                    style="background: #6f42c1; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
+                    + Ofrecer Tutoría
+                </button>
+            </div>
+        </div>
+
+        <div id="tutoring-section">
+            <div id="tutoring-catalog" style="display: flex; gap: 15px; flex-wrap: wrap;">
+                <p>Cargando ofertas de tutoría...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/tutoring-catalog.js"></script>
+</body>
+</html>
