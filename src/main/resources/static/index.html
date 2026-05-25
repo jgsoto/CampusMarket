@@ -1,35 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>CampusMarket</title>
-
+    <title>CampusMarket UCE - Plataforma Académica Integral</title>
     <link rel="stylesheet" href="/css/styles.css">
 </head>
-
 <body>
 
-    <div class="container">
+    <main class="container">
+        <header class="main-header">
+            <h1>CampusMarket</h1>
+            <p class="text-muted">Portal de servicios modulares de la comunidad universitaria.</p>
+        </header>
 
-        <h1>CampusMarket</h1>
+        <section class="auth-navigation">
+            <a href="/modules/identity/signin.html" class="btn btn-primary">
+                Iniciar Sesión
+            </a>
 
-        <a href="/sign-in">
-            <button>
-                Sign In
-            </button>
-        </a>
-
-        <a href="/sign-up">
-            <button>
-                Sign Up
-            </button>
-        </a>
-
-    </div>
+            <a href="/modules/identity/signup.html" class="btn btn-outline">
+                Registrarse
+            </a>
+        </section>
+    </main>
 
 </body>
-
 </html>

@@ -4,7 +4,7 @@ window.addEventListener("load", async () => {
 
     if (!Clerk.user) {
 
-        window.location.href = "/sign-in.html";
+        window.location.href = "/modules/identity/signin.html";
 
         return;
     }

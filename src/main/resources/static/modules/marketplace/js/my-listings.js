@@ -2,7 +2,7 @@ window.addEventListener("load", async () => {
     await Clerk.load();
 
     if (!Clerk.user) {
-        window.location.href = "/sign-in.html";
+        window.location.href = "/modules/identity/signin.html";
         return;
     }
 
@@ -16,7 +16,7 @@ async function loadMyListings() {
     const ownerId = localStorage.getItem("campusMarketUserId");
 
     if (!ownerId) {
-        container.innerHTML = "<p style='color:red;'>Error: No se encontró la sesión local. Ve al Dashboard para sincronizar.</p>";
+        container.innerHTML = "<p style='color:red;'>Error: No se encontro la sesion local. Ve al Dashboard para sincronizar.</p>";
         return;
     }
 
@@ -33,7 +33,7 @@ async function loadMyListings() {
         container.innerHTML = "";
 
         if (listings.length === 0) {
-            container.innerHTML = "<p>No tienes publicaciones aún. ¡Crea una!</p>";
+            container.innerHTML = "<p>No tienes publicaciones aun. ¡Crea una!</p>";
             return;
         }
 
@@ -41,10 +41,8 @@ async function loadMyListings() {
             const card = document.createElement("div");
             card.style = "border: 1px solid #ccc; padding: 15px; border-radius: 8px; width: 250px; background: #fff;";
             
-            // Color de estado
             let statusColor = listing.status === "BORRADOR" ? "orange" : (listing.status === "PUBLICADA" ? "green" : "gray");
 
-            // Obtener miniatura o primera imagen
             const thumbnail = listing.images && listing.images.length > 0
                 ? listing.images.find(img => img.thumbnail)?.url || listing.images[0].url
                 : "/images/no-image.png";
@@ -54,7 +52,7 @@ async function loadMyListings() {
                     <img src="${thumbnail}" alt="${listing.title}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='https://placehold.co/250x150?text=Sin+Imagen'">
                 </div>
                 <h3 style="margin-top: 0; margin-bottom: 5px;">${listing.title}</h3>
-                <p style="color: gray; font-size: 14px; margin: 2px 0;">Categoría: ${listing.categoryName}</p>
+                <p style="color: gray; font-size: 14px; margin: 2px 0;">Categoria: ${listing.categoryName}</p>
                 <p style="margin: 8px 0; font-size: 14px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 40px;">${listing.description}</p>
                 <h2 style="color: #28a745; margin: 8px 0;">$${listing.price.toFixed(2)}</h2>
                 <p style="font-weight: bold; color: ${statusColor}; margin: 2px 0;">ESTADO: ${listing.status}</p>
@@ -63,10 +61,9 @@ async function loadMyListings() {
                     ${listing.status !== 'VENDIDO' ? `<button onclick="openEditModal('${listing.id}', '${listing.title.replace(/'/g, "\\'").replace(/\n/g, ' ')}', '${listing.description.replace(/'/g, "\\'").replace(/\n/g, '\\n').replace(/\r/g, '')}', ${listing.price})" style="background: #ffc107; border: none; padding: 8px; border-radius: 4px; cursor: pointer; flex: 1;">Editar</button>` : ''}
                     ${listing.status === 'BORRADOR' ? `<button onclick="publishListing('${listing.id}')" style="background: #28a745; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; flex: 1;">Publicar</button>` : ''}
                     ${listing.status === 'PUBLICADA' ? `<button onclick="markAsSold('${listing.id}')" style="background: #6f42c1; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; flex: 1;">Marcar Vendido</button>` : ''}
-                    ${listing.status === 'VENDIDO' ? `<span style="background: #6c757d; color: white; padding: 8px; border-radius: 4px; flex: 1; text-align: center; font-size: 13px;">✅ Vendido</span>` : ''}
+                    ${listing.status === 'VENDIDO' ? `<span style="background: #6c757d; color: white; padding: 8px; border-radius: 4px; flex: 1; text-align: center; font-size: 13px;">Vendido</span>` : ''}
                     <button onclick="deleteListing('${listing.id}')" style="background: #dc3545; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; flex: 1;">Eliminar</button>
                 </div>
-
             `;
             container.appendChild(card);
         });
@@ -121,23 +118,22 @@ async function handleEditSubmit(e) {
         });
 
         if (response.ok) {
-            alert("Publicación actualizada con éxito");
+            alert("Publicacion actualizada con exito");
             closeEditModal();
-            // Resetear input de imágenes
             imagesInput.value = "";
-            loadMyListings(); // Recargar lista
+            loadMyListings();
         } else {
             const err = await response.json();
             alert("Error: " + err.message);
         }
     } catch (error) {
         console.error(error);
-        alert("Error de conexión al actualizar.");
+        alert("Error de conexion al actualizar.");
     }
 }
 
 async function deleteListing(id) {
-    if (!confirm("¿Estás seguro de que quieres eliminar esta publicación?")) return;
+    if (!confirm("¿Estas seguro de que quieres eliminar esta publicacion?")) return;
 
     const ownerId = localStorage.getItem("campusMarketUserId");
 
@@ -150,20 +146,20 @@ async function deleteListing(id) {
         });
 
         if (response.ok) {
-            alert("Publicación eliminada correctamente.");
-            loadMyListings(); // Recargar lista
+            alert("Publicacion eliminada correctamente.");
+            loadMyListings();
         } else {
             const err = await response.json();
             alert("Error: " + err.message);
         }
     } catch (error) {
         console.error(error);
-        alert("Error de conexión al eliminar.");
+        alert("Error de conexion al eliminar.");
     }
 }
 
 async function publishListing(id) {
-    if (!confirm("¿Quieres publicar esta publicación ahora?")) return;
+    if (!confirm("¿Quieres publicar esta publicacion ahora?")) return;
 
     const ownerId = localStorage.getItem("campusMarketUserId");
 
@@ -176,20 +172,20 @@ async function publishListing(id) {
         });
 
         if (response.ok) {
-            alert("¡Publicación publicada con éxito!");
-            loadMyListings(); // Recargar lista
+            alert("¡Publicacion publicada con exito!");
+            loadMyListings();
         } else {
             const err = await response.json();
             alert("Error: " + err.message);
         }
     } catch (error) {
         console.error(error);
-        alert("Error de conexión al publicar.");
+        alert("Error de conexion al publicar.");
     }
 }
 
 async function markAsSold(id) {
-    if (!confirm("¿Estás seguro de marcar este producto como VENDIDO? Esta acción no se puede deshacer.")) return;
+    if (!confirm("¿Estas seguro de marcar este producto como VENDIDO? Esta accon no se puede deshacer.")) return;
 
     const ownerId = localStorage.getItem("campusMarketUserId");
 
@@ -203,13 +199,13 @@ async function markAsSold(id) {
 
         if (response.ok) {
             alert("¡Producto marcado como vendido exitosamente!");
-            loadMyListings(); // Recargar lista
+            loadMyListings();
         } else {
             const err = await response.json();
             alert("Error: " + err.message);
         }
     } catch (error) {
         console.error(error);
-        alert("Error de conexión.");
+        alert("Error de conexion.");
     }
 }

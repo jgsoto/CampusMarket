@@ -2,7 +2,7 @@ window.addEventListener("load", async () => {
     const userId = localStorage.getItem("campusMarketUserId");
     if (!userId) {
         Swal.fire("Inicia sesión", "Debes iniciar sesión para ver tu perfil.", "warning")
-            .then(() => window.location.href = "/sign-in.html");
+            .then(() => window.location.href = "/modules/identity/signin.html");
         return;
     }
 

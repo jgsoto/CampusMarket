@@ -2,9 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>CampusMarket | Sign In</title>
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>CampusMarket | Sign Up</title>
 
     <link rel="stylesheet" href="/css/styles.css">
 
@@ -21,7 +25,7 @@
 
     <h1>CampusMarket</h1>
 
-    <div id="sign-in"></div>
+    <div id="sign-up"></div>
 
 </div>
 
@@ -38,16 +42,16 @@
             return;
         }
 
-        Clerk.mountSignIn(
-            document.getElementById("sign-in"),
+        Clerk.mountSignUp(
+            document.getElementById("sign-up"),
             {
                 routing: "path",
 
-                path: "/sign-in",
+                path: "/modules/identity/signup.html",
 
-                signUpUrl: "/sign-up",
+                signInUrl: "/modules/identity/signin.html",
 
-                afterSignInUrl: "/dashboard",
+                afterSignUpUrl: "/modules/marketplace/dashboard.html",
 
                 appearance: {
                     elements: {
