@@ -1,7 +1,10 @@
 package org.uce.campusmarket.marketplace.application.usecase;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.uce.campusmarket.identity.domain.model.User;
+import org.uce.campusmarket.identity.domain.repository.UserRepository;
 import org.uce.campusmarket.marketplace.application.dto.ListingImageResponse;
 import org.uce.campusmarket.marketplace.application.dto.ListingResponse;
 import org.uce.campusmarket.marketplace.domain.model.Listing;
@@ -12,18 +15,19 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class GetListingUseCase {
 
     private final ListingRepository listingRepository;
-
-    public GetListingUseCase(ListingRepository listingRepository) {
-        this.listingRepository = listingRepository;
-    }
+    private final UserRepository userRepository;
 
     public ListingResponse execute(UUID listingId) {
         Listing listing = listingRepository.findById(listingId)
                 .orElseThrow(() -> new DomainException("La publicación no existe"));
+
+        User seller = userRepository.findById(listing.getOwnerId())
+                .orElse(null);
 
         List<ListingImageResponse> images = listing.getImages()
                 .stream()
@@ -42,7 +46,12 @@ public class GetListingUseCase {
                 listing.getOwnerId(),
                 listing.getStatus().name(),
                 listing.getCreatedAt(),
-                images
+                images,
+                seller != null ? seller.getFullName() : "Desconocido",
+                seller != null ? seller.getEmail() : "No disponible",
+                seller != null ? seller.getPhone() : "No disponible",
+                seller != null ? seller.getAddress() : "No disponible",
+                seller != null ? seller.getSocialMedia() : "No disponible"
         );
     }
 }

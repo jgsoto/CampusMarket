@@ -9,16 +9,14 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.uce.campusmarket.marketplace.application.dto.CreateListingRequest;
 import org.uce.campusmarket.marketplace.application.dto.ListingResponse;
 import org.uce.campusmarket.marketplace.application.dto.UpdateListingRequest;
-import org.uce.campusmarket.marketplace.application.dto.CheckoutResponse;
-
 import org.uce.campusmarket.marketplace.application.usecase.BrowseListingsUseCase;
-import org.uce.campusmarket.marketplace.application.usecase.CheckoutUseCase;
 import org.uce.campusmarket.marketplace.application.usecase.CreateListingUseCase;
 import org.uce.campusmarket.marketplace.application.usecase.DeleteListingUseCase;
 import org.uce.campusmarket.marketplace.application.usecase.GetMyListingsUseCase;
 import org.uce.campusmarket.marketplace.application.usecase.PublishListingUseCase;
 import org.uce.campusmarket.marketplace.application.usecase.UpdateListingUseCase;
 import org.uce.campusmarket.marketplace.application.usecase.GetListingUseCase;
+import org.uce.campusmarket.marketplace.application.usecase.MarkListingAsSoldUseCase;
 
 import java.util.List;
 import java.util.UUID;
@@ -35,7 +33,7 @@ public class ListingController {
     private final GetMyListingsUseCase getMyListingsUseCase;
     private final PublishListingUseCase publishListingUseCase;
     private final GetListingUseCase getListingUseCase;
-    private final CheckoutUseCase checkoutUseCase;
+    private final MarkListingAsSoldUseCase markListingAsSoldUseCase;
 
     @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<ListingResponse> createListing(
@@ -108,16 +106,12 @@ public class ListingController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/{id}/purchase")
-    public ResponseEntity<CheckoutResponse> purchaseListing(
+    @PostMapping("/{id}/mark-sold")
+    public ResponseEntity<Void> markAsSold(
             @PathVariable UUID id,
-            @RequestHeader("X-User-Id") UUID buyerId
+            @RequestHeader("X-User-Id") UUID ownerId
     ) {
-        CheckoutResponse response = checkoutUseCase.execute(id, buyerId);
-        if (response.isSuccess()) {
-            return ResponseEntity.ok(response);
-        } else {
-            return ResponseEntity.badRequest().body(response);
-        }
+        markListingAsSoldUseCase.execute(id, ownerId);
+        return ResponseEntity.ok().build();
     }
 }

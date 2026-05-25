@@ -42,7 +42,7 @@ window.addEventListener("load", async () => {
             </div>
         `;
 
-        // Logica del botón de compra
+        // Logica del botón de compra/contacto
         const actionContainer = document.getElementById("purchase-action-container");
         const currentUserId = localStorage.getItem("campusMarketUserId");
 
@@ -51,15 +51,16 @@ window.addEventListener("load", async () => {
         } else if (product.ownerId === currentUserId) {
             actionContainer.innerHTML = `<span style="background: #17a2b8; color: white; padding: 8px 15px; border-radius: 5px; font-weight: bold;">Tu publicación</span>`;
         } else if (product.status === "PUBLICADA") {
-            const buyBtn = document.createElement("button");
-            buyBtn.textContent = "Comprar Ahora";
-            buyBtn.style = "background: #28a745; color: white; padding: 12px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; width: 100%; transition: background 0.3s;";
-            buyBtn.onmouseover = () => buyBtn.style.background = "#218838";
-            buyBtn.onmouseout = () => buyBtn.style.background = "#28a745";
-            
-            // Redirigir a la página de checkout
-            buyBtn.onclick = () => window.location.href = `/checkout.html?id=${productId}`;
-            actionContainer.appendChild(buyBtn);
+            actionContainer.innerHTML = `
+                <div style="background: #e9ecef; padding: 15px; border-radius: 8px; margin-top: 10px;">
+                    <h3 style="margin-top: 0;">Contactar al Vendedor</h3>
+                    <p style="margin: 5px 0;"><strong>Vendedor:</strong> ${product.sellerName || 'Desconocido'}</p>
+                    <p style="margin: 5px 0;"><strong>Email:</strong> ${product.sellerEmail || 'No disponible'}</p>
+                    <p style="margin: 5px 0;"><strong>Teléfono:</strong> ${product.sellerPhone || 'No disponible'}</p>
+                    <p style="margin: 5px 0;"><strong>Ubicación:</strong> ${product.sellerAddress || 'No disponible'}</p>
+                    <p style="margin: 5px 0;"><strong>Redes:</strong> ${product.sellerSocialMedia || 'No disponible'}</p>
+                </div>
+            `;
         }
 
     } catch (error) {
@@ -69,63 +70,3 @@ window.addEventListener("load", async () => {
         `;
     }
 });
-
-async function handlePurchase(productId, userId) {
-    if (!userId) {
-        Swal.fire("Inicia sesión", "Debes iniciar sesión para comprar.", "warning")
-            .then(() => window.location.href = "/sign-in.html");
-        return;
-    }
-
-    // Confirmación inicial
-    const confirm = await Swal.fire({
-        title: '¿Confirmar compra?',
-        text: "Serás redirigido a la pasarela de pagos.",
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#28a745',
-        cancelButtonColor: '#6c757d',
-        confirmButtonText: 'Sí, continuar',
-        cancelButtonText: 'Cancelar'
-    });
-
-    if (!confirm.isConfirmed) return;
-
-    // Simulación de carga (pasarela)
-    Swal.fire({
-        title: 'Procesando pago...',
-        text: 'Simulando comunicación con el banco. Por favor espera.',
-        allowOutsideClick: false,
-        didOpen: () => {
-            Swal.showLoading();
-        }
-    });
-
-    try {
-        const response = await fetch(`http://localhost:8080/api/listings/${productId}/purchase`, {
-            method: "POST",
-            headers: {
-                "X-User-Id": userId,
-                "Content-Type": "application/json"
-            }
-        });
-
-        const data = await response.json();
-
-        if (response.ok && data.success) {
-            Swal.fire({
-                title: '¡Pago Exitoso!',
-                text: 'Transacción: ' + data.transactionId,
-                icon: 'success',
-                confirmButtonText: 'Aceptar'
-            }).then(() => {
-                window.location.reload(); // Recargar para mostrar como VENDIDO
-            });
-        } else {
-            Swal.fire('Pago Rechazado', data.message || 'Fondos insuficientes.', 'error');
-        }
-    } catch (error) {
-        console.error("Error en purchase:", error);
-        Swal.fire('Error', 'Hubo un problema de conexión al procesar el pago.', 'error');
-    }
-}

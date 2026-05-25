@@ -88,7 +88,8 @@ public class CreateListingUseCase {
                 savedListing.getOwnerId(),
                 savedListing.getStatus().name(),
                 savedListing.getCreatedAt(),
-                imageResponses
+                imageResponses,
+                null, null, null, null, null
         );
     }
 }

@@ -62,12 +62,9 @@ public class Listing {
         this.images.add(image);
     }
 
-    public void markAsSold(UUID buyerId) {
+    public void markAsSold() {
         if (this.status != ListingStatus.PUBLICADA) {
-            throw new DomainException("Solo se pueden comprar productos que estén publicados");
-        }
-        if (this.ownerId.equals(buyerId)) {
-            throw new DomainException("No puedes comprar tu propio producto");
+            throw new DomainException("Solo se pueden marcar como vendidos los productos que estén publicados");
         }
         this.status = ListingStatus.VENDIDO;
     }

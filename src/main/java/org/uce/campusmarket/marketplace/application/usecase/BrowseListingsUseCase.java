@@ -26,8 +26,8 @@ public class BrowseListingsUseCase {
 
         return listings.stream()
                 .filter(listing ->
-                        listing.getStatus()
-                                == org.uce.campusmarket.marketplace.domain.model.ListingStatus.PUBLICADA
+                        listing.getStatus() == org.uce.campusmarket.marketplace.domain.model.ListingStatus.PUBLICADA ||
+                        listing.getStatus() == org.uce.campusmarket.marketplace.domain.model.ListingStatus.VENDIDO
                 )
                 .map(listing -> {
 
@@ -48,7 +48,8 @@ public class BrowseListingsUseCase {
                             listing.getOwnerId(),
                             listing.getStatus().name(),
                             listing.getCreatedAt(),
-                            images
+                            images,
+                            null, null, null, null, null
                     );
                 })
                 .collect(Collectors.toList());

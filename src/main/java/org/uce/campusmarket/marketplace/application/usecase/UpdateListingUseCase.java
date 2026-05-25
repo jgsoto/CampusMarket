@@ -90,7 +90,8 @@ public class UpdateListingUseCase {
                 updatedListing.getOwnerId(),
                 updatedListing.getStatus().name(),
                 updatedListing.getCreatedAt(),
-                images
+                images,
+                null, null, null, null, null
         );
     }
 }

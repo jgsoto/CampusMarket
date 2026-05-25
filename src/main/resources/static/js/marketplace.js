@@ -49,36 +49,45 @@ async function loadCatalog() {
                     ? listing.images[0].url
                     : "https://via.placeholder.com/300x200?text=Sin+Imagen";
 
+            const isSold = listing.status === "VENDIDO";
+            const opacity = isSold ? "0.6" : "1";
+            const badge = isSold 
+                ? `<div style="position: absolute; top: 10px; right: 10px; background: red; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold; font-size: 12px; z-index: 10;">AGOTADO</div>` 
+                : "";
+
             card.innerHTML = `
+                <div style="position: relative; width: 100%; height: 200px;">
+                    ${badge}
+                    <img
+                        src="${imageUrl}"
+                        alt="${listing.title}"
+                        style="
+                            width: 100%;
+                            height: 100%;
+                            object-fit: cover;
+                            border-radius: 8px;
+                            opacity: ${opacity};
+                        "
+                    >
+                </div>
 
-                <img
-                    src="${imageUrl}"
-                    alt="${listing.title}"
-                    style="
-                        width: 100%;
-                        height: 200px;
-                        object-fit: cover;
-                        border-radius: 8px;
-                    "
-                >
-
-                <h3 style="margin: 0;">
+                <h3 style="margin: 0; opacity: ${opacity};">
                     ${listing.title}
                 </h3>
 
-                <p style="margin: 0; color: gray; font-size: 14px;">
+                <p style="margin: 0; color: gray; font-size: 14px; opacity: ${opacity};">
                     Categoría: ${listing.categoryName}
                 </p>
 
-                <p style="margin: 0;">
+                <p style="margin: 0; opacity: ${opacity};">
                     ${listing.description}
                 </p>
 
-                <h2 style="margin: 0; color: #28a745;">
+                <h2 style="margin: 0; color: #28a745; opacity: ${opacity};">
                     $${listing.price.toFixed(2)}
                 </h2>
 
-                <p style="margin: 0; font-size: 12px; color: #888;">
+                <p style="margin: 0; font-size: 12px; color: ${isSold ? 'red' : '#888'}; font-weight: ${isSold ? 'bold' : 'normal'};">
                     Estado: ${listing.status}
                 </p>
 
@@ -87,7 +96,7 @@ async function loadCatalog() {
                     style="
                         margin-top: 10px;
                         padding: 8px;
-                        background-color: #007bff;
+                        background-color: ${isSold ? '#6c757d' : '#007bff'};
                         color: white;
                         border: none;
                         border-radius: 4px;

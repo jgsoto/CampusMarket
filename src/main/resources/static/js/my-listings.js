@@ -62,6 +62,7 @@ async function loadMyListings() {
                 <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
                     ${listing.status !== 'VENDIDO' ? `<button onclick="openEditModal('${listing.id}', '${listing.title.replace(/'/g, "\\'").replace(/\n/g, ' ')}', '${listing.description.replace(/'/g, "\\'").replace(/\n/g, '\\n').replace(/\r/g, '')}', ${listing.price})" style="background: #ffc107; border: none; padding: 8px; border-radius: 4px; cursor: pointer; flex: 1;">Editar</button>` : ''}
                     ${listing.status === 'BORRADOR' ? `<button onclick="publishListing('${listing.id}')" style="background: #28a745; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; flex: 1;">Publicar</button>` : ''}
+                    ${listing.status === 'PUBLICADA' ? `<button onclick="markAsSold('${listing.id}')" style="background: #6f42c1; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; flex: 1;">Marcar Vendido</button>` : ''}
                     ${listing.status === 'VENDIDO' ? `<span style="background: #6c757d; color: white; padding: 8px; border-radius: 4px; flex: 1; text-align: center; font-size: 13px;">✅ Vendido</span>` : ''}
                     <button onclick="deleteListing('${listing.id}')" style="background: #dc3545; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; flex: 1;">Eliminar</button>
                 </div>
@@ -184,5 +185,31 @@ async function publishListing(id) {
     } catch (error) {
         console.error(error);
         alert("Error de conexión al publicar.");
+    }
+}
+
+async function markAsSold(id) {
+    if (!confirm("¿Estás seguro de marcar este producto como VENDIDO? Esta acción no se puede deshacer.")) return;
+
+    const ownerId = localStorage.getItem("campusMarketUserId");
+
+    try {
+        const response = await fetch(`http://localhost:8080/api/listings/${id}/mark-sold`, {
+            method: "POST",
+            headers: {
+                "X-User-Id": ownerId
+            }
+        });
+
+        if (response.ok) {
+            alert("¡Producto marcado como vendido exitosamente!");
+            loadMyListings(); // Recargar lista
+        } else {
+            const err = await response.json();
+            alert("Error: " + err.message);
+        }
+    } catch (error) {
+        console.error(error);
+        alert("Error de conexión.");
     }
 }

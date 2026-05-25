@@ -50,7 +50,8 @@ public class GetMyListingsUseCase {
                             listing.getOwnerId(),
                             listing.getStatus().name(),
                             listing.getCreatedAt(),
-                            images
+                            images,
+                            null, null, null, null, null
                     );
                 })
                 .collect(Collectors.toList());
