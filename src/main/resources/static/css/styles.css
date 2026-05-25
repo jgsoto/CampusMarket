@@ -5,12 +5,9 @@ body {
 }
 
 .container {
-    width: 400px;
-    margin: 100px auto;
-    background: white;
-    padding: 40px;
-    border-radius: 10px;
-    text-align: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
 }
 
 button {
@@ -20,4 +17,50 @@ button {
     color: white;
     cursor: pointer;
     border-radius: 5px;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #eef0f2;
+    padding-bottom: 20px;
+    margin-bottom: 30px;
+}
+
+.action-menu {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.button-group button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-left: 10px;
+    color: white;
+}
+
+.btn-profile { background: #17a2b8; }
+.btn-publications { background: #007bff; }
+.btn-sell { background: #28a745; }
+.btn-logout {
+    background: #212529;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.product-marketplace-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+    padding: 20px 0;
 }

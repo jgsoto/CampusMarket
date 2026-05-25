@@ -1,70 +1,53 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>CampusMarket | Dashboard</title>
-
     <link rel="stylesheet" href="/css/styles.css">
-
     <script async crossorigin="anonymous"
         data-clerk-publishable-key="pk_test_ZnVubnktbXVza294LTU5LmNsZXJrLmFjY291bnRzLmRldiQ"
         src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@4/dist/clerk.browser.js">
-        </script>
+    </script>
 </head>
 
 <body>
 
     <div class="container">
 
-        <h1>Dashboard</h1>
-
-        <div id="user-section" style="display: none;">
-
-            <h2>
-                Welcome,
-                <span id="user-name"></span>
-            </h2>
-
-            <p id="user-email"></p>
-
-            <p>
-                Clerk ID:
-                <span id="user-id"></span>
-            </p>
-
-            <button id="logout-button">
-                Logout
+        <header class="dashboard-header">
+            <div id="user-section" style="display: none;">
+                <h1 style="margin: 0; font-size: 24px;">
+                    Welcome, <span id="user-name"></span>
+                </h1>
+                <p id="user-email" style="margin: 5px 0 0 0; color: #666;"></p>
+                
+                <span id="user-id" style="display: none;"></span>
+            </div>
+            
+            <button id="logout-button" class="btn-logout">
+                Cerrar sesión
             </button>
+        </header>
 
-        </div>
-
-        <hr style="margin: 20px 0;">
-
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <div class="action-menu">
             <h2 style="margin: 0;">Catálogo de Productos</h2>
-            <div>
-                <button onclick="window.location.href='/profile.html'"
-                    style="background: #17a2b8; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-right: 10px;">
+            <div class="button-group">
+                <button onclick="window.location.href='/modules/identity/profile.html'" class="btn-profile">
                     👤 Mi Perfil
                 </button>
-                <button onclick="window.location.href='/my-listings.html'"
-                    style="background: #007bff; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-right: 10px;">
+                <button onclick="window.location.href='/modules/marketplace/my-listings.html'" class="btn-publications">
                     Mis Publicaciones
                 </button>
-                <button onclick="window.location.href='/create-listing.html'"
-                    style="background: #28a745; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
+                <button onclick="window.location.href='/modules/marketplace/create-listing.html'" class="btn-sell">
                     + Vender Producto
                 </button>
             </div>
         </div>
 
-
         <div id="marketplace-section" style="display: none;">
-            <div id="catalog-container" style="display: flex; gap: 15px; flex-wrap: wrap;">
+            <div id="catalog-container" class="product-marketplace-grid">
                 <p>Cargando productos...</p>
             </div>
         </div>
@@ -72,9 +55,7 @@
     </div>
 
     <script src="/modules/marketplace/js/dashboard.js"></script>
-
     <script src="/modules/marketplace/js/marketplace.js"></script>
 
 </body>
-
 </html>
