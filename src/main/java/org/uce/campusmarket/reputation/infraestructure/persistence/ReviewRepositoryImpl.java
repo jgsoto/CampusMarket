@@ -62,4 +62,28 @@ public class ReviewRepositoryImpl implements ReviewRepository {
                         targetId
                 );
     }
+
+    @Override
+    public double getAverageRatingByReviewedUserId(UUID reviewedUserId) {
+
+        List<ReviewJpaEntity> reviews =
+                jpaRepository.findByReviewedUserId(reviewedUserId);
+
+        if (reviews.isEmpty()) {
+            return 0.0;
+        }
+
+        return reviews.stream()
+                .mapToInt(ReviewJpaEntity::getRating)
+                .average()
+                .orElse(0.0);
+    }
+
+    @Override
+    public int countByReviewedUserId(UUID reviewedUserId) {
+
+        return jpaRepository
+                .findByReviewedUserId(reviewedUserId)
+                .size();
+    }
 }

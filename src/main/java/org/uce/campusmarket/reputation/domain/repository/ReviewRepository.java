@@ -18,4 +18,8 @@ public interface ReviewRepository {
             UUID reviewerId,
             UUID targetId
     );
+
+    double getAverageRatingByReviewedUserId(UUID reviewedUserId);
+
+    int countByReviewedUserId(UUID reviewedUserId);
 }

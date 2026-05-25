@@ -16,4 +16,8 @@ public interface ReviewJpaRepository
             UUID reviewerId,
             UUID targetId
     );
+
+    int countByReviewedUserId(
+            UUID reviewedUserId
+    );
 }

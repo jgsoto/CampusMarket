@@ -9,7 +9,9 @@ import org.uce.campusmarket.reputation.application.dto.CreateReviewRequest;
 import org.uce.campusmarket.reputation.application.dto.ReviewResponse;
 import org.uce.campusmarket.reputation.application.usecase.CreateReviewUseCase;
 import org.uce.campusmarket.reputation.application.usecase.GetUserReputationUseCase;
+import org.uce.campusmarket.reputation.application.usecase.GetUserReviewsUseCase;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -19,8 +21,8 @@ import java.util.UUID;
 public class ReviewController {
 
     private final CreateReviewUseCase createReviewUseCase;
-
     private final GetUserReputationUseCase getUserReputationUseCase;
+    private final GetUserReviewsUseCase getUserReviewsUseCase;
 
     @PostMapping
     public ResponseEntity<ReviewResponse> createReview(
@@ -29,12 +31,9 @@ public class ReviewController {
     ) {
 
         ReviewResponse response =
-                createReviewUseCase.execute(
-                        reviewerId,
-                        request
-                );
+                createReviewUseCase.execute(reviewerId, request);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(201).body(response);
     }
 
     @GetMapping("/users/{userId}/reputation")
@@ -48,5 +47,16 @@ public class ReviewController {
         return ResponseEntity.ok(
                 Map.of("reputation", reputation)
         );
+    }
+
+    @GetMapping("/users/{userId}/reviews")
+    public ResponseEntity<List<ReviewResponse>> getUserReviews(
+            @PathVariable UUID userId
+    ) {
+
+        List<ReviewResponse> response =
+                getUserReviewsUseCase.execute(userId);
+
+        return ResponseEntity.ok(response);
     }
 }

@@ -23,9 +23,13 @@ public class ListingResponse {
     private LocalDateTime createdAt;
 
     private List<ListingImageResponse> images;
+
     private String sellerName;
     private String sellerEmail;
     private String sellerPhone;
     private String sellerAddress;
     private String sellerSocialMedia;
+
+    private Double averageRating;
+    private Integer totalReviews;
 }

@@ -6,6 +6,7 @@ import org.uce.campusmarket.marketplace.application.dto.ListingImageResponse;
 import org.uce.campusmarket.marketplace.application.dto.ListingResponse;
 import org.uce.campusmarket.marketplace.domain.model.Listing;
 import org.uce.campusmarket.marketplace.domain.repository.ListingRepository;
+import org.uce.campusmarket.reputation.domain.repository.ReviewRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,9 +16,14 @@ import java.util.stream.Collectors;
 public class BrowseListingsUseCase {
 
     private final ListingRepository listingRepository;
+    private final ReviewRepository reviewRepository;
 
-    public BrowseListingsUseCase(ListingRepository listingRepository) {
+    public BrowseListingsUseCase(
+            ListingRepository listingRepository,
+            ReviewRepository reviewRepository
+    ) {
         this.listingRepository = listingRepository;
+        this.reviewRepository = reviewRepository;
     }
 
     public List<ListingResponse> execute() {
@@ -27,7 +33,7 @@ public class BrowseListingsUseCase {
         return listings.stream()
                 .filter(listing ->
                         listing.getStatus() == org.uce.campusmarket.marketplace.domain.model.ListingStatus.PUBLICADA ||
-                        listing.getStatus() == org.uce.campusmarket.marketplace.domain.model.ListingStatus.VENDIDO
+                                listing.getStatus() == org.uce.campusmarket.marketplace.domain.model.ListingStatus.VENDIDO
                 )
                 .map(listing -> {
 
@@ -39,6 +45,16 @@ public class BrowseListingsUseCase {
                             ))
                             .toList();
 
+                    Double averageRating =
+                            reviewRepository.getAverageRatingByReviewedUserId(
+                                    listing.getOwnerId()
+                            );
+
+                    Integer totalReviews =
+                            reviewRepository.countByReviewedUserId(
+                                    listing.getOwnerId()
+                            );
+
                     return new ListingResponse(
                             listing.getId(),
                             listing.getTitle().getValue(),
@@ -49,7 +65,13 @@ public class BrowseListingsUseCase {
                             listing.getStatus().name(),
                             listing.getCreatedAt(),
                             images,
-                            null, null, null, null, null
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            averageRating,
+                            totalReviews
                     );
                 })
                 .collect(Collectors.toList());
