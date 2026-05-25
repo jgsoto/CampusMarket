@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CampusMarket | Detalle de Tutoría</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <script async crossorigin="anonymous"
+        data-clerk-publishable-key="pk_test_ZnVubnktbXVza294LTU5LmNsZXJrLmFjY291bnRzLmRldiQ"
+        src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@4/dist/clerk.browser.js">
+        </script>
+</head>
+<body>
+    <div class="container">
+        <button onclick="window.location.href='/tutoring-catalog.html'" 
+                style="margin-bottom: 20px; background: #6c757d; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer;">
+            ← Volver al Catálogo
+        </button>
+
+        <div style="display: flex; gap: 30px; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            
+            <!-- Detalles de la Tutoría -->
+            <div style="flex: 2;">
+                <h1 id="tutoring-subject" style="margin-top: 0; color: #6f42c1;">Cargando...</h1>
+                <h2 style="color: #28a745;" id="tutoring-price">...</h2>
+                
+                <h3>Descripción</h3>
+                <p id="tutoring-description" style="line-height: 1.6;">Cargando...</p>
+
+                <div id="owner-actions" style="display: none; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+                    <p style="color: #666;"><strong>Esta es tu publicación</strong></p>
+                    <button id="close-offer-btn" style="background: #dc3545; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
+                        Marcar como Finalizada / Cerrar Oferta
+                    </button>
+                </div>
+            </div>
+
+            <!-- Panel Lateral de Contacto -->
+            <div style="flex: 1; border-left: 1px solid #eee; padding-left: 30px;">
+                <div id="contact-panel" style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                    <h3 style="margin-top: 0;">Contacto del Tutor</h3>
+                    <div style="margin-bottom: 15px;">
+                        <strong>Nombre:</strong>
+                        <p id="tutor-name" style="margin: 5px 0;">...</p>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <strong>Email:</strong>
+                        <p id="tutor-email" style="margin: 5px 0;">...</p>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <strong>Teléfono:</strong>
+                        <p id="tutor-phone" style="margin: 5px 0;">...</p>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <strong>Redes / Medio:</strong>
+                        <p id="tutor-social" style="margin: 5px 0;">...</p>
+                    </div>
+                    
+                    <p style="font-size: 0.9em; color: #666; margin-top: 20px;">
+                        <em>¡Escribe directamente al tutor para acordar horarios y modalidad de la clase!</em>
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="/js/tutoring-details.js"></script>
+</body>
+</html>
