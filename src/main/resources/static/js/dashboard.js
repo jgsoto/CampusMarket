@@ -4,36 +4,72 @@ window.addEventListener("load", async () => {
 
     if (!Clerk.user) {
 
-        window.location.href = "/";
+        window.location.href = "/sign-in.html";
 
         return;
     }
 
     const token = await Clerk.session.getToken();
 
-    const user = {
-        clerkId: Clerk.user.id,
-        email: Clerk.user.primaryEmailAddress.emailAddress,
-        fullName: Clerk.user.fullName
-    };
+    try {
 
-    await fetch("http://localhost:8080/api/auth/sync", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify(user)
-    });
+        const response = await fetch(
+            "http://localhost:8080/api/v1/users/sync",
+            {
+                method: "POST",
 
-    const response = await fetch("http://localhost:8080/api/auth/me", {
-        headers: {
-            Authorization: `Bearer ${token}`
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    clerkUserId: Clerk.user.id,
+                    fullName: Clerk.user.fullName,
+                    email: Clerk.user.primaryEmailAddress.emailAddress
+                })
+            }
+        );
+
+        if (!response.ok) {
+
+            throw new Error("Failed to synchronize user");
+
         }
-    });
 
-    const currentUser = await response.json();
+        const user = await response.json();
 
-    document.getElementById("user-email").innerText =
-        currentUser.email;
+
+        localStorage.setItem("campusMarketUserId", user.id);
+
+        console.log("User synchronized:", user);
+
+    } catch (error) {
+
+        console.error(error);
+
+    }
+
+    document.getElementById("user-section").style.display = "block";
+    document.getElementById("marketplace-section").style.display = "block";
+    loadCatalog();
+
+    document.getElementById("user-name").textContent =
+        Clerk.user.fullName || "User";
+
+    document.getElementById("user-email").textContent =
+        Clerk.user.primaryEmailAddress.emailAddress;
+
+    document.getElementById("user-id").textContent =
+        Clerk.user.id;
+
+    document
+        .getElementById("logout-button")
+        .addEventListener("click", async () => {
+
+            await Clerk.signOut();
+
+            window.location.href = "/";
+
+        });
+
 });

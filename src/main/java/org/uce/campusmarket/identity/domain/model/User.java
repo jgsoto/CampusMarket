@@ -31,6 +31,18 @@ public class User {
     @Column(name = "trust_score", nullable = false)
     private Double trustScore;
 
+    @Column(length = 20)
+    private String phone;
+
+    @Column(length = 255)
+    private String address;
+
+    @Column(length = 1000)
+    private String description;
+
+    @Column(name = "social_media", length = 255)
+    private String socialMedia;
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 }

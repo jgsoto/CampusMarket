@@ -1,5 +1,8 @@
 package org.uce.campusmarket.marketplace.domain.model;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.uce.campusmarket.marketplace.domain.valueobject.ListingDescription;
 import org.uce.campusmarket.marketplace.domain.valueobject.ListingTitle;
 import org.uce.campusmarket.marketplace.domain.valueobject.Price;
@@ -10,6 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Getter
+@Setter
+@NoArgsConstructor
 public class Listing {
     private UUID id;
     private ListingTitle title;
@@ -19,11 +25,8 @@ public class Listing {
     private UUID ownerId;
     private ListingStatus status;
     private LocalDateTime createdAt;
+    private Long version;
     private List<ListingImage> images = new ArrayList<>();
-
-    public Listing() {
-    }
-
 
     public Listing(UUID id, ListingTitle title, ListingDescription description, Price price, 
                    Category category, UUID ownerId) {
@@ -51,9 +54,6 @@ public class Listing {
 
 
     public void publish() {
-        if (this.images.isEmpty()) {
-            throw new DomainException("No se puede publicar sin al menos una imagen");
-        }
         this.status = ListingStatus.PUBLICADA;
     }
 
@@ -64,50 +64,18 @@ public class Listing {
 
     public void markAsSold() {
         if (this.status != ListingStatus.PUBLICADA) {
-            throw new DomainException("Solo se pueden marcar como vendidas las publicaciones publicadas");
+            throw new DomainException("Solo se pueden marcar como vendidos los productos que estén publicados");
         }
         this.status = ListingStatus.VENDIDO;
+    }
+
+    public void markAsDeleted() {
+        this.status = ListingStatus.ELIMINADO;
     }
 
     public void updateDetails(ListingTitle title, ListingDescription description, Price price) {
         this.title = title;
         this.description = description;
         this.price = price;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public ListingTitle getTitle() {
-        return title;
-    }
-
-    public ListingDescription getDescription() {
-        return description;
-    }
-
-    public Price getPrice() {
-        return price;
-    }
-
-    public Category getCategory() {
-        return category;
-    }
-
-    public UUID getOwnerId() {
-        return ownerId;
-    }
-
-    public ListingStatus getStatus() {
-        return status;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public List<ListingImage> getImages() {
-        return images;
     }
 }

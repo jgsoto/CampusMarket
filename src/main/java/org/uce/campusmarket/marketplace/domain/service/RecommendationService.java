@@ -6,9 +6,7 @@ import java.util.UUID;
 
 public interface RecommendationService {
     
-    // Sugerencias basadas en el historial del usuario
     List<Listing> getRecommendationsForUser(UUID userId);
     
-    // Sugerencias de productos similares al actual
     List<Listing> getRelatedListings(UUID listingId);
 }

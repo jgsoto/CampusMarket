@@ -11,12 +11,12 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
-public class CategoryRepositoryAdapter implements CategoryRepository {
+public class CategoryRepositoryImpl implements CategoryRepository {
 
     private final JpaCategoryRepository jpaCategoryRepository;
     private final CategoryMapper categoryMapper;
 
-    public CategoryRepositoryAdapter(JpaCategoryRepository jpaCategoryRepository, CategoryMapper categoryMapper) {
+    public CategoryRepositoryImpl(JpaCategoryRepository jpaCategoryRepository, CategoryMapper categoryMapper) {
         this.jpaCategoryRepository = jpaCategoryRepository;
         this.categoryMapper = categoryMapper;
     }

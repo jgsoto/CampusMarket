@@ -2,15 +2,20 @@ package org.uce.campusmarket.marketplace.application.usecase;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import org.uce.campusmarket.marketplace.application.dto.ListingImageResponse;
 import org.uce.campusmarket.marketplace.application.dto.ListingResponse;
 import org.uce.campusmarket.marketplace.application.dto.UpdateListingRequest;
 import org.uce.campusmarket.marketplace.domain.model.Listing;
+import org.uce.campusmarket.marketplace.domain.model.ListingImage;
 import org.uce.campusmarket.marketplace.domain.repository.ListingRepository;
 import org.uce.campusmarket.marketplace.domain.valueobject.ListingDescription;
 import org.uce.campusmarket.marketplace.domain.valueobject.ListingTitle;
 import org.uce.campusmarket.marketplace.domain.valueobject.Price;
+import org.uce.campusmarket.marketplace.infrastructure.storage.SupabaseStorageService;
 import org.uce.campusmarket.shared.exception.DomainException;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -18,33 +23,64 @@ import java.util.UUID;
 public class UpdateListingUseCase {
 
     private final ListingRepository listingRepository;
+    private final SupabaseStorageService storageService;
 
-    public UpdateListingUseCase(ListingRepository listingRepository) {
+    public UpdateListingUseCase(ListingRepository listingRepository, SupabaseStorageService storageService) {
         this.listingRepository = listingRepository;
+        this.storageService = storageService;
     }
 
     public ListingResponse execute(UUID listingId, UUID requesterId, UpdateListingRequest request) {
-        // 1. Buscar la publicación
+
         Listing listing = listingRepository.findById(listingId)
                 .orElseThrow(() -> new DomainException("La publicación no existe"));
 
-        // 2. Validar que quien intenta actualizar es el dueño
         if (!listing.getOwnerId().equals(requesterId)) {
             throw new DomainException("No tienes permiso para editar esta publicación");
         }
 
-        // 3. Crear los nuevos objetos de valor
         ListingTitle newTitle = new ListingTitle(request.getTitle());
         ListingDescription newDescription = new ListingDescription(request.getDescription());
         Price newPrice = Price.of(request.getPrice());
 
-        // 4. Actualizar la entidad
         listing.updateDetails(newTitle, newDescription, newPrice);
 
-        // 5. Guardar los cambios
+        List<MultipartFile> newImages = request.getImages();
+        boolean hasRealFiles = newImages != null && newImages.stream().anyMatch(f -> !f.isEmpty());
+
+        if (hasRealFiles) {
+            // 1. Eliminar las imágenes viejas del storage de Supabase
+            //    antes de reemplazarlas, para no dejar archivos huérfanos
+            listing.getImages().forEach(img -> storageService.delete(img.getUrl()));
+
+            // 2. Limpiar las referencias en la base de datos
+            listing.getImages().clear();
+
+            // 3. Subir las nuevas imágenes y registrarlas
+            for (int i = 0; i < newImages.size(); i++) {
+                MultipartFile file = newImages.get(i);
+                if (!file.isEmpty()) {
+                    String imageUrl = storageService.upload(file);
+                    ListingImage listingImage = new ListingImage(
+                            UUID.randomUUID(),
+                            imageUrl,
+                            i == 0
+                    );
+                    listing.addImage(listingImage);
+                }
+            }
+        }
+
         Listing updatedListing = listingRepository.save(listing);
 
-        // 6. Devolver respuesta
+        List<ListingImageResponse> images = updatedListing.getImages()
+                .stream()
+                .map(img -> new ListingImageResponse(
+                        img.getUrl(),
+                        img.isThumbnail()
+                ))
+                .toList();
+
         return new ListingResponse(
                 updatedListing.getId(),
                 updatedListing.getTitle().getValue(),
@@ -53,7 +89,9 @@ public class UpdateListingUseCase {
                 updatedListing.getCategory().getName(),
                 updatedListing.getOwnerId(),
                 updatedListing.getStatus().name(),
-                updatedListing.getCreatedAt()
+                updatedListing.getCreatedAt(),
+                images,
+                null, null, null, null, null
         );
     }
 }
