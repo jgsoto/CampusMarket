@@ -4,26 +4,90 @@ window.addEventListener("load", () => {
 
 async function initializeProfile() {
 
-    const userId = localStorage.getItem("campusMarketUserId");
+    const currentUserId =
+        localStorage.getItem("campusMarketUserId");
 
-    if (!userId) {
+    const urlParams =
+        new URLSearchParams(window.location.search);
+
+    const profileUserId =
+        urlParams.get("id") || currentUserId;
+
+    if (!currentUserId) {
+
         await Swal.fire({
             title: "Inicia sesión",
-            text: "Debes iniciar sesión para ver tu perfil.",
+            text: "Debes iniciar sesión para ver perfiles.",
             icon: "warning"
         });
 
         window.location.href = "/signin.html";
+
         return;
     }
 
-    setupFormListener(userId);
+    const isOwnProfile =
+        currentUserId === profileUserId;
+
+    setupProfileMode(isOwnProfile);
+
+    if (isOwnProfile) {
+        setupFormListener(currentUserId);
+    }
 
     await Promise.all([
-        loadProfile(userId),
-        loadReputation(userId),
-        loadReviews(userId)
+        loadProfile(profileUserId),
+        loadReputation(profileUserId),
+        loadReviews(profileUserId)
     ]);
+}
+
+function setupProfileMode(isOwnProfile) {
+
+    const form =
+        document.getElementById("profile-form");
+
+    const saveButton =
+        document.getElementById("save-profile-btn");
+
+    if (isOwnProfile) {
+        return;
+    }
+
+    if (saveButton) {
+        saveButton.style.display = "none";
+    }
+
+    const editableFields = [
+        "prof-phone",
+        "prof-address",
+        "prof-social",
+        "prof-desc"
+    ];
+
+    editableFields.forEach(id => {
+
+        const input =
+            document.getElementById(id);
+
+        if (!input) {
+            return;
+        }
+
+        input.disabled = true;
+
+        input.style.backgroundColor = "#f5f5f5";
+
+        input.style.cursor = "not-allowed";
+    });
+
+    if (form) {
+
+        form.addEventListener(
+            "submit",
+            event => event.preventDefault()
+        );
+    }
 }
 
 async function loadProfile(userId) {
@@ -35,21 +99,49 @@ async function loadProfile(userId) {
         );
 
         if (!response.ok) {
-            throw new Error("No se pudo obtener el perfil");
+            throw new Error(
+                "No se pudo obtener el perfil"
+            );
         }
 
         const profile = await response.json();
 
-        setInputValue("prof-name", profile.fullName);
-        setInputValue("prof-email", profile.email);
-        setInputValue("prof-phone", profile.phone);
-        setInputValue("prof-address", profile.address);
-        setInputValue("prof-social", profile.socialMedia);
-        setInputValue("prof-desc", profile.description);
+        setInputValue(
+            "prof-name",
+            profile.fullName
+        );
+
+        setInputValue(
+            "prof-email",
+            profile.email
+        );
+
+        setInputValue(
+            "prof-phone",
+            profile.phone
+        );
+
+        setInputValue(
+            "prof-address",
+            profile.address
+        );
+
+        setInputValue(
+            "prof-social",
+            profile.socialMedia
+        );
+
+        setInputValue(
+            "prof-desc",
+            profile.description
+        );
 
     } catch (error) {
 
-        console.error("Error al cargar perfil:", error);
+        console.error(
+            "Error al cargar perfil:",
+            error
+        );
 
         Swal.fire({
             title: "Error",
@@ -62,9 +154,13 @@ async function loadProfile(userId) {
 async function loadReputation(userId) {
 
     const reputationContainer =
-        document.getElementById("profile-reputation");
+        document.getElementById(
+            "profile-reputation"
+        );
 
-    if (!reputationContainer) return;
+    if (!reputationContainer) {
+        return;
+    }
 
     try {
 
@@ -73,7 +169,10 @@ async function loadReputation(userId) {
         );
 
         if (!response.ok) {
-            throw new Error("No se pudo obtener la reputación");
+
+            throw new Error(
+                "No se pudo obtener la reputación"
+            );
         }
 
         const data = await response.json();
@@ -85,17 +184,27 @@ async function loadReputation(userId) {
 
         reputationContainer.innerHTML = `
             <div class="profile-reputation-box">
+
                 <h3>Reputación</h3>
-                <p>${reputation.toFixed(1)} / 5</p>
+
+                <p>
+                    ${reputation.toFixed(1)} / 5
+                </p>
+
             </div>
         `;
 
     } catch (error) {
 
-        console.error("Error al cargar reputación:", error);
+        console.error(
+            "Error al cargar reputación:",
+            error
+        );
 
         reputationContainer.innerHTML = `
-            <p>No se pudo cargar la reputación.</p>
+            <p>
+                No se pudo cargar la reputación.
+            </p>
         `;
     }
 }
@@ -103,9 +212,13 @@ async function loadReputation(userId) {
 async function loadReviews(userId) {
 
     const reviewsContainer =
-        document.getElementById("profile-reviews");
+        document.getElementById(
+            "profile-reviews"
+        );
 
-    if (!reviewsContainer) return;
+    if (!reviewsContainer) {
+        return;
+    }
 
     try {
 
@@ -114,7 +227,10 @@ async function loadReviews(userId) {
         );
 
         if (!response.ok) {
-            throw new Error("No se pudieron obtener las reviews");
+
+            throw new Error(
+                "No se pudieron obtener las reviews"
+            );
         }
 
         const reviews = await response.json();
@@ -124,7 +240,9 @@ async function loadReviews(userId) {
         if (!reviews.length) {
 
             reviewsContainer.innerHTML = `
-                <p>Este usuario todavía no tiene reviews.</p>
+                <p>
+                    Este usuario todavía no tiene reviews.
+                </p>
             `;
 
             return;
@@ -132,16 +250,23 @@ async function loadReviews(userId) {
 
         reviews.forEach(review => {
 
-            const reviewCard = document.createElement("div");
+            const reviewCard =
+                document.createElement("div");
 
-            reviewCard.className = "review-card";
+            reviewCard.className =
+                "review-card";
 
             reviewCard.innerHTML = `
                 <div class="review-header">
-                    <strong>${renderStars(review.rating)}</strong>
+
+                    <strong>
+                        ${renderStars(review.rating)}
+                    </strong>
+
                     <span>
                         ${formatDate(review.createdAt)}
                     </span>
+
                 </div>
 
                 <p>
@@ -149,81 +274,117 @@ async function loadReviews(userId) {
                 </p>
             `;
 
-            reviewsContainer.appendChild(reviewCard);
+            reviewsContainer.appendChild(
+                reviewCard
+            );
         });
 
     } catch (error) {
 
-        console.error("Error al cargar reviews:", error);
+        console.error(
+            "Error al cargar reviews:",
+            error
+        );
 
         reviewsContainer.innerHTML = `
-            <p>No se pudieron cargar las reviews.</p>
+            <p>
+                No se pudieron cargar las reviews.
+            </p>
         `;
     }
 }
 
 function setupFormListener(userId) {
 
-    const form = document.getElementById("profile-form");
+    const form =
+        document.getElementById(
+            "profile-form"
+        );
 
-    if (!form) return;
+    if (!form) {
+        return;
+    }
 
-    form.addEventListener("submit", async (event) => {
+    form.addEventListener(
+        "submit",
+        async (event) => {
 
-        event.preventDefault();
+            event.preventDefault();
 
-        const payload = {
-            phone: getInputValue("prof-phone"),
-            address: getInputValue("prof-address"),
-            socialMedia: getInputValue("prof-social"),
-            description: getInputValue("prof-desc")
-        };
+            const payload = {
+                phone:
+                    getInputValue("prof-phone"),
 
-        try {
+                address:
+                    getInputValue("prof-address"),
 
-            const response = await fetch(
-                "http://localhost:8080/api/users/profile/me",
-                {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-User-Id": userId
-                    },
-                    body: JSON.stringify(payload)
+                socialMedia:
+                    getInputValue("prof-social"),
+
+                description:
+                    getInputValue("prof-desc")
+            };
+
+            try {
+
+                const response = await fetch(
+                    "http://localhost:8080/api/users/profile/me",
+                    {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type":
+                                "application/json",
+
+                            "X-User-Id":
+                            userId
+                        },
+                        body: JSON.stringify(payload)
+                    }
+                );
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "No se pudo actualizar el perfil"
+                    );
                 }
-            );
 
-            if (!response.ok) {
-                throw new Error("No se pudo actualizar el perfil");
+                await Swal.fire({
+                    title: "Perfil actualizado",
+                    text: "Los cambios se guardaron correctamente.",
+                    icon: "success"
+                });
+
+            } catch (error) {
+
+                console.error(
+                    "Error al actualizar perfil:",
+                    error
+                );
+
+                Swal.fire({
+                    title: "Error",
+                    text: "No se pudo actualizar el perfil.",
+                    icon: "error"
+                });
             }
-
-            await Swal.fire({
-                title: "Perfil actualizado",
-                text: "Los cambios se guardaron correctamente.",
-                icon: "success"
-            });
-
-        } catch (error) {
-
-            console.error("Error al actualizar perfil:", error);
-
-            Swal.fire({
-                title: "Error",
-                text: "No se pudo actualizar el perfil.",
-                icon: "error"
-            });
         }
-    });
+    );
 }
 
 function renderStars(rating) {
 
-    const fullStars = Math.round(rating);
+    const fullStars =
+        Math.round(rating);
 
     let stars = "";
 
     for (let i = 1; i <= 5; i++) {
-        stars += i <= fullStars ? "★" : "☆";
+
+        stars +=
+            i <= fullStars
+                ? "★"
+                : "☆";
     }
 
     return `${stars} (${rating}/5)`;
@@ -231,25 +392,35 @@ function renderStars(rating) {
 
 function formatDate(date) {
 
-    return new Date(date).toLocaleDateString("es-EC", {
-        year: "numeric",
-        month: "short",
-        day: "numeric"
-    });
+    return new Date(date)
+        .toLocaleDateString(
+            "es-EC",
+            {
+                year: "numeric",
+                month: "short",
+                day: "numeric"
+            }
+        );
 }
 
 function setInputValue(id, value) {
 
-    const element = document.getElementById(id);
+    const element =
+        document.getElementById(id);
 
-    if (!element) return;
+    if (!element) {
+        return;
+    }
 
     element.value = value || "";
 }
 
 function getInputValue(id) {
 
-    const element = document.getElementById(id);
+    const element =
+        document.getElementById(id);
 
-    return element ? element.value.trim() : "";
+    return element
+        ? element.value.trim()
+        : "";
 }

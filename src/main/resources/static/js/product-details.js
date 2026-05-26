@@ -1,16 +1,22 @@
 window.addEventListener("load", async () => {
 
-    const container = document.getElementById("product-details-container");
+    const container =
+        document.getElementById("product-details-container");
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const productId = urlParams.get("id");
+    const urlParams =
+        new URLSearchParams(window.location.search);
+
+    const productId =
+        urlParams.get("id");
 
     if (!productId) {
+
         container.innerHTML = `
             <p style="color: red;">
                 ID de producto no proporcionado.
             </p>
         `;
+
         return;
     }
 
@@ -21,6 +27,7 @@ window.addEventListener("load", async () => {
         );
 
         if (!response.ok) {
+
             throw new Error(
                 "No se pudo cargar la publicación."
             );
@@ -31,12 +38,15 @@ window.addEventListener("load", async () => {
         const imageUrl =
             product.images &&
             product.images.length > 0
-                ? product.images.find(img => img.thumbnail)?.url ||
-                product.images[0].url
+                ? product.images.find(
+                img => img.thumbnail
+            )?.url || product.images[0].url
                 : "";
 
         const currentUserId =
-            localStorage.getItem("campusMarketUserId");
+            localStorage.getItem(
+                "campusMarketUserId"
+            );
 
         const isOwner =
             product.ownerId === currentUserId;
@@ -106,6 +116,7 @@ window.addEventListener("load", async () => {
                 ">
 
                     <div>
+
                         <p style="
                             margin: 0;
                             color: #777;
@@ -127,6 +138,7 @@ window.addEventListener("load", async () => {
                             gap: 10px;
                             margin-bottom: 10px;
                         ">
+
                             <span style="
                                 font-size: 18px;
                                 color: #f5b301;
@@ -141,6 +153,7 @@ window.addEventListener("load", async () => {
                             ">
                                 (${totalReviews} reseñas)
                             </span>
+
                         </div>
 
                         <h2 style="
@@ -150,6 +163,7 @@ window.addEventListener("load", async () => {
                         ">
                             $${product.price.toFixed(2)}
                         </h2>
+
                     </div>
 
                     <div style="
@@ -158,6 +172,7 @@ window.addEventListener("load", async () => {
                         padding: 18px;
                         background: #fff;
                     ">
+
                         <h3 style="
                             margin-top: 0;
                         ">
@@ -171,55 +186,66 @@ window.addEventListener("load", async () => {
                         ">
                             ${product.description}
                         </p>
-                    </div>
-
-                    <div style="
-                        border: 1px solid #ddd;
-                        border-radius: 10px;
-                        padding: 18px;
-                        background: #fff;
-                    ">
-
-                        <h3 style="
-                            margin-top: 0;
-                        ">
-                            Información del vendedor
-                        </h3>
-
-                        <div style="
-                            display: flex;
-                            flex-direction: column;
-                            gap: 10px;
-                        ">
-
-                            <p style="margin: 0;">
-                                <strong>Nombre:</strong>
-                                ${product.sellerName || "No disponible"}
-                            </p>
-
-                            <p style="margin: 0;">
-                                <strong>Email:</strong>
-                                ${product.sellerEmail || "No disponible"}
-                            </p>
-
-                            <p style="margin: 0;">
-                                <strong>Teléfono:</strong>
-                                ${product.sellerPhone || "No disponible"}
-                            </p>
-
-                            <p style="margin: 0;">
-                                <strong>Ubicación:</strong>
-                                ${product.sellerAddress || "No disponible"}
-                            </p>
-
-                            <p style="margin: 0;">
-                                <strong>Redes:</strong>
-                                ${product.sellerSocialMedia || "No disponible"}
-                            </p>
-
-                        </div>
 
                     </div>
+
+                    ${
+            !isOwner
+                ? `
+                                <div
+                                    id="seller-contact-panel"
+                                    style="
+                                        border: 1px solid #ddd;
+                                        border-radius: 10px;
+                                        padding: 18px;
+                                        background: #fff;
+                                        display: none;
+                                    "
+                                >
+
+                                    <h3 style="
+                                        margin-top: 0;
+                                    ">
+                                        Información del vendedor
+                                    </h3>
+
+                                    <div style="
+                                        display: flex;
+                                        flex-direction: column;
+                                        gap: 10px;
+                                    ">
+
+                                        <p style="margin: 0;">
+                                            <strong>Nombre:</strong>
+                                            ${product.sellerName || "No disponible"}
+                                        </p>
+
+                                        <p style="margin: 0;">
+                                            <strong>Email:</strong>
+                                            ${product.sellerEmail || "No disponible"}
+                                        </p>
+
+                                        <p style="margin: 0;">
+                                            <strong>Teléfono:</strong>
+                                            ${product.sellerPhone || "No disponible"}
+                                        </p>
+
+                                        <p style="margin: 0;">
+                                            <strong>Ubicación:</strong>
+                                            ${product.sellerAddress || "No disponible"}
+                                        </p>
+
+                                        <p style="margin: 0;">
+                                            <strong>Redes:</strong>
+                                            ${product.sellerSocialMedia || "No disponible"}
+                                        </p>
+
+                                    </div>
+
+                                </div>
+                            `
+                : ""
+        }
 
                     <div style="
                         display: flex;
@@ -273,21 +299,6 @@ window.addEventListener("load", async () => {
                                     `
         }
 
-                        <button
-                            id="view-profile-button"
-                            style="
-                                background: #212529;
-                                color: white;
-                                border: none;
-                                padding: 14px;
-                                border-radius: 8px;
-                                font-size: 15px;
-                                cursor: pointer;
-                            "
-                        >
-                            Ver perfil del vendedor
-                        </button>
-
                     </div>
 
                     <div style="
@@ -304,19 +315,40 @@ window.addEventListener("load", async () => {
             </div>
         `;
 
-        const profileButton =
+        const contactButton =
             document.getElementById(
-                "view-profile-button"
+                "contact-button"
             );
 
-        if (profileButton) {
+        if (contactButton) {
 
-            profileButton.addEventListener(
+            contactButton.addEventListener(
                 "click",
                 () => {
 
-                    window.location.href =
-                        `/profile.html?id=${product.ownerId}`;
+                    const panel =
+                        document.getElementById(
+                            "seller-contact-panel"
+                        );
+
+                    if (!panel) {
+                        return;
+                    }
+
+                    if (panel.style.display === "none") {
+
+                        panel.style.display = "block";
+
+                        contactButton.textContent =
+                            "Ocultar información";
+
+                    } else {
+
+                        panel.style.display = "none";
+
+                        contactButton.textContent =
+                            "Contactar vendedor";
+                    }
                 }
             );
         }
