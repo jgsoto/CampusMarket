@@ -1,5 +1,4 @@
 window.addEventListener("load", async () => {
-
     await Clerk.load();
 
     if (!Clerk.user) {
@@ -8,7 +7,9 @@ window.addEventListener("load", async () => {
     }
 
     const urlParams =
-        new URLSearchParams(window.location.search);
+        new URLSearchParams(
+            window.location.search
+        );
 
     const offerId =
         urlParams.get("id");
@@ -36,25 +37,24 @@ window.addEventListener("load", async () => {
     );
 });
 
-
 async function loadTutoringDetails(
     offerId,
     currentUserId
-){
+) {
 
     const detailsContainer =
         document.getElementById(
             "tutoring-details"
         );
 
-    try{
+    try {
 
         const offerResponse =
             await fetch(
                 `http://localhost:8080/api/tutoring/${offerId}`
             );
 
-        if(!offerResponse.ok){
+        if (!offerResponse.ok) {
 
             throw new Error(
                 "No se pudo cargar la tutoría."
@@ -82,25 +82,25 @@ async function loadTutoringDetails(
 
         ]);
 
-        let reputation={
-            reputation:0
+        let reputation = {
+            reputation: 0
         };
 
-        let reviews=[];
+        let reviews = [];
 
-        if(
+        if (
             reputationResponse.ok
-        ){
+        ) {
 
-            reputation=
+            reputation =
                 await reputationResponse.json();
         }
 
-        if(
+        if (
             reviewsResponse.ok
-        ){
+        ) {
 
-            reviews=
+            reviews =
                 await reviewsResponse.json();
         }
 
@@ -136,142 +136,151 @@ async function loadTutoringDetails(
             currentUserId
         );
 
-    }
-    catch(error){
+    } catch (error) {
 
         console.error(error);
 
-        detailsContainer.innerHTML=`
-
-        <p style="
-        color:red;
-        ">
-
-        Error al cargar.
-
-        </p>
+        detailsContainer.innerHTML = `
+            <p style="color:red;">
+                Error al cargar.
+            </p>
         `;
     }
 }
 
-
-
 function renderTutoringInfo(
     offer
-){
+) {
 
     document.getElementById(
         "tutoring-subject"
-    ).textContent=
+    ).textContent =
         offer.subject;
 
     document.getElementById(
         "tutoring-price"
-    ).textContent=
+    ).textContent =
         `$${offer.hourlyRate}/hora`;
 
     document.getElementById(
         "tutoring-description"
-    ).textContent=
+    ).textContent =
         offer.description;
 }
-
 
 function renderTutorInfo(
     offer,
     reputation
-){
+) {
 
     document.getElementById(
         "tutor-name"
-    ).textContent=
+    ).textContent =
         offer.tutorName ||
         "No disponible";
 
     document.getElementById(
         "tutor-email"
-    ).textContent=
+    ).textContent =
         offer.tutorEmail ||
         "No disponible";
 
     document.getElementById(
         "tutor-phone"
-    ).textContent=
+    ).textContent =
         offer.tutorPhone ||
         "No disponible";
 
     document.getElementById(
         "tutor-social"
-    ).textContent=
+    ).textContent =
         offer.tutorSocialMedia ||
         "No disponible";
 
     document.getElementById(
         "tutor-reputation"
-    ).textContent=
-        `${reputation.reputation.toFixed(1)} /5`;
+    ).textContent =
+        `${reputation.reputation.toFixed(1)} / 5`;
 }
-
-
 
 function renderReviews(
     reviews,
     currentUserId
-){
+) {
 
-    const container=
+    const container =
         document.getElementById(
             "reviews-container"
         );
 
-    container.innerHTML="";
+    container.innerHTML = "";
 
-    if(
-        !reviews?.length
-    ){
+    if (!reviews?.length) {
 
-        container.innerHTML=`
-        <p>
-        No existen reseñas.
-        </p>
+        container.innerHTML = `
+            <p>
+                No existen reseñas.
+            </p>
         `;
 
         return;
     }
 
-    reviews.forEach(review=>{
+    reviews.forEach(review => {
 
-        const card=
+        const card =
             document.createElement(
                 "div"
             );
 
-        card.style=`
-        border:1px solid #ddd;
-        border-radius:8px;
-        padding:16px;
-        margin-bottom:16px;
-        background:#fafafa;
+        card.style = `
+            border:1px solid #ddd;
+            border-radius:8px;
+            padding:16px;
+            margin-bottom:16px;
+            background:#fafafa;
         `;
 
-        card.innerHTML=`
+        card.innerHTML = `
 
         <div style="
-        display:flex;
-        justify-content:space-between;
+            display:flex;
+            justify-content:space-between;
+            align-items:flex-start;
+            margin-bottom:12px;
         ">
 
             <div>
 
                 <strong>
-                ${review.reviewerName}
+                    ${
+            review.reviewerName ||
+            "Usuario"
+        }
                 </strong>
 
                 <div style="
-                color:#f5b301;
+                    color:gray;
+                    font-size:13px;
+                    margin-top:4px;
                 ">
-                ${"★".repeat(
+                    Tutoría:
+                    ${
+            review.targetTitle ||
+            "Sin título"
+        }
+                </div>
+
+                <div style="
+                    color:#f5b301;
+                    margin-top:8px;
+                    font-size:18px;
+                ">
+                    ${"★".repeat(
             review.rating
+        )}
+                    ${"☆".repeat(
+            5-review.rating
         )}
                 </div>
 
@@ -285,25 +294,26 @@ function renderReviews(
                 ?
 
                 `
+                <div style="
+                    display:flex;
+                    gap:8px;
+                ">
 
-                <div>
+                    <button
+                        class="edit-review"
+                        data-id="${review.id}"
+                    >
+                        Editar
+                    </button>
 
-                <button
-                class="edit-review"
-                data-id="${review.id}"
-                >
-                Editar
-                </button>
-
-                <button
-                class="delete-review"
-                data-id="${review.id}"
-                >
-                Eliminar
-                </button>
+                    <button
+                        class="delete-review"
+                        data-id="${review.id}"
+                    >
+                        Eliminar
+                    </button>
 
                 </div>
-
                 `
 
                 :
@@ -313,16 +323,19 @@ function renderReviews(
 
         </div>
 
-        <p>
-        ${
-            review.comment
-            ||
+        <p style="
+            margin:12px 0;
+        ">
+            ${
+            review.comment ||
             "Sin comentario"
         }
         </p>
 
-        <small>
-        ${
+        <small style="
+            color:gray;
+        ">
+            ${
             formatDate(
                 review.createdAt
             )
@@ -337,41 +350,42 @@ function renderReviews(
 
     });
 
+    configureReviewActions(
+        currentUserId
+    );
+}
 
+function configureReviewActions(
+    currentUserId
+) {
 
     document
         .querySelectorAll(
             ".delete-review"
         )
-        .forEach(btn=>{
+        .forEach(btn => {
 
             btn.addEventListener(
                 "click",
-                async()=>{
+                async () => {
 
-                    if(
-                        !confirm(
+                    const confirmed =
+                        confirm(
                             "¿Eliminar reseña?"
-                        )
-                    ){
+                        );
+
+                    if (!confirmed)
                         return;
-                    }
 
                     await fetch(
-
                         `http://localhost:8080/api/reviews/${btn.dataset.id}`,
-
                         {
-
                             method:"DELETE",
-
                             headers:{
-
                                 "X-User-Id":
                                 currentUserId
                             }
                         }
-
                     );
 
                     location.reload();
@@ -381,44 +395,35 @@ function renderReviews(
 
         });
 
-
-
     document
         .querySelectorAll(
             ".edit-review"
         )
-        .forEach(btn=>{
+        .forEach(btn => {
 
             btn.addEventListener(
                 "click",
-                async()=>{
+                async () => {
 
-                    const rating=
+                    const rating =
                         prompt(
-                            "Nueva calificación:"
+                            "Nueva calificación (1-5):"
                         );
 
-                    const comment=
+                    if (!rating)
+                        return;
+
+                    const comment =
                         prompt(
                             "Comentario:"
                         );
 
-                    if(
-                        !rating
-                    ){
-                        return;
-                    }
-
                     await fetch(
-
                         `http://localhost:8080/api/reviews/${btn.dataset.id}`,
-
                         {
-
                             method:"PUT",
 
                             headers:{
-
                                 "Content-Type":
                                     "application/json",
 
@@ -436,9 +441,7 @@ function renderReviews(
 
                                     comment
                                 })
-
                         }
-
                     );
 
                     location.reload();
@@ -447,57 +450,53 @@ function renderReviews(
             );
 
         });
-
 }
-
-
 
 function configureOwnerActions(
     offer,
     offerId,
     currentUserId
-){
+) {
 
-    if(
-        offer.tutorId
-        !==currentUserId
-    ){
+    if (
+        offer.tutorId !==
+        currentUserId
+    ) {
         return;
     }
 
     document.getElementById(
         "contact-panel"
-    ).style.display=
+    ).style.display =
         "none";
 
     document.getElementById(
         "owner-actions"
-    ).style.display=
+    ).style.display =
         "block";
 
-
-    const closeBtn=
+    const closeBtn =
         document.getElementById(
             "close-offer-btn"
         );
 
+    if (
+        offer.status ===
+        "CLOSED"
+    ) {
 
-    if(
-        offer.status==="CLOSED"
-    ){
+        closeBtn.disabled =
+            true;
 
-        closeBtn.disabled=true;
-
-        closeBtn.textContent=
+        closeBtn.textContent =
             "Tutoría cerrada";
 
         return;
     }
 
-
     closeBtn.addEventListener(
         "click",
-        async()=>{
+        async () => {
 
             await closeOffer(
                 offerId,
@@ -506,46 +505,34 @@ function configureOwnerActions(
 
         }
     );
-
 }
-
-
 
 function configureEnrollmentButton(
     offer,
     offerId,
     currentUserId
-){
+) {
 
-    if(
-        offer.tutorId===
+    if (
+        offer.tutorId ===
         currentUserId
         ||
-        offer.status==="CLOSED"
-    ){
+        offer.status ===
+        "CLOSED"
+    ) {
         return;
     }
 
-
-    const container=
+    const container =
         document.getElementById(
             "enroll-container"
         );
 
-
-    container.innerHTML=`
-
-<button
-id="enroll-btn"
->
-
-Inscribirme
-
-</button>
-
-`;
-
-
+    container.innerHTML = `
+        <button id="enroll-btn">
+            Inscribirme
+        </button>
+    `;
 
     document
         .getElementById(
@@ -553,25 +540,18 @@ Inscribirme
         )
         .addEventListener(
             "click",
-            async()=>{
+            async () => {
 
                 await fetch(
-
                     `http://localhost:8080/api/tutoring/${offerId}/enroll`,
-
                     {
-
                         method:"POST",
 
                         headers:{
-
                             "X-User-Id":
                             currentUserId
-
                         }
-
                     }
-
                 );
 
                 alert(
@@ -582,86 +562,76 @@ Inscribirme
 
             }
         );
-
 }
-
-
 
 async function configureReviewForm(
     offer,
     offerId,
     currentUserId
-){
+) {
 
-    const form=
+    const form =
         document.getElementById(
             "review-form"
         );
 
-    if(!form)return;
+    if (!form)
+        return;
 
-
-    if(
-        offer.tutorId===currentUserId
+    if (
+        offer.tutorId ===
+        currentUserId
         ||
-        offer.status!=="CLOSED"
-    ){
+        offer.status !==
+        "CLOSED"
+    ) {
 
-        form.style.display=
+        form.style.display =
             "none";
 
         return;
     }
 
+    try {
 
-    try{
-
-        const response=
+        const response =
             await fetch(
-
                 `http://localhost:8080/api/tutoring/${offerId}/enrolled`,
-
                 {
                     headers:{
                         "X-User-Id":
                         currentUserId
                     }
                 }
-
             );
 
-        const enrolled=
+        const enrolled =
             await response.json();
 
-        if(
-            !enrolled
-        ){
+        if (!enrolled) {
 
-            form.style.display=
+            form.style.display =
                 "none";
 
             return;
         }
 
-        form.style.display=
+        form.style.display =
             "block";
 
-    }
-    catch{
+    } catch {
 
-        form.style.display=
+        form.style.display =
             "none";
     }
 
-
-
     form.addEventListener(
         "submit",
-        async(event)=>{
+        async event => {
 
             event.preventDefault();
 
-            const payload={
+            const payload = {
 
                 reviewedUserId:
                 offer.tutorId,
@@ -685,80 +655,64 @@ async function configureReviewForm(
                 ).value
             };
 
-
             await fetch(
-
                 "http://localhost:8080/api/reviews",
-
                 {
-
                     method:"POST",
 
                     headers:{
-
                         "Content-Type":
                             "application/json",
 
                         "X-User-Id":
                         currentUserId
-
                     },
 
                     body:
                         JSON.stringify(
                             payload
                         )
-
                 }
-
             );
 
             location.reload();
 
         }
     );
-
 }
-
-
 
 async function closeOffer(
     offerId,
     currentUserId
-){
+) {
 
     await fetch(
-
         `http://localhost:8080/api/tutoring/${offerId}/close`,
-
         {
-
             method:"POST",
 
             headers:{
                 "X-User-Id":
                 currentUserId
             }
-
         }
-
     );
 
     location.reload();
-
 }
-
-
 
 function formatDate(
     date
-){
+) {
 
     return new Date(
         date
-    )
-        .toLocaleDateString(
-            "es-EC"
-        );
-
+    ).toLocaleDateString(
+        "es-EC",
+        {
+            day:"numeric",
+            month:"numeric",
+            year:"numeric"
+        }
+    );
 }
