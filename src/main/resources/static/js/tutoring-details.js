@@ -392,42 +392,93 @@ function configureEnrollmentButton(
         );
 }
 
-function configureReviewForm(
+async function configureReviewForm(
     offer,
     offerId,
     currentUserId
-){
+) {
 
-    const form=
+    const form =
         document.getElementById(
             "review-form"
         );
 
-    if(!form)return;
+    if (!form) return;
 
-    if(
-        offer.tutorId===
-        currentUserId
-        ||
-        offer.status!=="CLOSED"
-    ){
+    if (
+        offer.tutorId === currentUserId
+    ) {
 
-        form.style.display=
+        form.style.display = "none";
+
+        return;
+    }
+
+    if (
+        offer.status !== "CLOSED"
+    ) {
+
+        form.style.display = "none";
+
+        return;
+    }
+
+    try {
+
+        const response =
+            await fetch(
+                `http://localhost:8080/api/tutoring/${offerId}/enrolled`,
+                {
+                    headers:{
+                        "X-User-Id":
+                        currentUserId
+                    }
+                }
+            );
+
+        const enrolled =
+            await response.json();
+
+        if (!enrolled) {
+
+            form.style.display =
+                "none";
+
+            return;
+        }
+
+        form.style.display =
+            "block";
+
+    } catch(error){
+
+        console.error(error);
+
+        form.style.display =
             "none";
 
         return;
     }
 
-    form.style.display=
-        "block";
-
     form.addEventListener(
         "submit",
-        async(event)=>{
+        async event => {
 
             event.preventDefault();
 
-            const payload={
+            const rating =
+                parseInt(
+                    document.getElementById(
+                        "review-rating"
+                    ).value
+                );
+
+            const comment =
+                document.getElementById(
+                    "review-comment"
+                ).value;
+
+            const payload = {
 
                 reviewedUserId:
                 offer.tutorId,
@@ -438,21 +489,14 @@ function configureReviewForm(
                 targetType:
                     "TUTORING",
 
-                rating:parseInt(
-                    document.getElementById(
-                        "review-rating"
-                    ).value
-                ),
+                rating,
 
-                comment:
-                document.getElementById(
-                    "review-comment"
-                ).value
+                comment
             };
 
-            try{
+            try {
 
-                const response=
+                const response =
                     await fetch(
                         "http://localhost:8080/api/reviews",
                         {
@@ -464,7 +508,6 @@ function configureReviewForm(
                                 "X-User-Id":
                                 currentUserId
                             },
-
                             body:
                                 JSON.stringify(
                                     payload
@@ -472,29 +515,28 @@ function configureReviewForm(
                         }
                     );
 
+                const data =
+                    await response.text();
+
                 if(!response.ok){
 
                     throw new Error(
-                        await response.text()
+                        data
                     );
-
                 }
 
                 alert(
-                    "Reseña registrada"
+                    "Reseña registrada correctamente."
                 );
 
-                location.reload();
+                window.location.reload();
 
-            }
-            catch(error){
+            } catch(error){
 
                 alert(
                     error.message
                 );
-
             }
-
         }
     );
 }

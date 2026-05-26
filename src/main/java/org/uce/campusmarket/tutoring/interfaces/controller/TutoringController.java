@@ -14,6 +14,7 @@ import org.uce.campusmarket.tutoring.application.usecase.CreateTutoringOfferUseC
 import org.uce.campusmarket.tutoring.application.usecase.EnrollInTutoringUseCase;
 import org.uce.campusmarket.tutoring.application.usecase.GetMyTutoringOffersUseCase;
 import org.uce.campusmarket.tutoring.application.usecase.GetTutoringOfferUseCase;
+import org.uce.campusmarket.tutoring.domain.repository.TutoringEnrollmentRepository;
 
 import java.util.List;
 import java.util.UUID;
@@ -42,6 +43,8 @@ public class TutoringController {
     private final EnrollInTutoringUseCase
             enrollInTutoringUseCase;
 
+    private final TutoringEnrollmentRepository
+            tutoringEnrollmentRepository;
 
     @PostMapping
     public ResponseEntity<TutoringOfferResponse>
@@ -147,5 +150,24 @@ public class TutoringController {
 
         return ResponseEntity.ok()
                 .build();
+    }
+
+    @GetMapping("/{id}/enrolled")
+    public ResponseEntity<Boolean> isEnrolled(
+            @PathVariable UUID id,
+
+            @RequestHeader("X-User-Id")
+            UUID studentId
+    ) {
+
+        boolean enrolled =
+                tutoringEnrollmentRepository
+                        .findByTutoringOfferIdAndStudentId(
+                                id,
+                                studentId
+                        )
+                        .isPresent();
+
+        return ResponseEntity.ok(enrolled);
     }
 }
