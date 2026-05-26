@@ -1,23 +1,110 @@
+/* ============================================================
+   CampusMarket — styles.css
+   Universidad Central del Ecuador · 2025
+   Con Tailwind CDN este archivo es mínimo.
+   Solo contiene: tokens de color UCE, fuentes y clases
+   que Tailwind no puede generar dinámicamente.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+/* ── Tokens UCE ── */
+:root {
+  --uce-navy:       #0A1628;
+  --uce-navy-mid:   #0E2040;
+  --uce-navy-light: #1A3260;
+  --uce-gold:       #C9A84C;
+  --uce-gold-light: #E2C47A;
+  --uce-gold-pale:  #F5E6C0;
+  --uce-gold-dark:  #9E7D34;
+}
+
+/* ── Tipografía base ── */
 body {
-    font-family: Arial, sans-serif;
-    background: #f5f5f5;
-    margin: 0;
+  font-family: 'DM Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-.container {
-    width: 400px;
-    margin: 100px auto;
-    background: white;
-    padding: 40px;
-    border-radius: 10px;
-    text-align: center;
+h1, h2, h3, h4 {
+  font-family: 'Playfair Display', Georgia, serif;
 }
 
-button {
-    padding: 12px 24px;
-    border: none;
-    background: black;
-    color: white;
-    cursor: pointer;
-    border-radius: 5px;
+/* ── Clases UCE para Tailwind (colores custom) ── */
+.bg-uce-navy       { background-color: var(--uce-navy); }
+.bg-uce-navy-mid   { background-color: var(--uce-navy-mid); }
+.bg-uce-navy-light { background-color: var(--uce-navy-light); }
+.bg-uce-gold       { background-color: var(--uce-gold); }
+.bg-uce-gold-pale  { background-color: var(--uce-gold-pale); }
+
+.text-uce-navy      { color: var(--uce-navy); }
+.text-uce-gold      { color: var(--uce-gold); }
+.text-uce-gold-light{ color: var(--uce-gold-light); }
+.text-uce-gold-dark { color: var(--uce-gold-dark); }
+
+.border-uce-gold    { border-color: var(--uce-gold); }
+.border-uce-navy    { border-color: var(--uce-navy); }
+
+.font-display { font-family: 'Playfair Display', Georgia, serif; }
+
+/* ── Grid decorativo de fondo ── */
+.bg-grid-gold {
+  background-image:
+    linear-gradient(rgba(201,168,76,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201,168,76,.04) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+
+/* ── Animaciones ── */
+@keyframes pulse-dot {
+  0%,100% { opacity:1; transform:scale(1); }
+  50%      { opacity:.6; transform:scale(.85); }
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+@keyframes toast-in {
+  from { opacity:0; transform:translateX(20px); }
+  to   { opacity:1; transform:translateX(0); }
+}
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+.animate-pulse-dot  { animation: pulse-dot 2s ease-in-out infinite; }
+.animate-spin-slow  { animation: spin .7s linear infinite; }
+.animate-toast      { animation: toast-in .3s cubic-bezier(.34,1.56,.64,1); }
+
+.skeleton {
+  background: linear-gradient(90deg, #EDEEF2 25%, #D8DAE5 50%, #EDEEF2 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 6px;
+}
+
+/* ── Clerk widget override ── */
+.cl-card {
+  border-radius: 16px !important;
+  box-shadow: 0 16px 64px rgba(10,22,40,.18) !important;
+}
+.cl-formButtonPrimary {
+  background-color: var(--uce-navy) !important;
+  color: var(--uce-gold) !important;
+}
+
+/* ── Focus visible accesible ── */
+:focus-visible {
+  outline: 2.5px solid var(--uce-gold);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ── Scrollbar personalizado ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: var(--uce-navy-light); border-radius: 3px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
 }

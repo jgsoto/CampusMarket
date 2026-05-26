@@ -17,7 +17,7 @@ async function submitForm(isPublish) {
 
     if (!ownerId) {
         alert("Error de sesión: No se encontró tu ID de usuario.");
-        window.location.href = "/signin.html";
+        window.location.href = "/modules/identity/signin.html";
         return;
     }
 
@@ -56,7 +56,7 @@ async function submitForm(isPublish) {
             }.`
         );
 
-        window.location.href = "/my-listings.html";
+        window.location.href = "/modules/marketplace/my-listings.html";
 
     } catch (error) {
 

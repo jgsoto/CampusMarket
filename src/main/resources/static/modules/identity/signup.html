@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CampusMarket | Crear Cuenta</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/js/tailwind-config.js"></script>
+  <link rel="stylesheet" href="/css/styles.css" />
+  <script
+    async crossorigin="anonymous"
+    data-clerk-publishable-key="pk_test_ZnVubnktbXVza294LTU5LmNsZXJrLmFjY291bnRzLmRldiQ"
+    src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@4/dist/clerk.browser.js">
+  </script>
+</head>
+<body class="bg-uce-navy min-h-screen flex flex-col lg:flex-row lg:overflow-hidden">
+
+  <div id="auth-branding"></div>
+
+  <main class="flex-1 flex items-center justify-center px-6 py-10 lg:py-12 relative z-10 w-full">
+    <div class="w-full max-w-md flex flex-col gap-6 lg:gap-8">
+
+      <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl px-6 py-4 lg:py-5">
+        <h2 class="font-display text-xl lg:text-2xl font-bold text-white">Crear cuenta</h2>
+        <p class="text-white/50 text-xs lg:text-sm mt-1">Regístrate con tu correo institucional UCE</p>
+      </div>
+
+      <div id="sign-up" class="w-full"></div>
+
+      <p class="text-center text-sm text-white/50">
+        ¿Ya tienes cuenta?
+        <a href="/modules/identity/signin.html" class="text-uce-gold font-semibold underline underline-offset-4 hover:text-uce-gold-light transition-colors">
+          Inicia sesión
+        </a>
+      </p>
+
+    </div>
+  </main>
+
+  <script src="/modules/identity/js/auth-layout.js"></script>
+  <script>
+    AuthLayout.mount({
+      title: 'Únete a la comunidad universitaria',
+      subtitle: 'Crea tu cuenta con tu correo institucional y empieza a comprar, vender y aprender hoy.',
+      features: [
+        { icon: 'store', text: 'Publica tus productos en minutos' },
+        { icon: 'book', text: 'Conecta con tutores de tu facultad' },
+        { icon: 'star', text: 'Construye tu reputación académica' }
+      ]
+    });
+
+    window.addEventListener('load', async () => {
+      await Clerk.load();
+      if (Clerk.user) {
+        window.location.href = '/modules/marketplace/dashboard.html';
+        return;
+      }
+      Clerk.mountSignUp(document.getElementById('sign-up'), {
+        routing: 'hash',
+        signInUrl: '/modules/identity/signin.html',
+        afterSignUpUrl: '/modules/marketplace/dashboard.html',
+        appearance: {
+          variables: {
+            colorPrimary: '#C5A059',
+            borderRadius: '12px',
+            fontFamily: 'DM Sans, sans-serif',
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -4,30 +4,23 @@ async function loadCatalog() {
     const container = document.getElementById("catalog-container");
 
     try {
-
-        // Petición al backend
         const response = await fetch("http://localhost:8080/api/listings");
 
         if (!response.ok) {
             throw new Error("Error al cargar el catálogo");
         }
 
-        // Convertimos la respuesta a JSON
         const listings = await response.json();
 
-        // Limpiamos el contenedor
+       
         container.innerHTML = "";
 
-        // Validamos si no hay productos
+      
         if (listings.length === 0) {
-
-            container.innerHTML =
-                "<p>No hay productos disponibles en este momento.</p>";
-
+            container.innerHTML = "<p>No hay productos disponibles en este momento.</p>";
             return;
         }
 
-        // Recorremos las publicaciones
         listings.forEach(listing => {
 
             const card = document.createElement("div");
@@ -76,7 +69,7 @@ async function loadCatalog() {
                 </h3>
 
                 <p style="margin: 0; color: gray; font-size: 14px; opacity: ${opacity};">
-                    Categoría: ${listing.categoryName}
+                    Categoria: ${listing.categoryName}
                 </p>
 
                 <p style="margin: 0; opacity: ${opacity};">
@@ -92,7 +85,7 @@ async function loadCatalog() {
                 </p>
 
                 <button
-                    onclick="window.location.href='/product-details.html?id=${listing.id}'"
+                    onclick="window.location.href='/modules/marketplace/product-details.html?id=${listing.id}'"
                     style="
                         margin-top: 10px;
                         padding: 8px;
@@ -119,11 +112,11 @@ async function loadCatalog() {
         container.innerHTML = `
             <p style="color:red;">
                 Error al cargar los productos.
-                Asegúrate de que el servidor Java esté corriendo.
+                Asegurate de que el servidor Java este corriendo.
             </p>
         `;
     }
 }
 
-// Ejecutamos automáticamente al cargar la página
+
 loadCatalog();
