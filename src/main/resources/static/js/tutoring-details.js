@@ -7,18 +7,26 @@ window.addEventListener("load", async () => {
         return;
     }
 
-    const urlParams = new URLSearchParams(window.location.search);
+    const urlParams =
+        new URLSearchParams(window.location.search);
 
-    const offerId = urlParams.get("id");
+    const offerId =
+        urlParams.get("id");
 
     if (!offerId) {
+
         alert("No se especificó la tutoría.");
-        window.location.href = "/tutoring-catalog.html";
+
+        window.location.href =
+            "/tutoring-catalog.html";
+
         return;
     }
 
     const currentUserId =
-        localStorage.getItem("campusMarketUserId");
+        localStorage.getItem(
+            "campusMarketUserId"
+        );
 
     await loadTutoringDetails(
         offerId,
@@ -32,46 +40,58 @@ async function loadTutoringDetails(
 ) {
 
     const detailsContainer =
-        document.getElementById("tutoring-details");
+        document.getElementById(
+            "tutoring-details"
+        );
 
     try {
 
-        const offerResponse = await fetch(
-            `http://localhost:8080/api/tutoring/${offerId}`
-        );
+        const offerResponse =
+            await fetch(
+                `http://localhost:8080/api/tutoring/${offerId}`
+            );
 
         if (!offerResponse.ok) {
+
             throw new Error(
                 "No se pudo cargar la tutoría."
             );
         }
 
-        const offer = await offerResponse.json();
+        const offer =
+            await offerResponse.json();
 
-        const tutorId = offer.tutorId;
+        const tutorId =
+            offer.tutorId;
 
         const [
             reputationResponse,
             reviewsResponse
         ] = await Promise.all([
+
             fetch(
                 `http://localhost:8080/api/reviews/users/${tutorId}/reputation`
             ),
+
             fetch(
                 `http://localhost:8080/api/reviews/users/${tutorId}/reviews`
             )
         ]);
 
-        let reputation = { reputation: 0 };
+        let reputation = {
+            reputation: 0
+        };
 
         let reviews = [];
 
         if (reputationResponse.ok) {
+
             reputation =
                 await reputationResponse.json();
         }
 
         if (reviewsResponse.ok) {
+
             reviews =
                 await reviewsResponse.json();
         }
@@ -83,9 +103,17 @@ async function loadTutoringDetails(
             reputation
         );
 
-        renderReviews(reviews);
+        renderReviews(
+            reviews
+        );
 
         configureOwnerActions(
+            offer,
+            offerId,
+            currentUserId
+        );
+
+        configureEnrollmentButton(
             offer,
             offerId,
             currentUserId
@@ -113,7 +141,8 @@ function renderTutoringInfo(offer) {
 
     document.getElementById(
         "tutoring-subject"
-    ).textContent = offer.subject;
+    ).textContent =
+        offer.subject;
 
     document.getElementById(
         "tutoring-price"
@@ -122,7 +151,8 @@ function renderTutoringInfo(offer) {
 
     document.getElementById(
         "tutoring-description"
-    ).textContent = offer.description;
+    ).textContent =
+        offer.description;
 }
 
 function renderTutorInfo(
@@ -133,22 +163,26 @@ function renderTutorInfo(
     document.getElementById(
         "tutor-name"
     ).textContent =
-        offer.tutorName || "No disponible";
+        offer.tutorName ||
+        "No disponible";
 
     document.getElementById(
         "tutor-email"
     ).textContent =
-        offer.tutorEmail || "No disponible";
+        offer.tutorEmail ||
+        "No disponible";
 
     document.getElementById(
         "tutor-phone"
     ).textContent =
-        offer.tutorPhone || "No disponible";
+        offer.tutorPhone ||
+        "No disponible";
 
     document.getElementById(
         "tutor-social"
     ).textContent =
-        offer.tutorSocialMedia || "No disponible";
+        offer.tutorSocialMedia ||
+        "No disponible";
 
     document.getElementById(
         "tutor-reputation"
@@ -165,7 +199,7 @@ function renderReviews(reviews) {
 
     container.innerHTML = "";
 
-    if (!reviews || reviews.length === 0) {
+    if (!reviews?.length) {
 
         container.innerHTML = `
             <p>
@@ -182,26 +216,45 @@ function renderReviews(reviews) {
             document.createElement("div");
 
         card.style = `
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 16px;
-            background: #fafafa;
+            border:1px solid #ddd;
+            border-radius:8px;
+            padding:16px;
+            margin-bottom:16px;
+            background:#fafafa;
         `;
 
         card.innerHTML = `
-            <div style="margin-bottom: 10px;">
+
+            <div style="
+                display:flex;
+                justify-content:space-between;
+                margin-bottom:10px;
+            ">
+
                 <strong>
-                    ${"★".repeat(review.rating)}
+                    ${review.reviewerName || "Usuario"}
                 </strong>
+
+                <span style="
+                    color:#f5b301;
+                    font-weight:bold;
+                ">
+                    ${"★".repeat(
+            review.rating
+        )}
+                </span>
+
             </div>
 
-            <p style="margin-bottom: 10px;">
-                ${review.comment || "Sin comentario"}
+            <p>
+                ${review.comment ||
+        "Sin comentario"}
             </p>
 
-            <small style="color: gray;">
-                ${formatDate(review.createdAt)}
+            <small>
+                ${formatDate(
+            review.createdAt
+        )}
             </small>
         `;
 
@@ -215,137 +268,233 @@ function configureOwnerActions(
     currentUserId
 ) {
 
-    if (offer.tutorId !== currentUserId) {
+    if (
+        offer.tutorId !==
+        currentUserId
+    ) {
         return;
     }
 
     document.getElementById(
         "contact-panel"
-    ).style.display = "none";
+    ).style.display =
+        "none";
 
     document.getElementById(
         "owner-actions"
-    ).style.display = "block";
+    ).style.display =
+        "block";
 
     const closeBtn =
         document.getElementById(
             "close-offer-btn"
         );
 
-    if (offer.status === "CLOSED") {
+    if (
+        offer.status === "CLOSED"
+    ) {
+
+        closeBtn.disabled =
+            true;
 
         closeBtn.textContent =
-            "Esta tutoría ya está cerrada";
-
-        closeBtn.disabled = true;
+            "Tutoría cerrada";
 
         return;
     }
 
     closeBtn.addEventListener(
         "click",
-        async () => {
+        async ()=>{
+
             await closeOffer(
                 offerId,
                 currentUserId
             );
+
         }
     );
+}
+
+function configureEnrollmentButton(
+    offer,
+    offerId,
+    currentUserId
+) {
+
+    if (
+        offer.tutorId ===
+        currentUserId
+        ||
+        offer.status==="CLOSED"
+    ) {
+        return;
+    }
+
+    const container =
+        document.getElementById(
+            "enroll-container"
+        );
+
+    container.innerHTML=`
+
+        <button
+            id="enroll-btn"
+        >
+            Inscribirme
+        </button>
+
+    `;
+
+    document
+        .getElementById(
+            "enroll-btn"
+        )
+        .addEventListener(
+            "click",
+            async()=>{
+
+                try{
+
+                    const response=
+                        await fetch(
+                            `http://localhost:8080/api/tutoring/${offerId}/enroll`,
+                            {
+                                method:"POST",
+                                headers:{
+                                    "X-User-Id":
+                                    currentUserId
+                                }
+                            }
+                        );
+
+                    if(!response.ok){
+
+                        throw new Error(
+                            await response.text()
+                        );
+                    }
+
+                    alert(
+                        "Inscripción exitosa"
+                    );
+
+                }
+                catch(error){
+
+                    alert(
+                        error.message
+                    );
+
+                }
+
+            }
+        );
 }
 
 function configureReviewForm(
     offer,
     offerId,
     currentUserId
-) {
+){
 
-    const form =
+    const form=
         document.getElementById(
             "review-form"
         );
 
-    if (!form) {
+    if(!form)return;
+
+    if(
+        offer.tutorId===
+        currentUserId
+        ||
+        offer.status!=="CLOSED"
+    ){
+
+        form.style.display=
+            "none";
+
         return;
     }
 
-    if (offer.tutorId === currentUserId) {
-
-        form.style.display = "none";
-
-        return;
-    }
+    form.style.display=
+        "block";
 
     form.addEventListener(
         "submit",
-        async (event) => {
+        async(event)=>{
 
             event.preventDefault();
 
-            const rating =
-                parseInt(
+            const payload={
+
+                reviewedUserId:
+                offer.tutorId,
+
+                targetId:
+                offerId,
+
+                targetType:
+                    "TUTORING",
+
+                rating:parseInt(
                     document.getElementById(
                         "review-rating"
                     ).value
-                );
+                ),
 
-            const comment =
+                comment:
                 document.getElementById(
                     "review-comment"
-                ).value.trim();
-
-            const payload = {
-                reviewedUserId: offer.tutorId,
-                targetId: offerId,
-                targetType: "TUTORING",
-                rating: rating,
-                comment: comment
+                ).value
             };
 
-            try {
+            try{
 
-                const response =
+                const response=
                     await fetch(
                         "http://localhost:8080/api/reviews",
                         {
-                            method: "POST",
-                            headers: {
+                            method:"POST",
+                            headers:{
                                 "Content-Type":
                                     "application/json",
+
                                 "X-User-Id":
                                 currentUserId
                             },
-                            body: JSON.stringify(
-                                payload
-                            )
+
+                            body:
+                                JSON.stringify(
+                                    payload
+                                )
                         }
                     );
 
-                if (!response.ok) {
-
-                    const errorText =
-                        await response.text();
-
-                    console.error(errorText);
+                if(!response.ok){
 
                     throw new Error(
-                        "No se pudo registrar la reseña."
+                        await response.text()
                     );
+
                 }
 
                 alert(
-                    "Reseña registrada correctamente."
+                    "Reseña registrada"
                 );
 
-                window.location.reload();
+                location.reload();
 
-            } catch (error) {
-
-                console.error(error);
+            }
+            catch(error){
 
                 alert(
-                    "Error al registrar la reseña."
+                    error.message
                 );
+
             }
+
         }
     );
 }
@@ -353,64 +502,27 @@ function configureReviewForm(
 async function closeOffer(
     offerId,
     currentUserId
-) {
+){
 
-    const confirmed = confirm(
-        "¿Deseas cerrar esta tutoría?"
+    await fetch(
+        `http://localhost:8080/api/tutoring/${offerId}/close`,
+        {
+            method:"POST",
+            headers:{
+                "X-User-Id":
+                currentUserId
+            }
+        }
     );
 
-    if (!confirmed) {
-        return;
-    }
-
-    try {
-
-        const response = await fetch(
-            `http://localhost:8080/api/tutoring/${offerId}/close`,
-            {
-                method: "POST",
-                headers: {
-                    "X-User-Id":
-                    currentUserId
-                }
-            }
-        );
-
-        if (!response.ok) {
-            throw new Error(
-                "No se pudo cerrar la tutoría."
-            );
-        }
-
-        alert(
-            "Tutoría cerrada correctamente."
-        );
-
-        window.location.reload();
-
-    } catch (error) {
-
-        console.error(error);
-
-        alert(
-            "Error al cerrar la tutoría."
-        );
-    }
+    location.reload();
 }
 
-function formatDate(date) {
+function formatDate(date){
 
-    if (!date) {
-        return "";
-    }
-
-    return new Date(date)
-        .toLocaleDateString(
-            "es-EC",
-            {
-                year: "numeric",
-                month: "long",
-                day: "numeric"
-            }
-        );
+    return new Date(
+        date
+    ).toLocaleDateString(
+        "es-EC"
+    );
 }
