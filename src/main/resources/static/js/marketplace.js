@@ -1,63 +1,125 @@
-// Función principal para cargar el catálogo
 async function loadCatalog() {
 
     const container = document.getElementById("catalog-container");
 
     try {
 
-        // Petición al backend
-        const response = await fetch("http://localhost:8080/api/listings");
+        container.innerHTML = "<p>Cargando productos...</p>";
+
+        const response = await fetch(
+            "http://localhost:8080/api/listings"
+        );
 
         if (!response.ok) {
-            throw new Error("Error al cargar el catálogo");
+            throw new Error("Error al cargar publicaciones");
         }
 
-        // Convertimos la respuesta a JSON
         const listings = await response.json();
 
-        // Limpiamos el contenedor
         container.innerHTML = "";
 
-        // Validamos si no hay productos
         if (listings.length === 0) {
 
-            container.innerHTML =
-                "<p>No hay productos disponibles en este momento.</p>";
+            container.innerHTML = `
+                <p style="color: gray;">
+                    No hay productos disponibles.
+                </p>
+            `;
 
             return;
         }
 
-        // Recorremos las publicaciones
-        listings.forEach(listing => {
+        container.style.display = "grid";
+        container.style.gridTemplateColumns =
+            "repeat(auto-fill, minmax(280px, 1fr))";
+
+        container.style.gap = "20px";
+
+        for (const listing of listings) {
+
+            let reputation = 0;
+
+            try {
+
+                const reputationResponse = await fetch(
+                    `http://localhost:8080/api/reviews/users/${listing.ownerId}/reputation`
+                );
+
+                if (reputationResponse.ok) {
+
+                    const reputationData =
+                        await reputationResponse.json();
+
+                    reputation = reputationData.reputation || 0;
+                }
+
+            } catch (e) {
+
+                console.warn(
+                    "No se pudo cargar reputación",
+                    e
+                );
+            }
+
+            const imageUrl =
+                listing.images &&
+                listing.images.length > 0
+                    ? listing.images[0].url
+                    : "https://placehold.co/300x200?text=Sin+Imagen";
+
+            const isSold =
+                listing.status === "VENDIDO";
 
             const card = document.createElement("div");
 
             card.style = `
-                border: 1px solid #ccc;
-                padding: 15px;
-                border-radius: 8px;
-                width: 250px;
-                background: #f9f9f9;
+                background: white;
+                border-radius: 14px;
+                overflow: hidden;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+                transition: 0.2s;
                 display: flex;
                 flex-direction: column;
-                gap: 10px;
+                cursor: pointer;
             `;
 
-            // Imagen principal
-            const imageUrl =
-                listing.images && listing.images.length > 0
-                    ? listing.images[0].url
-                    : "https://via.placeholder.com/300x200?text=Sin+Imagen";
+            card.onmouseenter = () => {
+                card.style.transform = "translateY(-4px)";
+            };
 
-            const isSold = listing.status === "VENDIDO";
-            const opacity = isSold ? "0.6" : "1";
-            const badge = isSold 
-                ? `<div style="position: absolute; top: 10px; right: 10px; background: red; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold; font-size: 12px; z-index: 10;">AGOTADO</div>` 
+            card.onmouseleave = () => {
+                card.style.transform = "translateY(0)";
+            };
+
+            const soldBadge = isSold
+                ? `
+                    <div style="
+                        position: absolute;
+                        top: 10px;
+                        right: 10px;
+                        background: #dc3545;
+                        color: white;
+                        padding: 6px 10px;
+                        border-radius: 8px;
+                        font-size: 12px;
+                        font-weight: bold;
+                    ">
+                        AGOTADO
+                    </div>
+                `
                 : "";
 
             card.innerHTML = `
-                <div style="position: relative; width: 100%; height: 200px;">
-                    ${badge}
+
+                <div style="
+                    position: relative;
+                    width: 100%;
+                    height: 220px;
+                    overflow: hidden;
+                ">
+
+                    ${soldBadge}
+
                     <img
                         src="${imageUrl}"
                         alt="${listing.title}"
@@ -65,65 +127,124 @@ async function loadCatalog() {
                             width: 100%;
                             height: 100%;
                             object-fit: cover;
-                            border-radius: 8px;
-                            opacity: ${opacity};
+                            opacity: ${isSold ? "0.7" : "1"};
                         "
                     >
+
                 </div>
 
-                <h3 style="margin: 0; opacity: ${opacity};">
-                    ${listing.title}
-                </h3>
+                <div style="
+                    padding: 16px;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 10px;
+                    flex: 1;
+                ">
 
-                <p style="margin: 0; color: gray; font-size: 14px; opacity: ${opacity};">
-                    Categoría: ${listing.categoryName}
-                </p>
+                    <div style="
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                    ">
 
-                <p style="margin: 0; opacity: ${opacity};">
-                    ${listing.description}
-                </p>
+                        <h3 style="
+                            margin: 0;
+                            font-size: 18px;
+                        ">
+                            ${listing.title}
+                        </h3>
 
-                <h2 style="margin: 0; color: #28a745; opacity: ${opacity};">
-                    $${listing.price.toFixed(2)}
-                </h2>
+                        <span style="
+                            font-size: 14px;
+                            color: #f39c12;
+                            font-weight: bold;
+                        ">
+                            ⭐ ${reputation.toFixed(1)}
+                        </span>
 
-                <p style="margin: 0; font-size: 12px; color: ${isSold ? 'red' : '#888'}; font-weight: ${isSold ? 'bold' : 'normal'};">
-                    Estado: ${listing.status}
-                </p>
+                    </div>
 
-                <button
-                    onclick="window.location.href='/product-details.html?id=${listing.id}'"
-                    style="
-                        margin-top: 10px;
-                        padding: 8px;
-                        background-color: ${isSold ? '#6c757d' : '#007bff'};
-                        color: white;
-                        border: none;
-                        border-radius: 4px;
-                        cursor: pointer;
-                        width: 100%;
-                        font-weight: bold;
-                    "
-                >
-                    Ver Producto
-                </button>
+                    <p style="
+                        margin: 0;
+                        color: #777;
+                        font-size: 14px;
+                    ">
+                        ${listing.categoryName}
+                    </p>
+
+                    <p style="
+                        margin: 0;
+                        color: #444;
+                        flex: 1;
+                    ">
+                        ${listing.description}
+                    </p>
+
+                    <div style="
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                    ">
+
+                        <h2 style="
+                            margin: 0;
+                            color: #28a745;
+                            font-size: 24px;
+                        ">
+                            $${listing.price.toFixed(2)}
+                        </h2>
+
+                        <span style="
+                            font-size: 12px;
+                            font-weight: bold;
+                            color: ${isSold ? "#dc3545" : "#777"};
+                        ">
+                            ${listing.status}
+                        </span>
+
+                    </div>
+
+                    <button
+                        style="
+                            padding: 12px;
+                            border: none;
+                            border-radius: 10px;
+                            background: ${isSold ? "#6c757d" : "#007bff"};
+                            color: white;
+                            font-weight: bold;
+                            cursor: pointer;
+                        "
+                    >
+                        Ver producto
+                    </button>
+
+                </div>
             `;
 
+            card.onclick = () => {
+
+                window.location.href =
+                    `/product-details.html?id=${listing.id}`;
+            };
+
             container.appendChild(card);
-        });
+        }
 
     } catch (error) {
 
-        console.error("Fallo al conectar con el backend:", error);
+        console.error(error);
 
         container.innerHTML = `
-            <p style="color:red;">
-                Error al cargar los productos.
-                Asegúrate de que el servidor Java esté corriendo.
-            </p>
+            <div style="
+                color: red;
+                padding: 20px;
+                background: #ffeaea;
+                border-radius: 10px;
+            ">
+                Error al cargar productos.
+            </div>
         `;
     }
 }
 
-// Ejecutamos automáticamente al cargar la página
 loadCatalog();

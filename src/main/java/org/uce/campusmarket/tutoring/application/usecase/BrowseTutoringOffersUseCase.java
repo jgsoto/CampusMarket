@@ -31,7 +31,8 @@ public class BrowseTutoringOffersUseCase {
         return repository.findAll()
                 .stream()
                 .filter(offer ->
-                        offer.getStatus() == TutoringStatus.ACTIVE
+                        offer.getStatus() == TutoringStatus.ACTIVE ||
+                                offer.getStatus() == TutoringStatus.CLOSED
                 )
                 .map(offer -> {
 
