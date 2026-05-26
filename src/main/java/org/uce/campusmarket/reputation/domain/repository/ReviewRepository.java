@@ -22,4 +22,6 @@ public interface ReviewRepository {
     double getAverageRatingByReviewedUserId(UUID reviewedUserId);
 
     int countByReviewedUserId(UUID reviewedUserId);
+
+    void deleteById(UUID id);
 }

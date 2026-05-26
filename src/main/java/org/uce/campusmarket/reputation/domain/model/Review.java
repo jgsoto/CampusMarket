@@ -1,12 +1,14 @@
 package org.uce.campusmarket.reputation.domain.model;
 
 import lombok.Getter;
+import lombok.Setter;
 import org.uce.campusmarket.shared.exception.DomainException;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
+@Setter
 public class Review {
 
     private UUID id;

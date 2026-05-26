@@ -86,4 +86,10 @@ public class ReviewRepositoryImpl implements ReviewRepository {
                 .findByReviewedUserId(reviewedUserId)
                 .size();
     }
+
+    @Override
+    public void deleteById(UUID id) {
+
+        jpaRepository.deleteById(id);
+    }
 }
