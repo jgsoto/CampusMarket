@@ -1,11 +1,13 @@
 package org.uce.campusmarket.tutoring.domain.valueobject;
 
+import lombok.Getter;
 import org.uce.campusmarket.shared.exception.DomainException;
 
 import java.math.BigDecimal;
 
 public class HourlyRate {
 
+    @Getter
     private final BigDecimal value;
 
     public HourlyRate(Double value) {
@@ -13,9 +15,5 @@ public class HourlyRate {
             throw new DomainException("La tarifa por hora no puede ser negativa o nula");
         }
         this.value = BigDecimal.valueOf(value);
-    }
-
-    public BigDecimal getValue() {
-        return value;
     }
 }

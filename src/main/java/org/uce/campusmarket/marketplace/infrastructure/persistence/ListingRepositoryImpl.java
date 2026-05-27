@@ -1,5 +1,6 @@
 package org.uce.campusmarket.marketplace.infrastructure.persistence;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.uce.campusmarket.marketplace.domain.model.Listing;
 import org.uce.campusmarket.marketplace.domain.repository.ListingRepository;
@@ -11,15 +12,11 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class ListingRepositoryImpl implements ListingRepository {
 
     private final JpaListingRepository jpaListingRepository;
     private final ListingMapper listingMapper;
-
-    public ListingRepositoryImpl(JpaListingRepository jpaListingRepository, ListingMapper listingMapper) {
-        this.jpaListingRepository = jpaListingRepository;
-        this.listingMapper = listingMapper;
-    }
 
     @Override
     public Listing save(Listing listing) {

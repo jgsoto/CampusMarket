@@ -6,8 +6,6 @@ import org.springframework.stereotype.Repository;
 
 import org.uce.campusmarket.tutoring.domain.model.TutoringEnrollment;
 import org.uce.campusmarket.tutoring.domain.repository.TutoringEnrollmentRepository;
-import org.uce.campusmarket.tutoring.infraestructure.persistence.JpaTutoringEnrollmentRepository;
-import org.uce.campusmarket.tutoring.infraestructure.persistence.TutoringEnrollmentJpaEntity;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -15,62 +13,48 @@ import java.util.UUID;
 @Repository
 @RequiredArgsConstructor
 public class TutoringEnrollmentRepositoryImpl
-        implements TutoringEnrollmentRepository {
+                implements TutoringEnrollmentRepository {
 
-    private final JpaTutoringEnrollmentRepository repository;
+        private final JpaTutoringEnrollmentRepository repository;
 
-    @Override
-    public TutoringEnrollment save(
-            TutoringEnrollment enrollment
-    ) {
+        @Override
+        public TutoringEnrollment save(
+                        TutoringEnrollment enrollment) {
 
-        TutoringEnrollmentJpaEntity entity =
-                TutoringEnrollmentJpaEntity.builder()
-                        .id(enrollment.getId())
-                        .tutoringOfferId(
-                                enrollment.getTutoringOfferId()
-                        )
-                        .studentId(
-                                enrollment.getStudentId()
-                        )
-                        .build();
-
-        TutoringEnrollmentJpaEntity saved =
-                repository.save(entity);
-
-        return TutoringEnrollment.builder()
-                .id(saved.getId())
-                .tutoringOfferId(
-                        saved.getTutoringOfferId()
-                )
-                .studentId(
-                        saved.getStudentId()
-                )
-                .build();
-    }
-
-    @Override
-    public Optional<TutoringEnrollment>
-    findByTutoringOfferIdAndStudentId(
-            UUID tutoringOfferId,
-            UUID studentId
-    ) {
-
-        return repository
-                .findByTutoringOfferIdAndStudentId(
-                        tutoringOfferId,
-                        studentId
-                )
-                .map(entity ->
-                        TutoringEnrollment.builder()
-                                .id(entity.getId())
+                TutoringEnrollmentJpaEntity entity = TutoringEnrollmentJpaEntity.builder()
+                                .id(enrollment.getId())
                                 .tutoringOfferId(
-                                        entity.getTutoringOfferId()
-                                )
+                                                enrollment.getTutoringOfferId())
                                 .studentId(
-                                        entity.getStudentId()
-                                )
-                                .build()
-                );
-    }
+                                                enrollment.getStudentId())
+                                .build();
+
+                TutoringEnrollmentJpaEntity saved = repository.save(entity);
+
+                return TutoringEnrollment.builder()
+                                .id(saved.getId())
+                                .tutoringOfferId(
+                                                saved.getTutoringOfferId())
+                                .studentId(
+                                                saved.getStudentId())
+                                .build();
+        }
+
+        @Override
+        public Optional<TutoringEnrollment> findByTutoringOfferIdAndStudentId(
+                        UUID tutoringOfferId,
+                        UUID studentId) {
+
+                return repository
+                                .findByTutoringOfferIdAndStudentId(
+                                                tutoringOfferId,
+                                                studentId)
+                                .map(entity -> TutoringEnrollment.builder()
+                                                .id(entity.getId())
+                                                .tutoringOfferId(
+                                                                entity.getTutoringOfferId())
+                                                .studentId(
+                                                                entity.getStudentId())
+                                                .build());
+        }
 }
