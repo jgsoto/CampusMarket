@@ -1,8 +1,4 @@
 'use strict';
-
-const API_BASE = 'http://localhost:8080';
-
-// 1. Centralización del DOM (Si un ID cambia en el HTML, solo se corrige aquí)
 const DOM = {
   loading: () => document.getElementById('profile-loading'),
   form: () => document.getElementById('profile-form'),
@@ -10,8 +6,6 @@ const DOM = {
   cancelBtn: () => document.getElementById('cancel-btn'),
   charCount: () => document.getElementById('char-count'),
   toastContainer: () => document.getElementById('toast-container'),
-  
-  // Elementos del Sidebar
   avatarInitials: () => document.getElementById('avatar-initials'),
   displayName: () => document.getElementById('display-name'),
   displayEmail: () => document.getElementById('display-email'),
@@ -19,8 +13,6 @@ const DOM = {
   statListings: () => document.getElementById('stat-listings'),
   statTutorings: () => document.getElementById('stat-tutorings'),
   statReviews: () => document.getElementById('stat-reviews'),
-
-  // Campos del Formulario
   profName: () => document.getElementById('prof-name'),
   profEmail: () => document.getElementById('prof-email'),
   profPhone: () => document.getElementById('prof-phone'),
@@ -57,7 +49,6 @@ function setLoading(on) {
 function setSaving(on) {
   const btn = DOM.saveBtn();
   if (!btn) return;
-
   btn.disabled = on;
   btn.innerHTML = on
     ? '<span class="w-4 h-4 border-2 border-uce-gold/30 border-t-uce-gold rounded-full animate-spin inline-block mr-2"></span>Guardando...'
@@ -69,7 +60,6 @@ function getInitials(name) {
   return name.split(' ').filter(w => w).slice(0, 2).map(w => w[0].toUpperCase()).join('');
 }
 
-// 2. Single Responsibility: Funciones dedicadas exclusivamente a mapear datos
 function populateForm(p) {
   DOM.profName().value    = p.fullName    || '';
   DOM.profEmail().value   = p.email       || '';
@@ -86,9 +76,6 @@ function populateSidebar(p) {
   DOM.displayName().textContent    = name;
   DOM.displayEmail().textContent   = p.email || '—';
   DOM.trustScore().textContent     = Math.round(p.trustScore || 100);
-  DOM.statListings().textContent   = p.listingsCount   ?? '0';
-  DOM.statTutorings().textContent  = p.tutoringsCount  ?? '0';
-  DOM.statReviews().textContent    = p.reviewsCount    ?? '0';
 }
 
 function readFormPayload() {
@@ -100,6 +87,29 @@ function readFormPayload() {
   };
 }
 
+async function loadUserStats(userId) {
+  try {
+    const res = await fetch(`${API_BASE}/api/listings`);
+    
+    if (res.ok) {
+      const allListings = await res.json();
+      
+      // SOLUCIÓN: Filtramos en caliente para contar solo las que coincidan con tu ID
+      const myListings = allListings.filter(item => item.ownerId === userId || item.userId === userId);
+      
+      DOM.statListings().textContent = myListings.length;
+    } else {
+      DOM.statListings().textContent = '0';
+    }
+  } catch (err) {
+    console.error('[Stats] Error procesando listados:', err);
+    DOM.statListings().textContent = '0';
+  }
+  
+  DOM.statTutorings().textContent = '0';
+  DOM.statReviews().textContent    = '0';
+}
+
 async function loadProfile(userId) {
   setLoading(true);
   try {
@@ -109,8 +119,9 @@ async function loadProfile(userId) {
     const profile = await res.json();
     populateForm(profile);
     populateSidebar(profile);
+    await loadUserStats(userId);
   } catch (err) {
-    console.error('[Profile] Error cargando:', err);
+    console.error('[Profile] Error en fetch:', err);
     showToast('No se pudo cargar el perfil desde el servidor.', 'error');
     DOM.avatarInitials().textContent = '??';
     DOM.displayName().textContent = 'Error de carga';
@@ -138,14 +149,14 @@ async function saveProfile(userId) {
     showToast('Perfil actualizado correctamente.', 'success');
     loadProfile(userId);
   } catch (err) {
-    console.error('[Profile] Error guardando:', err);
+    console.error('[Profile] Error actualizando:', err);
     Swal.fire('Error', 'No se pudo actualizar el perfil.', 'error');
   } finally {
     setSaving(false);
   }
 }
 
-window.addEventListener('load', () => {
+window.addEventListener('load', async () => {
   const userId = localStorage.getItem('campusMarketUserId');
 
   if (!userId) {
@@ -157,6 +168,10 @@ window.addEventListener('load', () => {
     }).then(() => { window.location.href = '/modules/identity/signin.html'; });
     return;
   }
+
+  await Clerk.load();
+
+  MarketplaceLayout.mountNavbar('profile', Clerk.user);
 
   loadProfile(userId);
 

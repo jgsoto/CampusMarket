@@ -1,211 +1,287 @@
-window.addEventListener("load", async () => {
-    await Clerk.load();
+/**
+ * my-listings.js — Módulo Marketplace
+ * CampusMarket · Universidad Central del Ecuador · 2025
+ *
+ * Responsabilidades:
+ *  - Cargar publicaciones del usuario autenticado
+ *  - Renderizar cards con acciones según estado
+ *  - Editar, publicar, marcar vendido y eliminar
+ */
 
-    if (!Clerk.user) {
-        window.location.href = "/modules/identity/signin.html";
-        return;
-    }
+'use strict';
 
-    loadMyListings();
+// ─── Status config ────────────────────────────────────────────────────────────
+const STATUS_STYLES = {
+  BORRADOR:  { badge: 'bg-yellow-50 text-yellow-700',  label: 'Borrador'  },
+  PUBLICADA: { badge: 'bg-green-50 text-green-700',    label: 'Publicada' },
+  VENDIDO:   { badge: 'bg-gray-100 text-gray-500',     label: 'Vendido'   },
+};
 
-    document.getElementById("edit-listing-form").addEventListener("submit", handleEditSubmit);
-});
+// ─── Render de una card ───────────────────────────────────────────────────────
+function createMyListingCard(listing) {
+  const style    = STATUS_STYLES[listing.status] ?? STATUS_STYLES.BORRADOR;
+  const isSold   = listing.status === 'VENDIDO';
+  const thumb    = listing.images?.find(i => i.thumbnail)?.url
+                ?? listing.images?.[0]?.url
+                ?? 'https://placehold.co/400x300?text=Sin+Imagen';
 
-async function loadMyListings() {
-    const container = document.getElementById("my-listings-container");
-    const ownerId = localStorage.getItem("campusMarketUserId");
+  const card = document.createElement('article');
+  card.className = `bg-white border border-gray-100 rounded-2xl overflow-hidden
+                    shadow-sm flex flex-col`;
 
-    if (!ownerId) {
-        container.innerHTML = "<p style='color:red;'>Error: No se encontro la sesion local. Ve al Dashboard para sincronizar.</p>";
-        return;
-    }
+  card.innerHTML = `
+    <!-- Imagen -->
+    <div class="relative aspect-[4/3] overflow-hidden bg-gray-100">
+      <img src="${thumb}" alt="${listing.title}" loading="lazy"
+           class="w-full h-full object-cover ${isSold ? 'opacity-50 grayscale' : ''}"
+           onerror="this.src='https://placehold.co/400x300?text=Sin+Imagen'" />
+      <span class="absolute top-3 right-3 text-[10px] font-bold uppercase tracking-wider
+                   px-2.5 py-1 rounded-full ${style.badge}">
+        ${style.label}
+      </span>
+    </div>
 
-    try {
-        const response = await fetch("http://localhost:8080/api/listings/me", {
-            headers: {
-                "X-User-Id": ownerId
-            }
-        });
+    <!-- Contenido -->
+    <div class="p-5 flex flex-col gap-2 flex-1">
+      <h3 class="font-display text-base font-bold text-uce-navy leading-snug line-clamp-2">
+        ${listing.title}
+      </h3>
+      <p class="text-xs text-gray-400">${listing.categoryName ?? ''}</p>
+      <p class="text-xs text-gray-500 line-clamp-2 flex-1">${listing.description}</p>
+      <span class="font-display text-xl font-bold text-uce-navy mt-1">
+        $${listing.price.toFixed(2)}
+      </span>
+    </div>
 
-        if (!response.ok) throw new Error("Fallo al obtener mis publicaciones");
+    <!-- Acciones -->
+    <div class="px-5 pb-5 flex flex-wrap gap-2">
+      ${!isSold ? `
+        <button onclick="openEditModal('${listing.id}', \`${listing.title.replace(/`/g, '\\`')}\`, \`${listing.description.replace(/`/g, '\\`')}\`, ${listing.price})"
+                class="flex-1 py-2 rounded-lg text-xs font-semibold
+                       bg-yellow-50 text-yellow-700 hover:bg-yellow-100 transition-colors">
+          Editar
+        </button>` : ''}
 
-        const listings = await response.json();
-        container.innerHTML = "";
+      ${listing.status === 'BORRADOR' ? `
+        <button onclick="publishListing('${listing.id}')"
+                class="flex-1 py-2 rounded-lg text-xs font-semibold
+                       bg-green-500 text-white hover:bg-green-600 transition-colors">
+          Publicar
+        </button>` : ''}
 
-        if (listings.length === 0) {
-            container.innerHTML = "<p>No tienes publicaciones aun. ¡Crea una!</p>";
-            return;
-        }
+      ${listing.status === 'PUBLICADA' ? `
+        <button onclick="markAsSold('${listing.id}')"
+                class="flex-1 py-2 rounded-lg text-xs font-semibold
+                       bg-purple-600 text-white hover:bg-purple-700 transition-colors">
+          Marcar vendido
+        </button>` : ''}
 
-        listings.forEach(listing => {
-            const card = document.createElement("div");
-            card.style = "border: 1px solid #ccc; padding: 15px; border-radius: 8px; width: 250px; background: #fff;";
-            
-            let statusColor = listing.status === "BORRADOR" ? "orange" : (listing.status === "PUBLICADA" ? "green" : "gray");
+      ${isSold ? `
+        <span class="flex-1 py-2 rounded-lg text-xs font-semibold text-center
+                     bg-gray-100 text-gray-400">
+          Vendido
+        </span>` : ''}
 
-            const thumbnail = listing.images && listing.images.length > 0
-                ? listing.images.find(img => img.thumbnail)?.url || listing.images[0].url
-                : "/images/no-image.png";
+      <button onclick="deleteListing('${listing.id}')"
+              class="py-2 px-3 rounded-lg text-xs font-semibold
+                     bg-red-50 text-red-600 hover:bg-red-100 transition-colors">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" aria-hidden="true" class="inline">
+          <polyline points="3 6 5 6 21 6"/>
+          <path d="M19 6l-1 14H6L5 6"/>
+          <path d="M10 11v6M14 11v6"/>
+        </svg>
+      </button>
+    </div>
+  `;
 
-            card.innerHTML = `
-                <div style="width: 100%; height: 150px; background: #eee; border-radius: 4px; margin-bottom: 10px; display: flex; justify-content: center; align-items: center; overflow: hidden;">
-                    <img src="${thumbnail}" alt="${listing.title}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='https://placehold.co/250x150?text=Sin+Imagen'">
-                </div>
-                <h3 style="margin-top: 0; margin-bottom: 5px;">${listing.title}</h3>
-                <p style="color: gray; font-size: 14px; margin: 2px 0;">Categoria: ${listing.categoryName}</p>
-                <p style="margin: 8px 0; font-size: 14px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 40px;">${listing.description}</p>
-                <h2 style="color: #28a745; margin: 8px 0;">$${listing.price.toFixed(2)}</h2>
-                <p style="font-weight: bold; color: ${statusColor}; margin: 2px 0;">ESTADO: ${listing.status}</p>
-                
-                <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
-                    ${listing.status !== 'VENDIDO' ? `<button onclick="openEditModal('${listing.id}', '${listing.title.replace(/'/g, "\\'").replace(/\n/g, ' ')}', '${listing.description.replace(/'/g, "\\'").replace(/\n/g, '\\n').replace(/\r/g, '')}', ${listing.price})" style="background: #ffc107; border: none; padding: 8px; border-radius: 4px; cursor: pointer; flex: 1;">Editar</button>` : ''}
-                    ${listing.status === 'BORRADOR' ? `<button onclick="publishListing('${listing.id}')" style="background: #28a745; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; flex: 1;">Publicar</button>` : ''}
-                    ${listing.status === 'PUBLICADA' ? `<button onclick="markAsSold('${listing.id}')" style="background: #6f42c1; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; flex: 1;">Marcar Vendido</button>` : ''}
-                    ${listing.status === 'VENDIDO' ? `<span style="background: #6c757d; color: white; padding: 8px; border-radius: 4px; flex: 1; text-align: center; font-size: 13px;">Vendido</span>` : ''}
-                    <button onclick="deleteListing('${listing.id}')" style="background: #dc3545; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; flex: 1;">Eliminar</button>
-                </div>
-            `;
-            container.appendChild(card);
-        });
-
-    } catch (error) {
-        console.error(error);
-        container.innerHTML = "<p style='color:red;'>Error al cargar tus publicaciones.</p>";
-    }
+  return card;
 }
 
+// ─── Cargar mis publicaciones ─────────────────────────────────────────────────
+async function loadMyListings() {
+  const container = document.getElementById('my-listings-container');
+  const ownerId   = getOwnerId();
+
+  if (!ownerId) {
+    container.innerHTML = `
+      <div class="col-span-full text-center py-12 text-sm text-red-500">
+        No se encontró la sesión local. Vuelve al
+        <a href="/modules/marketplace/dashboard.html" class="underline font-semibold">Dashboard</a>.
+      </div>`;
+    return;
+  }
+
+  // Skeletons
+  container.innerHTML = Array(3).fill(0).map(() =>
+    `<div class="skeleton rounded-2xl h-80"></div>`
+  ).join('');
+
+  try {
+    const res = await fetch(`${API_BASE}/api/listings/me`, {
+      headers: { 'X-User-Id': ownerId },
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    const listings = await res.json();
+    container.innerHTML = '';
+
+    if (!listings.length) {
+      container.innerHTML = `
+        <div class="col-span-full flex flex-col items-center justify-center py-20 gap-4">
+          <div class="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.5" class="text-gray-400" aria-hidden="true">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+              <line x1="3" y1="6" x2="21" y2="6"/>
+            </svg>
+          </div>
+          <p class="text-gray-500 text-sm">Aún no tienes publicaciones.</p>
+          <a href="/modules/marketplace/create-listing.html"
+             class="text-sm font-semibold text-uce-navy underline underline-offset-4">
+            Crear mi primera publicación
+          </a>
+        </div>`;
+      return;
+    }
+
+    listings.forEach(l => container.appendChild(createMyListingCard(l)));
+
+  } catch (err) {
+    console.error('[MyListings] Error:', err);
+    container.innerHTML = `<div class="col-span-full text-center py-12 text-sm text-red-500">
+      Error al cargar tus publicaciones.</div>`;
+  }
+}
+
+// ─── Modal editar ─────────────────────────────────────────────────────────────
 function openEditModal(id, title, desc, price) {
-    document.getElementById("edit-id").value = id;
-    document.getElementById("edit-title").value = title;
-    document.getElementById("edit-desc").value = desc;
-    document.getElementById("edit-price").value = price;
-    
-    document.getElementById("edit-modal").style.display = "flex";
+  document.getElementById('edit-id').value    = id;
+  document.getElementById('edit-title').value = title;
+  document.getElementById('edit-desc').value  = desc;
+  document.getElementById('edit-price').value = price;
+  const modal = document.getElementById('edit-modal');
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
 }
 
 function closeEditModal() {
-    document.getElementById("edit-modal").style.display = "none";
+  const modal = document.getElementById('edit-modal');
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+  document.getElementById('edit-images').value = '';
 }
 
+// ─── Acciones API ─────────────────────────────────────────────────────────────
 async function handleEditSubmit(e) {
-    e.preventDefault();
-    
-    const id = document.getElementById("edit-id").value;
-    const title = document.getElementById("edit-title").value;
-    const desc = document.getElementById("edit-desc").value;
-    const price = parseFloat(document.getElementById("edit-price").value);
-    const imagesInput = document.getElementById("edit-images");
-    const ownerId = localStorage.getItem("campusMarketUserId");
+  e.preventDefault();
+  const ownerId = getOwnerId();
+  const id      = document.getElementById('edit-id').value;
 
-    try {
-        const formData = new FormData();
-        formData.append("title", title);
-        formData.append("description", desc);
-        formData.append("price", price);
-        
-        if (imagesInput.files.length > 0) {
-            for (const file of imagesInput.files) {
-                formData.append("images", file);
-            }
-        }
+  const formData = new FormData();
+  formData.append('title',       document.getElementById('edit-title').value.trim());
+  formData.append('description', document.getElementById('edit-desc').value.trim());
+  formData.append('price',       parseFloat(document.getElementById('edit-price').value));
 
-        const response = await fetch(`http://localhost:8080/api/listings/${id}`, {
-            method: "PUT",
-            headers: {
-                "X-User-Id": ownerId
-            },
-            body: formData
-        });
+  const files = document.getElementById('edit-images').files;
+  for (const file of files) formData.append('images', file);
 
-        if (response.ok) {
-            alert("Publicacion actualizada con exito");
-            closeEditModal();
-            imagesInput.value = "";
-            loadMyListings();
-        } else {
-            const err = await response.json();
-            alert("Error: " + err.message);
-        }
-    } catch (error) {
-        console.error(error);
-        alert("Error de conexion al actualizar.");
-    }
+  try {
+    const res = await fetch(`${API_BASE}/api/listings/${id}`, {
+      method:  'PUT',
+      headers: { 'X-User-Id': ownerId },
+      body:    formData,
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    showToast('Publicación actualizada correctamente.', 'success');
+    closeEditModal();
+    loadMyListings();
+
+  } catch (err) {
+    console.error('[MyListings] Error editando:', err);
+    showToast('No se pudo actualizar la publicación.', 'error');
+  }
 }
 
 async function deleteListing(id) {
-    if (!confirm("¿Estas seguro de que quieres eliminar esta publicacion?")) return;
+  const ok = await showConfirm('¿Eliminar esta publicación? Esta acción no se puede deshacer.', 'Eliminar');
+  if (!ok) return;
 
-    const ownerId = localStorage.getItem("campusMarketUserId");
+  try {
+    const res = await fetch(`${API_BASE}/api/listings/${id}`, {
+      method:  'DELETE',
+      headers: { 'X-User-Id': getOwnerId() },
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-    try {
-        const response = await fetch(`http://localhost:8080/api/listings/${id}`, {
-            method: "DELETE",
-            headers: {
-                "X-User-Id": ownerId
-            }
-        });
+    showToast('Publicación eliminada.', 'success');
+    loadMyListings();
 
-        if (response.ok) {
-            alert("Publicacion eliminada correctamente.");
-            loadMyListings();
-        } else {
-            const err = await response.json();
-            alert("Error: " + err.message);
-        }
-    } catch (error) {
-        console.error(error);
-        alert("Error de conexion al eliminar.");
-    }
+  } catch (err) {
+    console.error('[MyListings] Error eliminando:', err);
+    showToast('No se pudo eliminar la publicación.', 'error');
+  }
 }
 
 async function publishListing(id) {
-    if (!confirm("¿Quieres publicar esta publicacion ahora?")) return;
+  const ok = await showConfirm('¿Publicar este producto ahora?', 'Publicar');
+  if (!ok) return;
 
-    const ownerId = localStorage.getItem("campusMarketUserId");
+  try {
+    const res = await fetch(`${API_BASE}/api/listings/${id}/publish`, {
+      method:  'POST',
+      headers: { 'X-User-Id': getOwnerId() },
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-    try {
-        const response = await fetch(`http://localhost:8080/api/listings/${id}/publish`, {
-            method: "POST",
-            headers: {
-                "X-User-Id": ownerId
-            }
-        });
+    showToast('¡Producto publicado exitosamente!', 'success');
+    loadMyListings();
 
-        if (response.ok) {
-            alert("¡Publicacion publicada con exito!");
-            loadMyListings();
-        } else {
-            const err = await response.json();
-            alert("Error: " + err.message);
-        }
-    } catch (error) {
-        console.error(error);
-        alert("Error de conexion al publicar.");
-    }
+  } catch (err) {
+    console.error('[MyListings] Error publicando:', err);
+    showToast('No se pudo publicar el producto.', 'error');
+  }
 }
 
 async function markAsSold(id) {
-    if (!confirm("¿Estas seguro de marcar este producto como VENDIDO? Esta accon no se puede deshacer.")) return;
+  const ok = await showConfirm('¿Marcar como vendido? Esta acción no se puede deshacer.', 'Marcar vendido');
+  if (!ok) return;
 
-    const ownerId = localStorage.getItem("campusMarketUserId");
+  try {
+    const res = await fetch(`${API_BASE}/api/listings/${id}/mark-sold`, {
+      method:  'POST',
+      headers: { 'X-User-Id': getOwnerId() },
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-    try {
-        const response = await fetch(`http://localhost:8080/api/listings/${id}/mark-sold`, {
-            method: "POST",
-            headers: {
-                "X-User-Id": ownerId
-            }
-        });
+    showToast('Producto marcado como vendido.', 'success');
+    loadMyListings();
 
-        if (response.ok) {
-            alert("¡Producto marcado como vendido exitosamente!");
-            loadMyListings();
-        } else {
-            const err = await response.json();
-            alert("Error: " + err.message);
-        }
-    } catch (error) {
-        console.error(error);
-        alert("Error de conexion.");
-    }
+  } catch (err) {
+    console.error('[MyListings] Error marcando vendido:', err);
+    showToast('No se pudo actualizar el estado.', 'error');
+  }
 }
+
+// ─── Bootstrap ────────────────────────────────────────────────────────────────
+window.addEventListener('load', async () => {
+  await Clerk.load();
+
+  if (!Clerk.user) {
+    window.location.href = '/modules/identity/signin.html';
+    return;
+  }
+
+  MarketplaceLayout.mountNavbar('my-listings', Clerk.user);
+  loadMyListings();
+
+  document.getElementById('edit-listing-form')
+    .addEventListener('submit', handleEditSubmit);
+
+  // Cerrar modal al hacer click fuera
+  document.getElementById('edit-modal')
+    .addEventListener('click', e => {
+      if (e.target === e.currentTarget) closeEditModal();
+    });
+});

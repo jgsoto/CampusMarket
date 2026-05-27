@@ -1,67 +1,267 @@
-async function submitForm(isPublish) {
+'use strict';
 
-    const form = document.getElementById("create-listing-form");
+let _selectedFiles = [];
 
-    if (!form.checkValidity()) {
-        form.reportValidity();
-        return;
-    }
+const FIELDS = {
+  title:    () => document.getElementById('listing-title'),
+  desc:     () => document.getElementById('listing-desc'),
+  price:    () => document.getElementById('listing-price'),
+  category: () => document.getElementById('listing-category'),
+};
 
-    const title = document.getElementById("listing-title").value;
-    const desc = document.getElementById("listing-desc").value;
-    const price = parseFloat(document.getElementById("listing-price").value);
-    const categoryId = document.getElementById("listing-category").value;
-    const imagesInput = document.getElementById("listing-images");
+const ERRORS = {
+  title:    'El título es obligatorio.',
+  desc:     'La descripción es obligatoria.',
+  price:    'Ingresa un precio válido mayor a $0.00.',
+  category: 'Selecciona una categoría.',
+};
 
-    const ownerId = localStorage.getItem("campusMarketUserId");
+function showFieldError(fieldId, message) {
+  const input    = document.getElementById(fieldId);
+  const existing = document.getElementById(`error-${fieldId}`);
+  if (existing) existing.remove();
 
-    if (!ownerId) {
-        alert("Error de sesión: No se encontró tu ID de usuario.");
-        window.location.href = "/modules/identity/signin.html";
-        return;
-    }
+  input.classList.add('border-red-400');
+  input.classList.remove('border-gray-200', 'border-uce-navy');
 
-    try {
-
-        const formData = new FormData();
-
-        formData.append("title", title);
-        formData.append("description", desc);
-        formData.append("price", price);
-        formData.append("categoryId", categoryId);
-        formData.append("ownerId", ownerId);
-        formData.append("publish", isPublish);
-
-        for (const image of imagesInput.files) {
-            formData.append("images", image);
-        }
-
-        const response = await fetch("http://localhost:8080/api/listings", {
-            method: "POST",
-            body: formData
-        });
-
-        if (!response.ok) {
-
-            const errorText = await response.text();
-
-            console.error(errorText);
-
-            throw new Error("El servidor rechazó la petición.");
-        }
-
-        alert(
-            `¡Éxito! Publicación creada en estado ${
-                isPublish ? "PUBLICADA" : "BORRADOR"
-            }.`
-        );
-
-        window.location.href = "/modules/marketplace/my-listings.html";
-
-    } catch (error) {
-
-        console.error(error);
-
-        alert("Error al crear la publicación.");
-    }
+  const error       = document.createElement('span');
+  error.id          = `error-${fieldId}`;
+  error.className   = 'text-xs text-red-400 mt-1';
+  error.textContent = message;
+  input.parentElement.appendChild(error);
 }
+
+function clearFieldError(fieldId) {
+  const input    = document.getElementById(fieldId);
+  const existing = document.getElementById(`error-${fieldId}`);
+  if (existing) existing.remove();
+  input.classList.remove('border-red-400');
+  input.classList.add('border-gray-200');
+}
+
+function validateField(fieldId) {
+  const input = document.getElementById(fieldId);
+  const value = input.value.trim();
+
+  if (fieldId === 'listing-price') {
+    const num = parseFloat(value);
+    if (!value || isNaN(num) || num < 0.01) {
+      showFieldError(fieldId, ERRORS.price);
+      return false;
+    }
+    clearFieldError(fieldId);
+    return true;
+  }
+
+  if (!value) {
+    const key = fieldId.replace('listing-', '');
+    showFieldError(fieldId, ERRORS[key]);
+    return false;
+  }
+
+  clearFieldError(fieldId);
+  return true;
+}
+
+function validateAll() {
+  const results = [
+    validateField('listing-title'),
+    validateField('listing-desc'),
+    validateField('listing-price'),
+    validateField('listing-category'),
+  ];
+  return results.every(Boolean);
+}
+
+function initRealTimeValidation() {
+  ['listing-title', 'listing-desc', 'listing-price', 'listing-category'].forEach(id => {
+    const el = document.getElementById(id);
+    el.addEventListener('blur',  () => validateField(id));
+    el.addEventListener('input', () => {
+      if (document.getElementById(`error-${id}`)) validateField(id);
+    });
+  });
+}
+
+function setMainImage(src, alt) {
+  document.getElementById('main-preview-img').src = src;
+  document.getElementById('main-preview-img').alt = alt;
+}
+
+function updateImageCount() {
+  document.getElementById('image-count').textContent = `${_selectedFiles.length} / 5`;
+}
+
+function renderGallery() {
+  const mainContainer = document.getElementById('main-preview-container');
+  const thumbnailsRow = document.getElementById('thumbnails-row');
+  const clearBtn      = document.getElementById('btn-clear-images');
+  const uploadZone    = document.getElementById('upload-zone');
+
+  thumbnailsRow.innerHTML = '';
+
+  if (!_selectedFiles.length) {
+    mainContainer.classList.add('hidden');
+    thumbnailsRow.classList.add('hidden');
+    clearBtn.classList.add('hidden');
+    uploadZone.classList.remove('hidden');
+    updateImageCount();
+    return;
+  }
+
+  mainContainer.classList.remove('hidden');
+  thumbnailsRow.classList.remove('hidden');
+  clearBtn.classList.remove('hidden');
+  uploadZone.classList.toggle('hidden', _selectedFiles.length >= 5);
+
+  _selectedFiles.forEach((file, index) => {
+    const reader = new FileReader();
+    reader.onload = ({ target }) => {
+      const src = target.result;
+      if (index === 0) setMainImage(src, file.name);
+
+      const thumb = document.createElement('button');
+      thumb.type      = 'button';
+      thumb.className = `relative aspect-square rounded-xl overflow-hidden bg-gray-100
+                         border-2 transition-all group
+                         ${index === 0 ? 'border-uce-navy' : 'border-transparent hover:border-uce-navy/50'}`;
+      thumb.setAttribute('aria-label', `Ver imagen ${index + 1}`);
+      thumb.innerHTML = `
+        <img src="${src}" alt="${file.name}" class="w-full h-full object-contain bg-white" />
+        <button type="button"
+                class="remove-img absolute top-1 right-1 w-5 h-5 rounded-full
+                       bg-red-500 text-white flex items-center justify-center
+                       opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
+                data-index="${index}"
+                aria-label="Eliminar imagen ${index + 1}">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+        </button>`;
+
+      thumb.addEventListener('click', (e) => {
+        if (e.target.closest('.remove-img')) return;
+        setMainImage(src, file.name);
+        thumbnailsRow.querySelectorAll('button').forEach(b =>
+          b.classList.replace('border-uce-navy', 'border-transparent')
+        );
+        thumb.classList.replace('border-transparent', 'border-uce-navy');
+      });
+
+      thumbnailsRow.appendChild(thumb);
+    };
+    reader.readAsDataURL(file);
+  });
+
+  updateImageCount();
+}
+
+function initImageGallery() {
+  const input = document.getElementById('listing-images');
+
+  input.addEventListener('change', () => {
+    const remaining = 5 - _selectedFiles.length;
+    _selectedFiles  = [..._selectedFiles, ...Array.from(input.files).slice(0, remaining)];
+    input.value     = '';
+    renderGallery();
+  });
+
+  document.getElementById('thumbnails-row').addEventListener('click', (e) => {
+    const removeBtn = e.target.closest('.remove-img');
+    if (!removeBtn) return;
+    _selectedFiles.splice(parseInt(removeBtn.dataset.index, 10), 1);
+    renderGallery();
+  });
+
+  document.getElementById('btn-clear-images').addEventListener('click', () => {
+    _selectedFiles = [];
+    input.value    = '';
+    renderGallery();
+  });
+}
+
+function initDescCounter() {
+  const textarea = document.getElementById('listing-desc');
+  const counter  = document.getElementById('desc-count');
+  textarea.addEventListener('input', () => {
+    counter.textContent = textarea.value.length;
+  });
+}
+
+async function submitForm(isPublish) {
+  if (!validateAll()) {
+    document.querySelector('[id^="error-listing"]')
+      ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+
+  const ownerId = getOwnerId();
+  if (!ownerId) {
+    showToast('Sesión no encontrada. Inicia sesión nuevamente.', 'error');
+    window.location.href = '/modules/identity/signin.html';
+    return;
+  }
+
+  const btn          = isPublish
+    ? document.getElementById('btn-publish')
+    : document.getElementById('btn-draft');
+  const originalHTML = btn.innerHTML;
+
+  btn.disabled  = true;
+  btn.innerHTML = `<span class="w-4 h-4 border-2 border-uce-gold/30 border-t-uce-gold
+                               rounded-full animate-spin inline-block mr-2"></span>
+                   ${isPublish ? 'Publicando...' : 'Guardando...'}`;
+
+  try {
+    const formData = new FormData();
+    formData.append('title',       FIELDS.title().value.trim());
+    formData.append('description', FIELDS.desc().value.trim());
+    formData.append('price',       parseFloat(FIELDS.price().value));
+    formData.append('categoryId',  FIELDS.category().value);
+    formData.append('ownerId',     ownerId);
+    formData.append('publish',     isPublish);
+
+    for (const file of _selectedFiles) {
+      formData.append('images', file);
+    }
+
+    const res = await fetch(`${API_BASE}/api/listings`, {
+      method: 'POST',
+      body:    formData,
+    });
+
+    if (!res.ok) throw new Error(await res.text() || `HTTP ${res.status}`);
+
+    showToast(
+      isPublish ? 'Producto publicado exitosamente.' : 'Guardado como borrador.',
+      'success'
+    );
+
+    setTimeout(() => {
+      window.location.href = '/modules/marketplace/my-listings.html';
+    }, 1200);
+
+  } catch (err) {
+    console.error('[CreateListing]', err);
+    showToast('No se pudo crear la publicación. Intenta de nuevo.', 'error');
+    btn.disabled  = false;
+    btn.innerHTML = originalHTML;
+  }
+}
+
+window.addEventListener('load', async () => {
+  await Clerk.load();
+
+  if (!Clerk.user) {
+    window.location.href = '/modules/identity/signin.html';
+    return;
+  }
+
+  MarketplaceLayout.mountNavbar('create', Clerk.user);
+  initRealTimeValidation();
+  initImageGallery();
+  initDescCounter();
+
+  document.getElementById('btn-draft').addEventListener('click',   () => submitForm(false));
+  document.getElementById('btn-publish').addEventListener('click', () => submitForm(true));
+});

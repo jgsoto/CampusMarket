@@ -4,34 +4,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CampusMarket | Mi Perfil</title>
-  
   <script src="https://cdn.tailwindcss.com"></script>
-  
   <script src="/js/tailwind-config.js"></script>
-  
   <link rel="stylesheet" href="/css/styles.css" />
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script async crossorigin="anonymous"
+  data-clerk-publishable-key="pk_test_ZnVubnktbXVza294LTU5LmNsZXJrLmFjY291bnRzLmRldiQ"
+  src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@4/dist/clerk.browser.js">
+</script>
+  
 </head>
 <body class="bg-gray-50 min-h-screen">
 
-  <header class="bg-uce-navy sticky top-0 z-50 border-b border-uce-gold/15">
-    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between gap-8">
-
-      <a href="/modules/marketplace/dashboard.html" class="flex items-center gap-3">
-        <img src="/assets/icons/logo.png" alt="Logo" class="w-9 h-9 rounded-lg object-cover" />
-        <span class="font-display text-lg font-bold text-white">
-          Campus<span class="text-uce-gold">Market</span>
-        </span>
-      </a>
-
-      <nav class="hidden md:flex items-center gap-6">
-        <a href="/modules/marketplace/dashboard.html" class="text-sm text-white/70 hover:text-uce-gold transition-colors">Marketplace</a>
-        <a href="/modules/tutorias/index.html"        class="text-sm text-white/70 hover:text-uce-gold transition-colors">Tutorías</a>
-        <a href="/modules/identity/profile.html"      class="text-sm text-uce-gold font-semibold" aria-current="page">Mi Perfil</a>
-      </nav>
-
-    </div>
-  </header>
+  <div id="navbar-placeholder"></div>
 
   <main class="max-w-6xl mx-auto px-6 py-8 pb-20">
 
@@ -64,7 +49,7 @@
           <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-5">Actividad</p>
           <div class="grid grid-cols-3 gap-2 text-center">
             <div>
-              <p id="stat-listings"  class="font-display text-2xl font-bold text-uce-navy">—</p>
+              <p id="stat-listings" class="font-display text-2xl font-bold text-uce-navy">—</p>
               <p class="text-xs text-gray-400 mt-1">Publicaciones</p>
             </div>
             <div>
@@ -72,7 +57,7 @@
               <p class="text-xs text-gray-400 mt-1">Tutorías</p>
             </div>
             <div>
-              <p id="stat-reviews"   class="font-display text-2xl font-bold text-uce-navy">—</p>
+              <p id="stat-reviews" class="font-display text-2xl font-bold text-uce-navy">—</p>
               <p class="text-xs text-gray-400 mt-1">Reseñas</p>
             </div>
           </div>
@@ -116,49 +101,35 @@
           </div>
 
           <div class="flex flex-col gap-1.5">
-            <label class="text-sm font-medium text-gray-700" for="prof-phone">
-              Teléfono / WhatsApp
-              <span class="text-xs text-gray-400 font-normal ml-1">(opcional)</span>
-            </label>
+            <label class="text-sm font-medium text-gray-700" for="prof-phone">Teléfono / WhatsApp <span class="text-xs text-gray-400 font-normal ml-1">(opcional)</span></label>
             <input id="prof-phone" type="tel" placeholder="Ej: 0991234567" maxlength="15"
               class="px-4 py-3 border-2 border-gray-200 rounded-lg text-sm focus:border-uce-gold focus:outline-none focus:ring-2 focus:ring-uce-gold/10 transition-colors" />
           </div>
 
           <div class="flex flex-col gap-1.5">
-            <label class="text-sm font-medium text-gray-700" for="prof-address">
-              Sector / Dirección de referencia
-              <span class="text-xs text-gray-400 font-normal ml-1">(opcional)</span>
-            </label>
+            <label class="text-sm font-medium text-gray-700" for="prof-address">Sector / Dirección de referencia <span class="text-xs text-gray-400 font-normal ml-1">(opcional)</span></label>
             <input id="prof-address" type="text" placeholder="Ej: Sector La Gasca, norte de Quito"
               class="px-4 py-3 border-2 border-gray-200 rounded-lg text-sm focus:border-uce-gold focus:outline-none focus:ring-2 focus:ring-uce-gold/10 transition-colors" />
           </div>
 
           <div class="flex flex-col gap-1.5">
-            <label class="text-sm font-medium text-gray-700" for="prof-social">
-              Redes sociales
-              <span class="text-xs text-gray-400 font-normal ml-1">(opcional)</span>
-            </label>
+            <label class="text-sm font-medium text-gray-700" for="prof-social">Redes sociales <span class="text-xs text-gray-400 font-normal ml-1">(opcional)</span></label>
             <input id="prof-social" type="text" placeholder="Instagram, Facebook, LinkedIn..."
               class="px-4 py-3 border-2 border-gray-200 rounded-lg text-sm focus:border-uce-gold focus:outline-none focus:ring-2 focus:ring-uce-gold/10 transition-colors" />
           </div>
 
           <div class="flex flex-col gap-1.5">
-            <label class="text-sm font-medium text-gray-700" for="prof-desc">
-              Sobre ti
-              <span class="text-xs text-gray-400 font-normal ml-1">(opcional)</span>
-            </label>
+            <label class="text-sm font-medium text-gray-700" for="prof-desc">Sobre ti <span class="text-xs text-gray-400 font-normal ml-1">(opcional)</span></label>
             <textarea id="prof-desc" rows="4" maxlength="300"
               placeholder="Soy estudiante de Ingeniería en Sistemas, octavo semestre..."
               class="px-4 py-3 border-2 border-gray-200 rounded-lg text-sm focus:border-uce-gold focus:outline-none focus:ring-2 focus:ring-uce-gold/10 transition-colors resize-none"></textarea>
-            <span class="text-xs text-gray-400 text-right">
-              <span id="char-count">0</span>/300 caracteres
-            </span>
+              <span class="text-xs text-gray-400 text-right"><span id="char-count">0</span>/300 caracteres</span>
           </div>
 
           <div class="flex gap-4 pt-4 border-t border-gray-100">
             <button type="submit" id="save-btn"
               class="flex items-center gap-2 px-6 py-3 bg-uce-navy text-uce-gold font-semibold rounded-lg hover:bg-uce-navy-mid transition-colors text-sm shadow-sm">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="inline-block mr-1"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
               Guardar cambios
             </button>
             <button type="button" id="cancel-btn"
@@ -168,13 +139,13 @@
           </div>
 
         </form>
-
       </section>
     </div>
   </main>
 
   <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 max-w-sm" aria-live="polite"></div>
 
+  <script src="/modules/marketplace/js/marketplace-layout.js"></script>
   <script src="/modules/identity/js/profile.js"></script>
 </body>
 </html>

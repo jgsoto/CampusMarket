@@ -1,11 +1,3 @@
-/* ============================================================
-   CampusMarket — styles.css
-   Universidad Central del Ecuador · 2025
-   Con Tailwind CDN este archivo es mínimo.
-   Solo contiene: tokens de color UCE, fuentes y clases
-   que Tailwind no puede generar dinámicamente.
-   ============================================================ */
-
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap');
 
 /* ── Tokens UCE ── */

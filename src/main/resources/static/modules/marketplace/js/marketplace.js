@@ -1,122 +1,169 @@
-// Función principal para cargar el catálogo
-async function loadCatalog() {
+'use strict';
 
-    const container = document.getElementById("catalog-container");
+//  Almacena el catálogo en memoria para realizar filtrados locales instantáneos sin saturar la API con re-fetches.
+let _catalogCache = [];
 
-    try {
-        const response = await fetch("http://localhost:8080/api/listings");
+function createCard(listing) {
+  const isSold    = listing.status === 'VENDIDO';
+  const imageUrl  = listing.images?.length > 0
+    ? listing.images[0].url
+    : 'https://placehold.co/400x300?text=Sin+Imagen';
 
-        if (!response.ok) {
-            throw new Error("Error al cargar el catálogo");
-        }
+  const card = document.createElement('article');
+  card.className = `bg-white border border-gray-100 rounded-2xl overflow-hidden
+                    shadow-sm hover:shadow-lg hover:-translate-y-1
+                    transition-all duration-300 flex flex-col`;
+  card.dataset.title       = listing.title.toLowerCase();
+  card.dataset.category    = (listing.categoryName ?? '').toLowerCase();
+  card.dataset.description = (listing.description ?? '').toLowerCase();
 
-        const listings = await response.json();
+  card.innerHTML = `
+    <div class="relative aspect-[4/3] overflow-hidden bg-gray-100">
+      <img src="${imageUrl}"
+           alt="${listing.title}"
+           loading="lazy"
+          class="w-full h-full object-contain bg-white transition-transform duration-300
+                 group-hover:scale-105 ${isSold ? 'opacity-50' : ''}" />
+      ${isSold ? `
+        <div class="absolute inset-0 flex items-center justify-center">
+          <span class="bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow">
+            AGOTADO
+          </span>
+        </div>` : ''}
+      <span class="absolute bottom-2 left-2 bg-uce-navy/80 text-uce-gold
+                   text-[10px] font-semibold uppercase tracking-wider
+                   px-2 py-0.5 rounded-full backdrop-blur-sm">
+        ${listing.categoryName ?? 'Sin categoría'}
+      </span>
+    </div>
 
-       
-        container.innerHTML = "";
+    <div class="p-5 flex flex-col gap-3 flex-1">
+      <h3 class="font-display text-base font-bold text-uce-navy leading-snug
+                 line-clamp-2 ${isSold ? 'opacity-50' : ''}">
+        ${listing.title}
+      </h3>
 
-      
-        if (listings.length === 0) {
-            container.innerHTML = "<p>No hay productos disponibles en este momento.</p>";
-            return;
-        }
+      <p class="text-xs text-gray-500 line-clamp-2 flex-1 ${isSold ? 'opacity-50' : ''}">
+        ${listing.description}
+      </p>
 
-        listings.forEach(listing => {
+      <div class="flex items-center justify-between mt-auto pt-3 border-t border-gray-100">
+        <span class="font-display text-xl font-bold text-uce-navy ${isSold ? 'opacity-50' : ''}">
+          $${listing.price.toFixed(2)}
+        </span>
+        <span class="text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full
+                     ${isSold
+                       ? 'bg-gray-100 text-gray-400'
+                       : 'bg-green-50 text-green-700'}">
+          ${listing.status}
+        </span>
+      </div>
+    </div>
 
-            const card = document.createElement("div");
+    <div class="px-5 pb-5">
+      <button
+        onclick="window.location.href='/modules/marketplace/product-details.html?id=${listing.id}'"
+        class="w-full py-2.5 rounded-xl text-sm font-semibold transition-all
+               ${isSold
+                 ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                 : 'bg-uce-navy text-uce-gold hover:bg-uce-navy-light'}">
+        ${isSold ? 'No disponible' : 'Ver producto'}
+      </button>
+    </div>
+  `;
 
-            card.style = `
-                border: 1px solid #ccc;
-                padding: 15px;
-                border-radius: 8px;
-                width: 250px;
-                background: #f9f9f9;
-                display: flex;
-                flex-direction: column;
-                gap: 10px;
-            `;
-
-            // Imagen principal
-            const imageUrl =
-                listing.images && listing.images.length > 0
-                    ? listing.images[0].url
-                    : "https://via.placeholder.com/300x200?text=Sin+Imagen";
-
-            const isSold = listing.status === "VENDIDO";
-            const opacity = isSold ? "0.6" : "1";
-            const badge = isSold 
-                ? `<div style="position: absolute; top: 10px; right: 10px; background: red; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold; font-size: 12px; z-index: 10;">AGOTADO</div>` 
-                : "";
-
-            card.innerHTML = `
-                <div style="position: relative; width: 100%; height: 200px;">
-                    ${badge}
-                    <img
-                        src="${imageUrl}"
-                        alt="${listing.title}"
-                        style="
-                            width: 100%;
-                            height: 100%;
-                            object-fit: cover;
-                            border-radius: 8px;
-                            opacity: ${opacity};
-                        "
-                    >
-                </div>
-
-                <h3 style="margin: 0; opacity: ${opacity};">
-                    ${listing.title}
-                </h3>
-
-                <p style="margin: 0; color: gray; font-size: 14px; opacity: ${opacity};">
-                    Categoria: ${listing.categoryName}
-                </p>
-
-                <p style="margin: 0; opacity: ${opacity};">
-                    ${listing.description}
-                </p>
-
-                <h2 style="margin: 0; color: #28a745; opacity: ${opacity};">
-                    $${listing.price.toFixed(2)}
-                </h2>
-
-                <p style="margin: 0; font-size: 12px; color: ${isSold ? 'red' : '#888'}; font-weight: ${isSold ? 'bold' : 'normal'};">
-                    Estado: ${listing.status}
-                </p>
-
-                <button
-                    onclick="window.location.href='/modules/marketplace/product-details.html?id=${listing.id}'"
-                    style="
-                        margin-top: 10px;
-                        padding: 8px;
-                        background-color: ${isSold ? '#6c757d' : '#007bff'};
-                        color: white;
-                        border: none;
-                        border-radius: 4px;
-                        cursor: pointer;
-                        width: 100%;
-                        font-weight: bold;
-                    "
-                >
-                    Ver Producto
-                </button>
-            `;
-
-            container.appendChild(card);
-        });
-
-    } catch (error) {
-
-        console.error("Fallo al conectar con el backend:", error);
-
-        container.innerHTML = `
-            <p style="color:red;">
-                Error al cargar los productos.
-                Asegurate de que el servidor Java este corriendo.
-            </p>
-        `;
-    }
+  return card;
 }
 
+function renderEmpty(message = 'No hay productos disponibles.') {
+  const container = document.getElementById('catalog-container');
+  container.innerHTML = `
+    <div class="col-span-full flex flex-col items-center justify-center py-20 gap-4 text-center">
+      <div class="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.5" class="text-gray-400" aria-hidden="true">
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <path d="M16 10a4 4 0 0 1-8 0"/>
+        </svg>
+      </div>
+      <p class="text-gray-500 text-sm">${message}</p>
+      <a href="/modules/marketplace/create-listing.html"
+         class="text-sm font-semibold text-uce-navy underline underline-offset-4 hover:text-uce-gold transition-colors">
+        Sé el primero en publicar
+      </a>
+    </div>`;
+}
 
-loadCatalog();
+function renderError() {
+  const container = document.getElementById('catalog-container');
+  container.innerHTML = `
+    <div class="col-span-full flex flex-col items-center justify-center py-20 gap-4 text-center">
+      <div class="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.5" class="text-red-400" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+      </div>
+      <p class="text-gray-500 text-sm">Error al cargar los productos.</p>
+      <button onclick="loadCatalog()"
+              class="text-sm font-semibold text-uce-navy underline underline-offset-4 hover:text-uce-gold transition-colors">
+        Intentar de nuevo
+      </button>
+    </div>`;
+}
+
+async function loadCatalog() {
+  const container = document.getElementById('catalog-container');
+
+  container.innerHTML = Array(8).fill(0).map(() =>
+    `<div class="skeleton rounded-2xl h-72"></div>`
+  ).join('');
+
+  try {
+    const res = await fetch(`${API_BASE}/api/listings`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    const listings = await res.json();
+    _catalogCache  = listings;
+
+    renderCatalog(listings);
+
+  } catch (err) {
+    console.error('[Marketplace] Error cargando catálogo:', err);
+    renderError();
+  }
+}
+
+function renderCatalog(listings) {
+  const container = document.getElementById('catalog-container');
+  container.innerHTML = '';
+
+  if (!listings.length) {
+    renderEmpty();
+    return;
+  }
+
+  listings.forEach(listing => container.appendChild(createCard(listing)));
+}
+
+function filterCatalog(query) {
+  if (!query) {
+    renderCatalog(_catalogCache);
+    return;
+  }
+
+  const filtered = _catalogCache.filter(l =>
+    l.title.toLowerCase().includes(query)       ||
+    l.description.toLowerCase().includes(query) ||
+    (l.categoryName ?? '').toLowerCase().includes(query)
+  );
+
+  renderCatalog(filtered.length ? filtered : []);
+
+  if (!filtered.length) {
+    renderEmpty(`No se encontraron productos para "${query}".`);
+  }
+}

@@ -1,26 +1,100 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CampusMarket | Detalles del Producto</title>
-    <link rel="stylesheet" href="/css/styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CampusMarket | Detalle del Producto</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/js/tailwind-config.js"></script>
+  <link rel="stylesheet" href="/css/styles.css" />
 </head>
-<body>
-    <div class="container" style="max-width: 800px; margin: auto; padding: 20px;">
-        <h1 style="margin-bottom: 20px;">Detalles del Producto</h1>
 
-        <button onclick="window.location.href='/dashboard.html'"
-            style="background: #6c757d; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-bottom: 20px;">
-            ← Volver al Catálogo
-        </button>
+<body class="bg-gray-50 min-h-screen">
 
-        <div id="product-details-container" style="background: #f9f9f9; padding: 20px; border-radius: 8px; border: 1px solid #ccc;">
-            <p>Cargando detalles...</p>
-        </div>
+  <div id="navbar-placeholder"></div>
+
+  <main class="max-w-5xl mx-auto px-6 py-8 pb-20">
+
+    <nav class="flex items-center gap-2 text-sm text-gray-400 mb-8">
+      <a href="/modules/marketplace/dashboard.html" class="hover:text-uce-navy transition-colors">Catálogo</a>
+      <span class="text-gray-300">›</span>
+      <span id="breadcrumb-title" class="text-gray-700 font-medium">Detalle</span>
+    </nav>
+
+    <div id="product-skeleton" class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+      <div class="skeleton rounded-2xl aspect-square"></div>
+      <div class="flex flex-col gap-4">
+        <div class="skeleton h-8 w-3/4 rounded-lg"></div>
+        <div class="skeleton h-5 w-1/3 rounded-lg"></div>
+        <div class="skeleton h-10 w-1/2 rounded-lg"></div>
+        <div class="skeleton h-32 w-full rounded-xl"></div>
+        <div class="skeleton h-12 w-full rounded-xl"></div>
+      </div>
     </div>
 
-    <script src="/modules/marketplace/js/product-details.js"></script>
+    <div id="product-content" hidden
+         class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
+
+      <div class="flex flex-col gap-4">
+        <div class="rounded-2xl overflow-hidden bg-white border border-gray-100 aspect-square shadow-sm">
+          <img id="main-image" src="" alt=""
+               class="w-full h-full object-contain bg-white transition-opacity duration-300" />
+        </div>
+        <div id="thumbnails" class="flex gap-3 flex-wrap"></div>
+      </div>
+
+      <div class="flex flex-col gap-5 lg:sticky lg:top-24">
+
+        <div>
+          <span id="product-category"
+                class="text-xs font-semibold uppercase tracking-wider text-uce-gold-dark
+                       bg-uce-gold-pale px-3 py-1 rounded-full"></span>
+          <h1 id="product-title"
+              class="font-display text-3xl font-bold text-uce-navy mt-3 leading-tight"></h1>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <span id="product-price" class="font-display text-4xl font-black text-uce-navy"></span>
+          <span id="product-status"
+                class="text-xs font-bold uppercase tracking-wide px-3 py-1 rounded-full"></span>
+        </div>
+
+        <div class="bg-gray-50 border border-gray-100 rounded-xl p-5">
+          <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Descripción</p>
+          <p id="product-description" class="text-sm text-gray-600 leading-relaxed"></p>
+        </div>
+
+        <p id="product-date" class="text-xs text-gray-400"></p>
+
+        <div id="action-container"></div>
+
+      </div>
+    </div>
+
+    <div id="product-error" hidden
+         class="flex flex-col items-center justify-center py-24 gap-4">
+      <div class="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.5" class="text-red-400" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+      </div>
+      <p id="error-message" class="text-gray-500 text-sm text-center"></p>
+      <a href="/modules/marketplace/dashboard.html"
+         class="text-sm font-semibold text-uce-navy underline underline-offset-4">
+        Volver al catálogo
+      </a>
+    </div>
+
+  </main>
+
+  <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 max-w-sm"
+       aria-live="polite"></div>
+
+  <script src="/modules/marketplace/js/marketplace-layout.js"></script>
+  <script src="/modules/marketplace/js/product-details.js"></script>
+
 </body>
 </html>

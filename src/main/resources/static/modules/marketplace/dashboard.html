@@ -1,61 +1,148 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CampusMarket | Dashboard</title>
-    <link rel="stylesheet" href="/css/styles.css">
-    <script async crossorigin="anonymous"
-        data-clerk-publishable-key="pk_test_ZnVubnktbXVza294LTU5LmNsZXJrLmFjY291bnRzLmRldiQ"
-        src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@4/dist/clerk.browser.js">
-    </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CampusMarket | Catálogo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/js/tailwind-config.js"></script>
+  <link rel="stylesheet" href="/css/styles.css" />
+  <script async crossorigin="anonymous"
+    data-clerk-publishable-key="pk_test_ZnVubnktbXVza294LTU5LmNsZXJrLmFjY291bnRzLmRldiQ"
+    src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@4/dist/clerk.browser.js">
+  </script>
 </head>
 
-<body>
+<body class="bg-gray-50 min-h-screen">
 
-    <div class="container">
+  <div id="navbar-placeholder"></div>
 
-        <header class="dashboard-header">
-            <div id="user-section" style="display: none;">
-                <h1 style="margin: 0; font-size: 24px;">
-                    Welcome, <span id="user-name"></span>
-                </h1>
-                <p id="user-email" style="margin: 5px 0 0 0; color: #666;"></p>
-                
-                <span id="user-id" style="display: none;"></span>
-            </div>
-            
-            <button id="logout-button" class="btn-logout">
-                Cerrar sesión
-            </button>
-        </header>
+  <main class="max-w-6xl mx-auto px-6 py-8">
 
-        <div class="action-menu">
-            <h2 style="margin: 0;">Catálogo de Productos</h2>
-            <div class="button-group">
-                <button onclick="window.location.href='/modules/identity/profile.html'" class="btn-profile">
-                    👤 Mi Perfil
-                </button>
-                <button onclick="window.location.href='/modules/marketplace/my-listings.html'" class="btn-publications">
-                    Mis Publicaciones
-                </button>
-                <button onclick="window.location.href='/modules/marketplace/create-listing.html'" class="btn-sell">
-                    + Vender Producto
-                </button>
-            </div>
-        </div>
-
-        <div id="marketplace-section" style="display: none;">
-            <div id="catalog-container" class="product-marketplace-grid">
-                <p>Cargando productos...</p>
-            </div>
-        </div>
-
+    <div id="user-section" class="flex items-center gap-4 mb-8" style="display:none!important;">
+      <div class="w-12 h-12 rounded-full bg-gradient-to-br from-uce-navy to-uce-navy-light
+                  border-2 border-uce-gold flex items-center justify-center flex-shrink-0">
+        <span id="user-initials" class="font-display text-base font-bold text-uce-gold"></span>
+      </div>
+      <div>
+        <h1 class="font-display text-2xl font-bold text-uce-navy leading-tight">
+          Bienvenido, <span id="user-name" class="text-uce-gold"></span>
+        </h1>
+        <p id="user-email" class="text-sm text-gray-400"></p>
+      </div>
     </div>
 
-    <script src="/modules/marketplace/js/dashboard.js"></script>
-    <script src="/modules/marketplace/js/marketplace.js"></script>
+    <div id="user-skeleton" class="flex items-center gap-4 mb-8">
+      <div class="skeleton w-12 h-12 rounded-full flex-shrink-0"></div>
+      <div class="flex flex-col gap-2">
+        <div class="skeleton h-6 w-48 rounded-lg"></div>
+        <div class="skeleton h-4 w-36 rounded-lg"></div>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-5 mb-8">
+
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <h2 class="font-display text-3xl font-bold text-uce-navy">Catálogo de Productos</h2>
+          <p class="text-sm text-gray-400 mt-1">Encuentra lo que necesitas en tu comunidad UCE</p>
+        </div>
+        <a href="/modules/marketplace/create-listing.html"
+           class="inline-flex items-center gap-2 bg-uce-gold text-uce-navy
+                  text-sm font-bold px-5 py-2.5 rounded-xl hover:opacity-90
+                  transition-opacity shadow-md shadow-uce-gold/20 w-fit flex-shrink-0">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true">
+            <path d="M12 5v14M5 12h14"/>
+          </svg>
+          Publicar Producto
+        </a>
+      </div>
+
+      <div class="flex items-stretch w-full shadow-sm" role="search">
+
+        <div class="relative flex-shrink-0" id="category-selector-wrapper">
+          <button id="category-selector-btn"
+                  class="h-full flex items-center gap-2 px-4 bg-uce-navy text-white
+                         text-sm font-medium rounded-l-xl border-r border-uce-navy-light
+                         hover:bg-uce-navy-light transition-colors min-w-[160px] justify-between"
+                  aria-haspopup="listbox" aria-expanded="false">
+            <span id="category-label">Todas las categorías</span>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2.5" id="category-chevron" class="transition-transform duration-200 flex-shrink-0" aria-hidden="true">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </button>
+
+          <ul id="category-dropdown"
+              class="absolute left-0 top-full mt-1 w-52 bg-white rounded-xl shadow-lg
+                     border border-gray-100 overflow-hidden z-50 hidden"
+              role="listbox" aria-label="Categorías">
+            <li role="option" data-category="all" data-label="Todas las categorías"
+                class="category-option flex items-center gap-3 px-4 py-3 text-sm text-gray-700
+                       hover:bg-gray-50 cursor-pointer transition-colors font-medium
+                       border-b border-gray-50">
+              <span class="w-2 h-2 rounded-full bg-uce-gold flex-shrink-0"></span>
+              Todas las categorías
+            </li>
+            <li role="option" data-category="libros" data-label="Libros y Apuntes"
+                class="category-option flex items-center gap-3 px-4 py-3 text-sm text-gray-700
+                       hover:bg-gray-50 cursor-pointer transition-colors">
+              <span class="w-2 h-2 rounded-full bg-blue-400 flex-shrink-0"></span>
+              Libros y Apuntes
+            </li>
+            <li role="option" data-category="electrónica" data-label="Electrónica"
+                class="category-option flex items-center gap-3 px-4 py-3 text-sm text-gray-700
+                       hover:bg-gray-50 cursor-pointer transition-colors">
+              <span class="w-2 h-2 rounded-full bg-purple-400 flex-shrink-0"></span>
+              Electrónica
+            </li>
+            <li role="option" data-category="insumos" data-label="Insumos Universitarios"
+                class="category-option flex items-center gap-3 px-4 py-3 text-sm text-gray-700
+                       hover:bg-gray-50 cursor-pointer transition-colors">
+              <span class="w-2 h-2 rounded-full bg-green-400 flex-shrink-0"></span>
+              Insumos Universitarios
+            </li>
+          </ul>
+        </div>
+
+        <div class="relative flex-1">
+          <input id="search-input" type="search"
+                 placeholder="Buscar productos..."
+                 class="w-full h-full px-4 py-3 text-sm border-y-2 border-gray-200
+                        focus:border-uce-navy focus:outline-none transition-colors bg-white" />
+        </div>
+
+        <button id="search-btn"
+                class="flex items-center justify-center px-5 bg-uce-navy rounded-r-xl
+                       hover:bg-uce-navy-light transition-colors flex-shrink-0"
+                aria-label="Buscar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2.5" class="text-uce-gold" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="m21 21-4.35-4.35"/>
+          </svg>
+        </button>
+
+      </div>
+    </div>
+
+    <div id="catalog-container"
+         class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div class="skeleton rounded-2xl h-72"></div>
+      <div class="skeleton rounded-2xl h-72"></div>
+      <div class="skeleton rounded-2xl h-72"></div>
+      <div class="skeleton rounded-2xl h-72"></div>
+      <div class="skeleton rounded-2xl h-72 hidden sm:block"></div>
+      <div class="skeleton rounded-2xl h-72 hidden md:block"></div>
+      <div class="skeleton rounded-2xl h-72 hidden lg:block"></div>
+      <div class="skeleton rounded-2xl h-72 hidden lg:block"></div>
+    </div>
+
+  </main>
+
+  <script src="/modules/marketplace/js/marketplace-layout.js"></script>
+  <script src="/modules/marketplace/js/marketplace.js"></script>
+  <script src="/modules/marketplace/js/dashboard.js"></script>
 
 </body>
 </html>
