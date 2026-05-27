@@ -9,6 +9,7 @@ import org.uce.campusmarket.marketplace.application.dto.ListingImageResponse;
 import org.uce.campusmarket.marketplace.application.dto.ListingResponse;
 import org.uce.campusmarket.marketplace.domain.model.Listing;
 import org.uce.campusmarket.marketplace.domain.repository.ListingRepository;
+import org.uce.campusmarket.reputation.domain.repository.ReviewRepository;
 import org.uce.campusmarket.shared.exception.DomainException;
 
 import java.util.List;
@@ -21,10 +22,14 @@ public class GetListingUseCase {
 
     private final ListingRepository listingRepository;
     private final UserRepository userRepository;
+    private final ReviewRepository reviewRepository;
 
     public ListingResponse execute(UUID listingId) {
+
         Listing listing = listingRepository.findById(listingId)
-                .orElseThrow(() -> new DomainException("La publicación no existe"));
+                .orElseThrow(() ->
+                        new DomainException("La publicación no existe")
+                );
 
         User seller = userRepository.findById(listing.getOwnerId())
                 .orElse(null);
@@ -37,6 +42,16 @@ public class GetListingUseCase {
                 ))
                 .toList();
 
+        Double averageRating =
+                reviewRepository.getAverageRatingByReviewedUserId(
+                        listing.getOwnerId()
+                );
+
+        Integer totalReviews =
+                reviewRepository.countByReviewedUserId(
+                        listing.getOwnerId()
+                );
+
         return new ListingResponse(
                 listing.getId(),
                 listing.getTitle().getValue(),
@@ -47,11 +62,29 @@ public class GetListingUseCase {
                 listing.getStatus().name(),
                 listing.getCreatedAt(),
                 images,
-                seller != null ? seller.getFullName() : "Desconocido",
-                seller != null ? seller.getEmail() : "No disponible",
-                seller != null ? seller.getPhone() : "No disponible",
-                seller != null ? seller.getAddress() : "No disponible",
-                seller != null ? seller.getSocialMedia() : "No disponible"
+
+                seller != null
+                        ? seller.getFullName()
+                        : "Desconocido",
+
+                seller != null
+                        ? seller.getEmail()
+                        : "No disponible",
+
+                seller != null
+                        ? seller.getPhone()
+                        : "No disponible",
+
+                seller != null
+                        ? seller.getAddress()
+                        : "No disponible",
+
+                seller != null
+                        ? seller.getSocialMedia()
+                        : "No disponible",
+
+                averageRating,
+                totalReviews
         );
     }
 }

@@ -11,18 +11,34 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TutoringOfferResponse {
+
     private UUID id;
+
     private UUID tutorId;
+
     private String subject;
+
     private String description;
+
     private Double hourlyRate;
+
     private String status;
+
     private LocalDateTime createdAt;
-    
-    // Contact Info (optional)
+
+    // Tutor info
     private String tutorName;
+
     private String tutorEmail;
+
     private String tutorPhone;
+
     private String tutorAddress;
+
     private String tutorSocialMedia;
+
+    // Reputation
+    private Double averageRating;
+
+    private Integer totalReviews;
 }

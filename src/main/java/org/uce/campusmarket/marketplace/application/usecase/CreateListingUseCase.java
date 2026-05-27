@@ -4,19 +4,27 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
 import org.uce.campusmarket.marketplace.application.dto.CreateListingRequest;
+import org.uce.campusmarket.marketplace.application.dto.ListingImageResponse;
 import org.uce.campusmarket.marketplace.application.dto.ListingResponse;
+
 import org.uce.campusmarket.marketplace.domain.model.Category;
 import org.uce.campusmarket.marketplace.domain.model.Listing;
 import org.uce.campusmarket.marketplace.domain.model.ListingImage;
+
 import org.uce.campusmarket.marketplace.domain.repository.CategoryRepository;
 import org.uce.campusmarket.marketplace.domain.repository.ListingRepository;
+
 import org.uce.campusmarket.marketplace.domain.valueobject.ListingDescription;
 import org.uce.campusmarket.marketplace.domain.valueobject.ListingTitle;
 import org.uce.campusmarket.marketplace.domain.valueobject.Price;
+
 import org.uce.campusmarket.marketplace.infrastructure.storage.SupabaseStorageService;
+
+import org.uce.campusmarket.reputation.domain.repository.ReviewRepository;
+
 import org.uce.campusmarket.shared.exception.DomainException;
-import org.uce.campusmarket.marketplace.application.dto.ListingImageResponse;
 
 import java.util.List;
 import java.util.UUID;
@@ -29,12 +37,17 @@ public class CreateListingUseCase {
     private final ListingRepository listingRepository;
     private final CategoryRepository categoryRepository;
     private final SupabaseStorageService storageService;
+    private final ReviewRepository reviewRepository;
 
     public ListingResponse execute(CreateListingRequest request) {
 
-        Category category = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() ->
-                        new DomainException("La categoría especificada no existe"));
+        Category category = categoryRepository.findById(
+                request.getCategoryId()
+        ).orElseThrow(() ->
+                new DomainException(
+                        "La categoría especificada no existe"
+                )
+        );
 
         Listing newListing = new Listing(
                 UUID.randomUUID(),
@@ -79,6 +92,16 @@ public class CreateListingUseCase {
                 ))
                 .toList();
 
+        Double averageRating =
+                reviewRepository.getAverageRatingByReviewedUserId(
+                        savedListing.getOwnerId()
+                );
+
+        Integer totalReviews =
+                reviewRepository.countByReviewedUserId(
+                        savedListing.getOwnerId()
+                );
+
         return new ListingResponse(
                 savedListing.getId(),
                 savedListing.getTitle().getValue(),
@@ -89,7 +112,13 @@ public class CreateListingUseCase {
                 savedListing.getStatus().name(),
                 savedListing.getCreatedAt(),
                 imageResponses,
-                null, null, null, null, null
+                null,
+                null,
+                null,
+                null,
+                null,
+                averageRating,
+                totalReviews
         );
     }
 }
