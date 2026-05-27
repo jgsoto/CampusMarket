@@ -9,21 +9,17 @@
 
     <link rel="stylesheet" href="/css/styles.css">
 
-    <script
-            async
-            crossorigin="anonymous"
-            data-clerk-publishable-key="pk_test_ZnVubnktbXVza294LTU5LmNsZXJrLmFjY291bnRzLmRldiQ"
-            src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@4/dist/clerk.browser.js">
-    </script>
+    <script async crossorigin="anonymous"
+        data-clerk-publishable-key="pk_test_ZnVubnktbXVza294LTU5LmNsZXJrLmFjY291bnRzLmRldiQ"
+        src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@4/dist/clerk.browser.js">
+        </script>
 </head>
 
 <body>
 
-<div class="container">
+    <div class="container">
 
-    <button
-            onclick="window.location.href='/tutoring-catalog.html'"
-            style="
+        <button onclick="window.location.href='/modules/tutoring/tutoring-catalog.html'" style="
                 margin-bottom: 20px;
                 background: #6c757d;
                 color: white;
@@ -31,212 +27,167 @@
                 padding: 10px 15px;
                 border-radius: 4px;
                 cursor: pointer;
-            "
-    >
-        ← Volver al Catálogo
-    </button>
+            ">
+            ← Volver al Catálogo
+        </button>
 
-    <div
-            id="tutoring-details"
-            style="
+        <div id="tutoring-details" style="
                 display: flex;
                 gap: 30px;
                 background: white;
                 padding: 30px;
                 border-radius: 8px;
                 box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            "
-    >
+            ">
 
-        <!-- Información principal -->
-        <div style="flex: 2;">
+            <!-- Información principal -->
+            <div style="flex: 2;">
 
-            <h1
-                    id="tutoring-subject"
-                    style="
+                <h1 id="tutoring-subject" style="
                         margin-top: 0;
                         color: #6f42c1;
-                    "
-            >
-                Cargando...
-            </h1>
+                    ">
+                    Cargando...
+                </h1>
 
-            <h2
-                    id="tutoring-price"
-                    style="color: #28a745;"
-            >
-                ...
-            </h2>
+                <h2 id="tutoring-price" style="color: #28a745;">
+                    ...
+                </h2>
 
-            <div
-                    style="
+                <div style="
                         margin: 20px 0;
                         padding: 15px;
                         background: #f8f9fa;
                         border-radius: 8px;
-                    "
-            >
+                    ">
 
-                <h3 style="margin-top: 0;">
-                    Reputación del Tutor
-                </h3>
+                    <h3 style="margin-top: 0;">
+                        Reputación del Tutor
+                    </h3>
 
-                <p
-                        id="tutor-reputation"
-                        style="
+                    <p id="tutor-reputation" style="
                             font-size: 1.2rem;
                             font-weight: bold;
                             color: #ff9800;
-                        "
-                >
-                    0 / 5
-                </p>
-
-            </div>
-
-            <h3>Descripción</h3>
-
-            <p
-                    id="tutoring-description"
-                    style="
-                        line-height: 1.6;
-                    "
-            >
-                Cargando...
-            </p>
-
-            <!-- Reviews -->
-            <section
-                    style="
-                        margin-top: 40px;
-                    "
-            >
-
-                <h2>
-                    Reviews
-                </h2>
-
-                <div id="reviews-container">
-
-                    <p>
-                        Cargando reviews...
+                        ">
+                        0 / 5
                     </p>
 
                 </div>
 
-            </section>
+                <h3>Descripción</h3>
 
-            <!-- Formulario review -->
-            <section
-                    id="review-section"
-                    style="
+                <p id="tutoring-description" style="
+                        line-height: 1.6;
+                    ">
+                    Cargando...
+                </p>
+
+                <!-- Reviews -->
+                <section style="
+                        margin-top: 40px;
+                    ">
+
+                    <h2>
+                        Reviews
+                    </h2>
+
+                    <div id="reviews-container">
+
+                        <p>
+                            Cargando reviews...
+                        </p>
+
+                    </div>
+
+                </section>
+
+                <!-- Formulario review -->
+                <section id="review-section" style="
                         margin-top: 40px;
                         padding: 20px;
                         background: #f8f9fa;
                         border-radius: 8px;
-                    "
-            >
+                    ">
 
-                <h2
-                        style="
+                    <h2 style="
                             margin-top: 0;
-                        "
-                >
-                    Dejar una reseña
-                </h2>
+                        ">
+                        Dejar una reseña
+                    </h2>
 
-                <form id="review-form">
+                    <form id="review-form">
 
-                    <div
-                            style="
+                        <div style="
                                 margin-bottom: 20px;
-                            "
-                    >
+                            ">
 
-                        <label
-                                for="review-rating"
-                                style="
+                            <label for="review-rating" style="
                                     display: block;
                                     margin-bottom: 8px;
                                     font-weight: bold;
-                                "
-                        >
-                            Calificación
-                        </label>
+                                ">
+                                Calificación
+                            </label>
 
-                        <select
-                                id="review-rating"
-                                required
-                                style="
+                            <select id="review-rating" required style="
                                     width: 100%;
                                     padding: 10px;
                                     border-radius: 6px;
                                     border: 1px solid #ccc;
-                                "
-                        >
-                            <option value="">
-                                Selecciona una opción
-                            </option>
+                                ">
+                                <option value="">
+                                    Selecciona una opción
+                                </option>
 
-                            <option value="1">
-                                1
-                            </option>
+                                <option value="1">
+                                    1
+                                </option>
 
-                            <option value="2">
-                                2
-                            </option>
+                                <option value="2">
+                                    2
+                                </option>
 
-                            <option value="3">
-                                3
-                            </option>
+                                <option value="3">
+                                    3
+                                </option>
 
-                            <option value="4">
-                                4
-                            </option>
+                                <option value="4">
+                                    4
+                                </option>
 
-                            <option value="5">
-                                5
-                            </option>
+                                <option value="5">
+                                    5
+                                </option>
 
-                        </select>
+                            </select>
 
-                    </div>
+                        </div>
 
-                    <div
-                            style="
+                        <div style="
                                 margin-bottom: 20px;
-                            "
-                    >
+                            ">
 
-                        <label
-                                for="review-comment"
-                                style="
+                            <label for="review-comment" style="
                                     display: block;
                                     margin-bottom: 8px;
                                     font-weight: bold;
-                                "
-                        >
-                            Comentario
-                        </label>
+                                ">
+                                Comentario
+                            </label>
 
-                        <textarea
-                                id="review-comment"
-                                rows="5"
-                                placeholder="Escribe tu experiencia con el tutor"
+                            <textarea id="review-comment" rows="5" placeholder="Escribe tu experiencia con el tutor"
                                 style="
                                     width: 100%;
                                     padding: 10px;
                                     border-radius: 6px;
                                     border: 1px solid #ccc;
                                     resize: vertical;
-                                "
-                        ></textarea>
+                                "></textarea>
 
-                    </div>
+                        </div>
 
-                    <button
-                            type="submit"
-                            style="
+                        <button type="submit" style="
                                 background: #6f42c1;
                                 color: white;
                                 border: none;
@@ -244,37 +195,31 @@
                                 border-radius: 6px;
                                 cursor: pointer;
                                 font-weight: bold;
-                            "
-                    >
-                        Enviar reseña
-                    </button>
+                            ">
+                            Enviar reseña
+                        </button>
 
-                </form>
+                    </form>
 
-            </section>
+                </section>
 
-            <!-- Acciones propietario -->
-            <div
-                    id="owner-actions"
-                    style="
+                <!-- Acciones propietario -->
+                <div id="owner-actions" style="
                         display: none;
                         margin-top: 40px;
                         padding-top: 20px;
                         border-top: 1px solid #eee;
-                    "
-            >
+                    ">
 
-                <p style="color: #666;">
+                    <p style="color: #666;">
 
-                    <strong>
-                        Esta es tu publicación
-                    </strong>
+                        <strong>
+                            Esta es tu publicación
+                        </strong>
 
-                </p>
+                    </p>
 
-                <button
-                        id="close-offer-btn"
-                        style="
+                    <button id="close-offer-btn" style="
                             background: #dc3545;
                             color: white;
                             padding: 10px 15px;
@@ -282,136 +227,108 @@
                             border-radius: 5px;
                             cursor: pointer;
                             font-weight: bold;
-                        "
-                >
-                    Marcar como Finalizada
-                </button>
+                        ">
+                        Marcar como Finalizada
+                    </button>
+
+                </div>
 
             </div>
 
-        </div>
+            <div id="enroll-container"></div>
 
-        <div id="enroll-container"></div>
-
-        <!-- Panel lateral -->
-        <div
-                style="
+            <!-- Panel lateral -->
+            <div style="
                     flex: 1;
                     border-left: 1px solid #eee;
                     padding-left: 30px;
-                "
-        >
+                ">
 
-            <div
-                    id="contact-panel"
-                    style="
+                <div id="contact-panel" style="
                         background: #f8f9fa;
                         padding: 20px;
                         border-radius: 8px;
-                    "
-            >
+                    ">
 
-                <h3
-                        style="
+                    <h3 style="
                             margin-top: 0;
-                        "
-                >
-                    Información del Tutor
-                </h3>
+                        ">
+                        Información del Tutor
+                    </h3>
 
-                <div
-                        style="
+                    <div style="
                             margin-bottom: 15px;
-                        "
-                >
+                        ">
 
-                    <strong>
-                        Nombre
-                    </strong>
+                        <strong>
+                            Nombre
+                        </strong>
 
-                    <p
-                            id="tutor-name"
-                            style="
+                        <p id="tutor-name" style="
                                 margin: 5px 0;
-                            "
-                    >
-                        ...
-                    </p>
+                            ">
+                            ...
+                        </p>
 
-                </div>
+                    </div>
 
-                <div
-                        style="
+                    <div style="
                             margin-bottom: 15px;
-                        "
-                >
+                        ">
 
-                    <strong>
-                        Email
-                    </strong>
+                        <strong>
+                            Email
+                        </strong>
 
-                    <p
-                            id="tutor-email"
-                            style="
+                        <p id="tutor-email" style="
                                 margin: 5px 0;
-                            "
-                    >
-                        ...
-                    </p>
+                            ">
+                            ...
+                        </p>
 
-                </div>
+                    </div>
 
-                <div
-                        style="
+                    <div style="
                             margin-bottom: 15px;
-                        "
-                >
+                        ">
 
-                    <strong>
-                        Teléfono
-                    </strong>
+                        <strong>
+                            Teléfono
+                        </strong>
 
-                    <p
-                            id="tutor-phone"
-                            style="
+                        <p id="tutor-phone" style="
                                 margin: 5px 0;
-                            "
-                    >
-                        ...
-                    </p>
+                            ">
+                            ...
+                        </p>
 
-                </div>
+                    </div>
 
-                <div
-                        style="
+                    <div style="
                             margin-bottom: 15px;
-                        "
-                >
+                        ">
 
-                    <strong>
-                        Redes / Contacto
-                    </strong>
+                        <strong>
+                            Redes / Contacto
+                        </strong>
 
-                    <p
-                            id="tutor-social"
-                            style="
+                        <p id="tutor-social" style="
                                 margin: 5px 0;
-                            "
-                    >
-                        ...
-                    </p>
+                            ">
+                            ...
+                        </p>
 
-                </div>
+                    </div>
 
-                <p
-                        style="
+                    <p style="
                             font-size: 0.9rem;
                             color: #666;
                             margin-top: 20px;
-                        "
-                >
-                    Coordina horarios y modalidad directamente con el tutor.
-                </p>
+                        ">
+                        Coordina horarios y modalidad directamente con el tutor.
+                    </p>
+
+                </div>
 
             </div>
 
@@ -419,9 +336,7 @@
 
     </div>
 
-</div>
-
-<script src="/js/tutoring-details.js"></script>
+    <script src="/modules/tutoring/js/tutoring-details.js"></script>
 
 </body>
 

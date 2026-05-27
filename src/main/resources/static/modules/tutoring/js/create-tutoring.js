@@ -2,7 +2,7 @@ window.addEventListener('load', async () => {
     await Clerk.load();
 
     if (!Clerk.user) {
-        window.location.href = '/signin.html';
+        window.location.href = '/modules/identity/signin.html';
         return;
     }
 
@@ -17,7 +17,7 @@ window.addEventListener('load', async () => {
         const userId = localStorage.getItem('campusMarketUserId');
         if (!userId) {
             alert("Error: No se encontró el ID interno de usuario. Por favor inicia sesión de nuevo.");
-            window.location.href = '/signin.html';
+            window.location.href = '/modules/identity/signin.html';
             return;
         }
 
@@ -37,7 +37,7 @@ window.addEventListener('load', async () => {
 
             if (response.ok) {
                 alert('¡Tutoría publicada exitosamente!');
-                window.location.href = '/tutoring-catalog.html';
+                window.location.href = '/modules/tutoring/tutoring-catalog.html';
             } else {
                 alert('Error al publicar la tutoría');
             }

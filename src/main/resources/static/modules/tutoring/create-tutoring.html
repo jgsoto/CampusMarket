@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,37 +11,51 @@
         src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@4/dist/clerk.browser.js">
         </script>
 </head>
+
 <body>
-    <div class="container" style="max-width: 600px; margin: 40px auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    <div class="container"
+        style="max-width: 600px; margin: 40px auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
         <h2 style="color: #6f42c1; margin-top: 0;">Ofrecer Tutoría</h2>
-        
+
         <form id="create-tutoring-form" style="display: flex; flex-direction: column; gap: 15px;">
             <div>
-                <label for="subject" style="display: block; font-weight: bold; margin-bottom: 5px;">Materia o Tema</label>
-                <input type="text" id="subject" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" placeholder="Ej. Matemáticas Básicas">
+                <label for="subject" style="display: block; font-weight: bold; margin-bottom: 5px;">Materia o
+                    Tema</label>
+                <input type="text" id="subject" required
+                    style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;"
+                    placeholder="Ej. Matemáticas Básicas">
             </div>
 
             <div>
-                <label for="description" style="display: block; font-weight: bold; margin-bottom: 5px;">Descripción y Detalles</label>
-                <textarea id="description" rows="4" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" placeholder="¿Qué temas cubres? ¿Cuál es tu metodología?"></textarea>
+                <label for="description" style="display: block; font-weight: bold; margin-bottom: 5px;">Descripción y
+                    Detalles</label>
+                <textarea id="description" rows="4" required
+                    style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;"
+                    placeholder="¿Qué temas cubres? ¿Cuál es tu metodología?"></textarea>
             </div>
 
             <div>
-                <label for="hourlyRate" style="display: block; font-weight: bold; margin-bottom: 5px;">Tarifa por Hora ($)</label>
-                <input type="number" id="hourlyRate" step="0.01" min="0" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" placeholder="Ej. 10.00">
+                <label for="hourlyRate" style="display: block; font-weight: bold; margin-bottom: 5px;">Tarifa por Hora
+                    ($)</label>
+                <input type="number" id="hourlyRate" step="0.01" min="0" required
+                    style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;"
+                    placeholder="Ej. 10.00">
             </div>
 
             <div style="display: flex; gap: 10px; margin-top: 10px;">
-                <button type="submit" style="flex: 1; background: #28a745; color: white; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer;">
+                <button type="submit"
+                    style="flex: 1; background: #28a745; color: white; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer;">
                     Publicar Tutoría
                 </button>
-                <button type="button" onclick="window.location.href='/tutoring-catalog.html'" style="flex: 1; background: #6c757d; color: white; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer;">
+                <button type="button" onclick="window.location.href='/modules/tutoring/tutoring-catalog.html'"
+                    style="flex: 1; background: #6c757d; color: white; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer;">
                     Cancelar
                 </button>
             </div>
         </form>
     </div>
 
-    <script src="/js/create-tutoring.js"></script>
+    <script src="/modules/tutoring/js/create-tutoring.js"></script>
 </body>
+
 </html>
