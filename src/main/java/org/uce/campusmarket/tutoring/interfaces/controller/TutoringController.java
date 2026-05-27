@@ -43,6 +43,12 @@ public class TutoringController {
     private final EnrollInTutoringUseCase
             enrollInTutoringUseCase;
 
+    private final org.uce.campusmarket.tutoring.application.usecase.UpdateTutoringOfferUseCase
+            updateTutoringOfferUseCase;
+
+    private final org.uce.campusmarket.tutoring.application.usecase.DeleteTutoringOfferUseCase
+            deleteTutoringOfferUseCase;
+
     private final TutoringEnrollmentRepository
             tutoringEnrollmentRepository;
 
@@ -169,5 +175,24 @@ public class TutoringController {
                         .isPresent();
 
         return ResponseEntity.ok(enrolled);
+    }
+
+    @PutMapping("/{offerId}")
+    public ResponseEntity<TutoringOfferResponse> updateOffer(
+            @PathVariable UUID offerId,
+            @RequestBody org.uce.campusmarket.tutoring.application.dto.UpdateTutoringOfferRequest request,
+            @RequestHeader("X-User-Id") UUID requesterId
+    ) {
+        TutoringOfferResponse response = updateTutoringOfferUseCase.execute(offerId, request, requesterId);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{offerId}")
+    public ResponseEntity<Void> deleteOffer(
+            @PathVariable UUID offerId,
+            @RequestHeader("X-User-Id") UUID requesterId
+    ) {
+        deleteTutoringOfferUseCase.execute(offerId, requesterId);
+        return ResponseEntity.ok().build();
     }
 }

@@ -505,6 +505,62 @@ function configureOwnerActions(
 
         }
     );
+
+    const editBtn = document.getElementById("edit-offer-btn");
+    editBtn.addEventListener("click", async () => {
+        const newSubject = prompt("Nuevo título:", offer.subject);
+        if (newSubject === null) return;
+        
+        const newDescription = prompt("Nueva descripción:", offer.description);
+        if (newDescription === null) return;
+        
+        const newRate = prompt("Nueva tarifa por hora ($):", offer.hourlyRate);
+        if (newRate === null) return;
+
+        try {
+            const response = await fetch(`http://localhost:8080/api/tutoring/${offerId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-User-Id": currentUserId
+                },
+                body: JSON.stringify({
+                    subject: newSubject,
+                    description: newDescription,
+                    hourlyRate: parseFloat(newRate)
+                })
+            });
+
+            if (!response.ok) throw new Error("Error al editar");
+            
+            alert("Tutoría actualizada exitosamente");
+            location.reload();
+        } catch (error) {
+            alert("Error al actualizar la tutoría");
+        }
+    });
+
+    const deleteBtn = document.getElementById("delete-offer-btn");
+    deleteBtn.addEventListener("click", async () => {
+        const confirmDelete = confirm("¿Estás seguro que deseas eliminar esta tutoría definitivamente?");
+        if (!confirmDelete) return;
+
+        try {
+            const response = await fetch(`http://localhost:8080/api/tutoring/${offerId}`, {
+                method: "DELETE",
+                headers: {
+                    "X-User-Id": currentUserId
+                }
+            });
+
+            if (!response.ok) throw new Error("Error al eliminar");
+            
+            alert("Tutoría eliminada exitosamente");
+            window.location.href = "/modules/tutoring/tutoring-catalog.html";
+        } catch (error) {
+            alert("Error al eliminar la tutoría");
+        }
+    });
 }
 
 function configureEnrollmentButton(

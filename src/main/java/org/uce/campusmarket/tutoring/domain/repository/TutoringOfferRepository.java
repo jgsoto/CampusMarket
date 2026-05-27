@@ -11,4 +11,5 @@ public interface TutoringOfferRepository {
     Optional<TutoringOffer> findById(UUID id);
     List<TutoringOffer> findAll();
     List<TutoringOffer> findByTutorId(UUID tutorId);
+    void deleteById(UUID id);
 }
