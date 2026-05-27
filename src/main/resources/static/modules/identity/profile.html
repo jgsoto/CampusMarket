@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CampusMarket | Mi Perfil</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/js/tailwind-config.js"></script>
+  <link rel="stylesheet" href="/css/styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script async crossorigin="anonymous"
+  data-clerk-publishable-key="pk_test_ZnVubnktbXVza294LTU5LmNsZXJrLmFjY291bnRzLmRldiQ"
+  src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@4/dist/clerk.browser.js">
+</script>
+  
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+  <div id="navbar-placeholder"></div>
+
+  <main class="max-w-6xl mx-auto px-6 py-8 pb-20">
+
+    <nav class="flex items-center gap-2 text-sm text-gray-400 mb-8">
+      <a href="/modules/marketplace/dashboard.html" class="hover:text-uce-navy transition-colors">Dashboard</a>
+      <span class="text-gray-300">›</span>
+      <span class="text-gray-700 font-medium">Mi Perfil</span>
+    </nav>
+
+    <div class="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8 items-start">
+
+      <aside class="flex flex-col gap-5 lg:sticky lg:top-24">
+
+        <div class="bg-white border border-gray-100 rounded-2xl p-8 flex flex-col items-center gap-4 shadow-sm">
+          <div class="w-24 h-24 rounded-full border-4 border-uce-gold bg-gradient-to-br from-uce-navy to-uce-navy-light flex items-center justify-center">
+            <span id="avatar-initials" class="font-display text-3xl font-bold text-uce-gold">--</span>
+          </div>
+          <div class="text-center">
+            <h2 id="display-name" class="font-display text-lg font-bold text-uce-navy">Cargando...</h2>
+            <p id="display-email" class="text-sm text-gray-400 break-all mt-1">—</p>
+          </div>
+          <div class="flex items-center gap-2 px-4 py-2 rounded-full bg-uce-gold-pale border border-uce-gold/30">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-uce-gold-dark"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <span id="trust-score" class="font-semibold text-uce-gold-dark text-sm">—</span>
+            <span class="text-xs text-gray-500">Trust Score</span>
+          </div>
+        </div>
+
+        <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+          <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-5">Actividad</p>
+          <div class="grid grid-cols-3 gap-2 text-center">
+            <div>
+              <p id="stat-listings" class="font-display text-2xl font-bold text-uce-navy">—</p>
+              <p class="text-xs text-gray-400 mt-1">Publicaciones</p>
+            </div>
+            <div>
+              <p id="stat-tutorings" class="font-display text-2xl font-bold text-uce-navy">—</p>
+              <p class="text-xs text-gray-400 mt-1">Tutorías</p>
+            </div>
+            <div>
+              <p id="stat-reviews" class="font-display text-2xl font-bold text-uce-navy">—</p>
+              <p class="text-xs text-gray-400 mt-1">Reseñas</p>
+            </div>
+          </div>
+        </div>
+
+      </aside>
+
+      <section class="bg-white border border-gray-100 rounded-2xl p-10 shadow-sm">
+
+        <div class="border-b border-gray-100 pb-6 mb-8">
+          <h2 class="font-display text-2xl font-bold text-uce-navy">Información personal</h2>
+          <p class="text-sm text-gray-500 mt-2">Actualiza tus datos de contacto visibles para otros usuarios.</p>
+        </div>
+
+        <div id="profile-loading" class="flex flex-col gap-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div class="skeleton-blink h-12 w-full rounded-lg"></div>
+            <div class="skeleton-blink h-12 w-full rounded-lg"></div>
+          </div>
+          <div class="skeleton-blink h-12 w-full rounded-lg"></div>
+          <div class="skeleton-blink h-12 w-full rounded-lg"></div>
+          <div class="skeleton-blink h-12 w-full rounded-lg"></div>
+          <div class="skeleton-blink h-28 w-full rounded-lg"></div>
+        </div>
+
+        <form id="profile-form" class="flex flex-col gap-5" novalidate style="display:none;">
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div class="flex flex-col gap-1.5">
+              <label class="text-sm font-medium text-gray-700" for="prof-name">Nombre completo</label>
+              <input id="prof-name" type="text" disabled
+                class="px-4 py-3 border-2 border-gray-200 rounded-lg text-gray-400 bg-gray-50 cursor-not-allowed text-sm" />
+              <span class="text-xs text-gray-400">Sincronizado con tu cuenta Clerk. No editable.</span>
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="text-sm font-medium text-gray-700" for="prof-email">Correo institucional</label>
+              <input id="prof-email" type="email" disabled
+                class="px-4 py-3 border-2 border-gray-200 rounded-lg text-gray-400 bg-gray-50 cursor-not-allowed text-sm" />
+              <span class="text-xs text-gray-400">Correo verificado. No editable.</span>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label class="text-sm font-medium text-gray-700" for="prof-phone">Teléfono / WhatsApp <span class="text-xs text-gray-400 font-normal ml-1">(opcional)</span></label>
+            <input id="prof-phone" type="tel" placeholder="Ej: 0991234567" maxlength="15"
+              class="px-4 py-3 border-2 border-gray-200 rounded-lg text-sm focus:border-uce-gold focus:outline-none focus:ring-2 focus:ring-uce-gold/10 transition-colors" />
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label class="text-sm font-medium text-gray-700" for="prof-address">Sector / Dirección de referencia <span class="text-xs text-gray-400 font-normal ml-1">(opcional)</span></label>
+            <input id="prof-address" type="text" placeholder="Ej: Sector La Gasca, norte de Quito"
+              class="px-4 py-3 border-2 border-gray-200 rounded-lg text-sm focus:border-uce-gold focus:outline-none focus:ring-2 focus:ring-uce-gold/10 transition-colors" />
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label class="text-sm font-medium text-gray-700" for="prof-social">Redes sociales <span class="text-xs text-gray-400 font-normal ml-1">(opcional)</span></label>
+            <input id="prof-social" type="text" placeholder="Instagram, Facebook, LinkedIn..."
+              class="px-4 py-3 border-2 border-gray-200 rounded-lg text-sm focus:border-uce-gold focus:outline-none focus:ring-2 focus:ring-uce-gold/10 transition-colors" />
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label class="text-sm font-medium text-gray-700" for="prof-desc">Sobre ti <span class="text-xs text-gray-400 font-normal ml-1">(opcional)</span></label>
+            <textarea id="prof-desc" rows="4" maxlength="300"
+              placeholder="Soy estudiante de Ingeniería en Sistemas, octavo semestre..."
+              class="px-4 py-3 border-2 border-gray-200 rounded-lg text-sm focus:border-uce-gold focus:outline-none focus:ring-2 focus:ring-uce-gold/10 transition-colors resize-none"></textarea>
+              <span class="text-xs text-gray-400 text-right"><span id="char-count">0</span>/300 caracteres</span>
+          </div>
+
+          <div class="flex gap-4 pt-4 border-t border-gray-100">
+            <button type="submit" id="save-btn"
+              class="flex items-center gap-2 px-6 py-3 bg-uce-navy text-uce-gold font-semibold rounded-lg hover:bg-uce-navy-mid transition-colors text-sm shadow-sm">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="inline-block mr-1"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              Guardar cambios
+            </button>
+            <button type="button" id="cancel-btn"
+              class="px-6 py-3 border-2 border-gray-200 text-gray-600 font-medium rounded-lg hover:border-gray-400 hover:bg-gray-50 transition-all text-sm">
+              Cancelar
+            </button>
+          </div>
+
+        </form>
+      </section>
+    </div>
+  </main>
+
+  <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 max-w-sm" aria-live="polite"></div>
+
+  <script src="/modules/marketplace/js/marketplace-layout.js"></script>
+  <script src="/modules/identity/js/profile.js"></script>
+</body>
+</html>
