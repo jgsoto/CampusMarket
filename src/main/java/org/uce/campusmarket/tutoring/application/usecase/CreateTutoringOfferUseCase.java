@@ -10,7 +10,6 @@ import org.uce.campusmarket.tutoring.application.dto.TutoringOfferResponse;
 import org.uce.campusmarket.tutoring.domain.model.TutoringOffer;
 import org.uce.campusmarket.tutoring.domain.repository.TutoringOfferRepository;
 import org.uce.campusmarket.tutoring.domain.valueobject.HourlyRate;
-import org.uce.campusmarket.tutoring.domain.model.TutoringStatus;
 
 import org.uce.campusmarket.identity.domain.repository.UserRepository;
 import org.uce.campusmarket.identity.domain.model.User;
@@ -30,9 +29,7 @@ public class CreateTutoringOfferUseCase {
     public TutoringOfferResponse execute(CreateTutoringOfferRequest request) {
 
         User tutor = userRepository.findById(request.getTutorId())
-                .orElseThrow(() ->
-                        new DomainException("El tutor no existe")
-                );
+                .orElseThrow(() -> new DomainException("El tutor no existe"));
 
         if (tutor == null) {
             throw new DomainException("Tutor inválido");
@@ -42,15 +39,13 @@ public class CreateTutoringOfferUseCase {
             throw new DomainException("La tarifa por hora debe ser mayor a 0");
         }
 
-        TutoringOffer offer = new TutoringOffer(
-                UUID.randomUUID(),
-                request.getTutorId(),
-                request.getSubject(),
-                request.getDescription(),
-                new HourlyRate(request.getHourlyRate())
-        );
-
-        offer.setStatus(TutoringStatus.ACTIVE);
+        TutoringOffer offer = TutoringOffer.builder()
+                .id(UUID.randomUUID())
+                .tutorId(request.getTutorId())
+                .subject(request.getSubject())
+                .description(request.getDescription())
+                .hourlyRate(new HourlyRate(request.getHourlyRate()))
+                .build();
 
         TutoringOffer savedOffer = repository.save(offer);
 
@@ -70,7 +65,6 @@ public class CreateTutoringOfferUseCase {
                 tutor.getSocialMedia(),
 
                 null,
-                null
-        );
+                null);
     }
 }

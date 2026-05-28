@@ -19,14 +19,12 @@
 
   <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8 pb-20">
 
-    <!-- Breadcrumb -->
     <nav class="flex items-center gap-2 text-sm text-gray-400 mb-6">
       <a href="/modules/marketplace/dashboard.html" class="hover:text-uce-navy transition-colors">Dashboard</a>
       <span class="text-gray-300">›</span>
       <span class="text-gray-700 font-medium" aria-current="page">Tutorías</span>
     </nav>
 
-    <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
       <div>
         <h1 class="font-display text-2xl font-bold text-uce-navy">Catálogo de Tutorías</h1>
@@ -41,7 +39,6 @@
       </a>
     </div>
 
-    <!-- Filtros -->
     <div class="bg-white border border-gray-100 rounded-2xl p-4 mb-6 shadow-sm flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
       <div class="relative flex-1">
         <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -58,12 +55,9 @@
       </div>
     </div>
 
-    <!-- Contador -->
     <p id="results-count" class="text-xs text-gray-400 font-medium mb-4 px-1"></p>
 
-    <!-- Grid de tarjetas -->
     <div id="tutoring-catalog" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5" aria-live="polite">
-      <!-- Skeletons -->
       <div class="skeleton-blink bg-white rounded-2xl h-52 border border-gray-100"></div>
       <div class="skeleton-blink bg-white rounded-2xl h-52 border border-gray-100"></div>
       <div class="skeleton-blink bg-white rounded-2xl h-52 border border-gray-100"></div>

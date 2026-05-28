@@ -25,7 +25,6 @@
 
   <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8 pb-20">
 
-    <!-- Breadcrumb -->
     <nav class="flex items-center gap-2 text-sm text-gray-400 mb-6">
       <a href="/modules/marketplace/dashboard.html" class="hover:text-uce-navy transition-colors">Dashboard</a>
       <span class="text-gray-300">›</span>
@@ -34,7 +33,6 @@
       <span id="breadcrumb-subject" class="text-gray-700 font-medium truncate max-w-[160px]" aria-current="page">Detalle</span>
     </nav>
 
-    <!-- Skeleton de carga -->
     <div id="page-loading" class="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8">
       <div class="flex flex-col gap-4">
         <div class="skeleton-blink h-10 w-2/3 rounded-xl"></div>
@@ -45,13 +43,10 @@
       <div class="skeleton-blink rounded-2xl h-72"></div>
     </div>
 
-    <!-- Contenido real -->
     <div id="page-content" class="hidden grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8">
 
-      <!-- COLUMNA PRINCIPAL -->
       <div class="flex flex-col gap-6">
 
-        <!-- Título + badge estado -->
         <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
           <div class="flex flex-wrap items-start justify-between gap-3 mb-3">
             <h1 id="tutoring-subject" class="font-display text-2xl font-black text-uce-navy leading-tight">—</h1>
@@ -61,7 +56,6 @@
           <p id="tutoring-description" class="text-gray-600 text-sm leading-relaxed">—</p>
         </div>
 
-        <!-- Reputación del tutor -->
         <div class="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
           <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3">Reputación del Tutor</p>
           <div class="flex items-center gap-3">
@@ -73,7 +67,6 @@
           </div>
         </div>
 
-        <!-- Reseñas -->
         <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
           <h2 id="reviews-title" class="font-display text-base font-bold text-uce-navy border-b border-gray-100 pb-3 mb-4">
             Opiniones (0)
@@ -83,12 +76,9 @@
           </div>
         </div>
 
-        <!-- Formulario para dejar reseña (solo si está cerrada y el usuario estuvo inscrito) -->
         <div id="review-section" class="hidden bg-white border border-uce-gold/30 rounded-2xl p-6 shadow-sm">
           <h2 class="font-display text-base font-bold text-uce-navy mb-4">Dejar una reseña</h2>
           <form id="review-form" class="flex flex-col gap-4" novalidate>
-
-            <!-- Estrellas interactivas -->
             <div class="flex flex-col gap-1.5">
               <label class="text-sm font-medium text-gray-700">Calificación <span class="text-red-400">*</span></label>
               <div class="flex gap-2" id="star-rating" role="group" aria-label="Selecciona una calificación">
@@ -122,31 +112,39 @@
           </form>
         </div>
 
-        <!-- Acciones del propietario -->
         <div id="owner-actions" class="hidden bg-white border border-red-100 rounded-2xl p-6 shadow-sm">
           <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3">Esta es tu publicación</p>
-          <p class="text-sm text-gray-500 mb-4">Si ya no tienes disponibilidad, cierra el anuncio para que no aparezca como activo.</p>
-          <button id="close-offer-btn"
-            class="flex items-center gap-2 px-5 py-2.5 bg-red-500 text-white font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-red-600 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
-              <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
-            </svg>
-            Marcar como Cerrada
-          </button>
+          <p class="text-sm text-gray-500 mb-4">Gestiona tu oferta académica desde aquí.</p>
+          <div class="flex flex-wrap gap-3">
+            <button id="edit-offer-btn"
+              class="flex items-center gap-2 px-5 py-2.5 bg-amber-500 text-white font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-amber-600 transition-all shadow-sm">
+              🎨 Editar Tutoría
+            </button>
+            <button id="close-offer-btn"
+              class="flex items-center gap-2 px-5 py-2.5 bg-gray-500 text-white font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-gray-600 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+              </svg>
+              Marcar como Cerrada
+            </button>
+            <button id="delete-offer-btn"
+              class="flex items-center gap-2 px-5 py-2.5 bg-red-600 text-white font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-red-700 transition-all shadow-sm">
+              🗑️ Eliminar Tutoría
+            </button>
+          </div>
         </div>
 
       </div>
 
-      <!-- COLUMNA LATERAL — Panel del tutor -->
       <aside class="flex flex-col gap-5 lg:sticky lg:top-24">
 
-        <!-- Tarjeta del tutor -->
+        <div id="enroll-container" class="w-full"></div>
+
         <div id="contact-panel" class="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
           <div class="h-2 bg-gradient-to-r from-uce-navy to-uce-navy-light"></div>
           <div class="p-5">
             <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-4">Información del Tutor</p>
 
-            <!-- Avatar + nombre -->
             <div class="flex items-center gap-3 mb-5">
               <div class="w-11 h-11 rounded-full bg-gradient-to-br from-uce-navy to-uce-navy-light border-2 border-uce-gold flex items-center justify-center flex-shrink-0">
                 <span id="tutor-initials" class="font-display text-sm font-bold text-uce-gold">—</span>
@@ -157,7 +155,6 @@
               </div>
             </div>
 
-            <!-- Datos de contacto (ocultos hasta clic) -->
             <div id="contact-hidden" class="flex flex-col gap-3">
               <button id="reveal-contact-btn"
                 class="w-full flex items-center justify-center gap-2 py-2.5 bg-uce-navy text-uce-gold font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-uce-navy-light transition-all shadow-sm">
@@ -169,7 +166,6 @@
             </div>
 
             <div id="contact-revealed" class="hidden flex flex-col gap-3">
-              <!-- Teléfono/WhatsApp -->
               <a id="contact-whatsapp" href="#" target="_blank" rel="noopener"
                 class="flex items-center gap-3 px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-xl text-sm font-medium text-emerald-700 hover:bg-emerald-100 transition-colors hidden">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="text-emerald-600 shrink-0" aria-hidden="true">
@@ -179,7 +175,6 @@
                 <span id="contact-phone-text">—</span>
               </a>
 
-              <!-- Correo -->
               <a id="contact-email-link" href="#"
                 class="flex items-center gap-3 px-4 py-3 bg-blue-50 border border-blue-200 rounded-xl text-sm font-medium text-blue-700 hover:bg-blue-100 transition-colors hidden">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-blue-600 shrink-0" aria-hidden="true">
@@ -189,7 +184,6 @@
                 <span id="contact-email-text" class="truncate">—</span>
               </a>
 
-              <!-- Redes sociales -->
               <div id="contact-social-wrap" class="hidden flex items-center gap-3 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-700">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-gray-500 shrink-0" aria-hidden="true">
                   <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
@@ -206,8 +200,7 @@
           </div>
         </div>
 
-        <!-- Nota para el propietario (no ve el panel de contacto) -->
-        <div id="owner-note" class="hidden bg-uce-gold-pale border border-uce-gold/30 rounded-2xl p-4 text-sm text-uce-gold-dark font-medium text-center">
+        <div id="owner-note" class="hidden bg-amber-50 border border-amber-200 rounded-2xl p-4 text-sm text-amber-800 font-medium text-center">
           Estás viendo tu propia publicación.
         </div>
 

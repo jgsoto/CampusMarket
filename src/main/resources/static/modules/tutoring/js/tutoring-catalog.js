@@ -20,9 +20,8 @@ let _searchQuery   = '';
 
 // ── 3. API ───────────────────────────────────────────────────
 const CatalogAPI = Object.freeze({
-  fetchOffers:     ()      => fetch(`${API_BASE}/api/tutoring`),
-  fetchReputation: (tutorId) =>
-    fetch(`${API_BASE}/api/reviews/users/${tutorId}/reputation`),
+  fetchOffers:     ()        => fetch(`${API_BASE}/api/tutoring`),
+  fetchReputation: (tutorId) => fetch(`${API_BASE}/api/reviews/users/${tutorId}/reputation`),
 });
 
 // ── 4. Utilidades ────────────────────────────────────────────
@@ -56,7 +55,6 @@ function buildCardHTML(offer, reputation) {
     <article class="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col gap-4 cursor-pointer group"
              data-id="${offer.id}" role="article" aria-label="Tutoría de ${offer.subject}">
 
-      <!-- Header: materia + badge -->
       <div class="flex items-start justify-between gap-2">
         <h3 class="font-display font-bold text-uce-navy text-base group-hover:text-uce-navy-light transition-colors leading-tight">
           ${offer.subject}
@@ -66,10 +64,8 @@ function buildCardHTML(offer, reputation) {
         </span>
       </div>
 
-      <!-- Descripción -->
       <p class="text-sm text-gray-500 leading-relaxed flex-1">${truncate(offer.description)}</p>
 
-      <!-- Footer: precio + reputación + avatar -->
       <div class="flex items-center justify-between pt-3 border-t border-gray-50">
         <div class="flex items-center gap-2">
           <div class="w-7 h-7 rounded-full bg-gradient-to-br from-uce-navy to-uce-navy-light border border-uce-gold/50 flex items-center justify-center flex-shrink-0">
@@ -134,28 +130,20 @@ function resetFilters() {
   _activeFilter = 'ALL';
   _searchQuery  = '';
   if (CatalogDOM.searchInput()) CatalogDOM.searchInput().value = '';
-  CatalogDOM.filterBtns().forEach(b => {
-    const isAll = b.dataset.filter === 'ALL';
-    b.classList.toggle('active-filter', isAll);
-    b.classList.toggle('bg-uce-navy',    isAll);
-    b.classList.toggle('text-uce-gold',  isAll);
-    b.classList.toggle('border-uce-navy',isAll);
-    b.classList.toggle('bg-white',       !isAll);
-    b.classList.toggle('text-gray-500',  !isAll);
-    b.classList.toggle('border-gray-200',!isAll);
-  });
+  styleFilterBtns();
   applyFilters();
 }
 
 function styleFilterBtns() {
-  CatalogDOM.filterBtns().forEach(btn => {
-    const isActive = btn.dataset.filter === _activeFilter;
-    btn.classList.toggle('bg-uce-navy',    isActive);
-    btn.classList.toggle('text-uce-gold',  isActive);
-    btn.classList.toggle('border-uce-navy',isActive);
-    btn.classList.toggle('bg-white',       !isActive);
-    btn.classList.toggle('text-gray-500',  !isActive);
-    btn.classList.toggle('border-gray-200',!isActive);
+  CatalogDOM.filterBtns().forEach(b => {
+    const isActive = b.dataset.filter === _activeFilter;
+    b.classList.toggle('active-filter', isActive);
+    b.classList.toggle('bg-uce-navy',    isActive);
+    b.classList.toggle('text-uce-gold',  isActive);
+    b.classList.toggle('border-uce-navy',isActive);
+    b.classList.toggle('bg-white',       !isActive);
+    b.classList.toggle('text-gray-500',  !isActive);
+    b.classList.toggle('border-gray-200',!isActive);
   });
 }
 
@@ -178,7 +166,6 @@ async function loadOffers() {
       return;
     }
 
-    // Cargar reputaciones en paralelo (con fallback a 0)
     const withRep = await Promise.all(
       offers.map(async offer => {
         try {
@@ -202,7 +189,6 @@ async function loadOffers() {
 
 // ── 8. Bootstrap ─────────────────────────────────────────────
 window.addEventListener('load', async () => {
-  const userId = localStorage.getItem('campusMarketUserId');
   await Clerk.load();
 
   if (!Clerk.user) {
@@ -213,7 +199,6 @@ window.addEventListener('load', async () => {
   MarketplaceLayout.mountNavbar('tutorias', Clerk.user);
   styleFilterBtns();
 
-  // Filtros
   CatalogDOM.filterBtns().forEach(btn => {
     btn.addEventListener('click', () => {
       _activeFilter = btn.dataset.filter;
@@ -222,7 +207,6 @@ window.addEventListener('load', async () => {
     });
   });
 
-  // Búsqueda con debounce
   let debounceTimer;
   CatalogDOM.searchInput()?.addEventListener('input', function () {
     clearTimeout(debounceTimer);

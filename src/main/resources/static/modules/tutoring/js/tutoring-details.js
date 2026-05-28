@@ -3,7 +3,7 @@
 // ══════════════════════════════════════════════════════════════
 // MÓDULO: TutoringDetails
 // Responsabilidad: mostrar detalle de una tutoría, panel de
-// contacto con reveal, reseñas y acción de cierre del tutor.
+// contacto con reveal, reseñas, inscripciones, edición y cierre.
 // ══════════════════════════════════════════════════════════════
 
 // ── 1. Selectores ────────────────────────────────────────────
@@ -39,15 +39,18 @@ const DetailsDOM = Object.freeze({
   starBtns:           () => document.querySelectorAll('.star-btn'),
   ownerActions:       () => document.getElementById('owner-actions'),
   ownerNote:          () => document.getElementById('owner-note'),
+  editOfferBtn:       () => document.getElementById('edit-offer-btn'),
+  deleteOfferBtn:     () => document.getElementById('delete-offer-btn'),
   closeOfferBtn:      () => document.getElementById('close-offer-btn'),
+  enrollContainer:    () => document.getElementById('enroll-container'),
   toast:              () => document.getElementById('toast-container'),
 });
 
 // ── 2. API ───────────────────────────────────────────────────
 const DetailsAPI = Object.freeze({
-  fetchOffer:      (id)    => fetch(`${API_BASE}/api/tutoring/${id}`),
-  fetchReputation: (uid)   => fetch(`${API_BASE}/api/reviews/users/${uid}/reputation`),
-  fetchReviews:    (uid)   => fetch(`${API_BASE}/api/reviews/users/${uid}/reviews`),
+  fetchOffer:      (id)     => fetch(`${API_BASE}/api/tutoring/${id}`),
+  fetchReputation: (uid)    => fetch(`${API_BASE}/api/reviews/users/${uid}/reputation`),
+  fetchReviews:    (uid)    => fetch(`${API_BASE}/api/reviews/users/${uid}/reviews`),
   fetchEnrolled:   (id, uid) =>
     fetch(`${API_BASE}/api/tutoring/${id}/enrolled`, { headers: { 'X-User-Id': uid } }),
   closeOffer:      (id, uid) =>
@@ -111,9 +114,9 @@ function renderOfferInfo(offer) {
   const isOpen = offer.status !== 'CLOSED';
 
   if (DetailsDOM.breadcrumbSubject()) DetailsDOM.breadcrumbSubject().textContent = offer.subject;
-  if (DetailsDOM.subject())          DetailsDOM.subject().textContent            = offer.subject;
-  if (DetailsDOM.price())            DetailsDOM.price().textContent              = `$${offer.hourlyRate} / hora`;
-  if (DetailsDOM.description())      DetailsDOM.description().textContent        = offer.description ?? '—';
+  if (DetailsDOM.subject())           DetailsDOM.subject().textContent            = offer.subject;
+  if (DetailsDOM.price())            DetailsDOM.price().textContent               = `$${offer.hourlyRate} / hora`;
+  if (DetailsDOM.description())       DetailsDOM.description().textContent        = offer.description ?? '—';
 
   const badge = DetailsDOM.statusBadge();
   if (badge) {
@@ -140,7 +143,6 @@ function renderTutorPanel(offer, reputation) {
 // ── 7. Reveal de contacto ────────────────────────────────────
 function initRevealContact(offer) {
   DetailsDOM.revealBtn()?.addEventListener('click', () => {
-    // Construir los links de contacto la primera vez
     const phone   = offer.tutorPhone;
     const email   = offer.tutorEmail;
     const social  = offer.tutorSocialMedia;
@@ -183,7 +185,7 @@ function buildReviewCardHTML(review, currentUserId) {
   const initials = buildInitials(review.reviewerName ?? 'U');
   const stars    = buildStarString(review.rating ?? 0);
   const ownerBtns = isOwner
-    ? `<div class="flex gap-2">
+    ? `<div class="flex gap-2 mt-2">
          <button class="edit-review-btn text-[10px] font-semibold text-blue-500 hover:underline" data-id="${review.id}" data-rating="${review.rating}" data-comment="${encodeURIComponent(review.comment ?? '')}">Editar</button>
          <button class="delete-review-btn text-[10px] font-semibold text-red-400 hover:underline" data-id="${review.id}">Eliminar</button>
        </div>` : '';
@@ -199,12 +201,10 @@ function buildReviewCardHTML(review, currentUserId) {
             <span class="font-semibold text-gray-800 text-sm">${review.reviewerName ?? 'Estudiante'}</span>
             <div class="text-amber-400 text-xs mt-0.5">${stars}</div>
           </div>
-          <div class="flex flex-col items-end gap-1">
-            <time class="text-[10px] text-gray-400">${formatDate(review.createdAt)}</time>
-            ${ownerBtns}
-          </div>
+          <time class="text-[10px] text-gray-400">${formatDate(review.createdAt)}</time>
         </div>
         <p class="text-gray-600 text-xs mt-1 italic">"${review.comment ?? 'Sin comentario'}"</p>
+        ${ownerBtns}
       </div>
     </article>`;
 }
@@ -299,7 +299,6 @@ async function initReviewForm(offer, currentUserId) {
   const form    = DetailsDOM.reviewForm();
   if (!section || !form) return;
 
-  // Solo mostrar si: no es el tutor, oferta cerrada, y estuvo inscrito
   if (offer.tutorId === currentUserId || offer.status !== 'CLOSED') return;
 
   try {
@@ -333,44 +332,142 @@ async function initReviewForm(offer, currentUserId) {
   });
 }
 
-// ── 11. Acciones del propietario ─────────────────────────────
-function initOwnerActions(offer, currentUserId) {
+// ── 11. Botón de Inscripción (Para Alumnos) ──────────────────
+function initEnrollmentButton(offer, offerId, currentUserId) {
+  if (offer.tutorId === currentUserId || offer.status === 'CLOSED') return;
+
+  const container = DetailsDOM.enrollContainer();
+  if (!container) return;
+
+  container.innerHTML = `
+    <button id="enroll-btn" class="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold text-sm uppercase tracking-wider rounded-xl hover:from-emerald-600 hover:to-teal-700 transition-all shadow-md mb-4 transform hover:-translate-y-0.5">
+      🎓 Inscribirme a esta Tutoría
+    </button>
+  `;
+
+  document.getElementById('enroll-btn').addEventListener('click', async () => {
+    const confirmed = await Swal.fire({
+      title: '¿Inscribirte en la tutoría?',
+      text: 'Te registrarás como alumno para esta asignatura.',
+      icon: 'question', showCancelButton: true,
+      confirmButtonText: 'Sí, inscribirme', cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#10b981'
+    });
+    if (!confirmed.isConfirmed) return;
+
+    const res = await fetch(`${API_BASE}/api/tutoring/${offerId}/enroll`, {
+      method: 'POST',
+      headers: { 'X-User-Id': currentUserId }
+    });
+
+    if (res.ok) {
+      await Swal.fire('¡Éxito!', 'Inscripción exitosa. Ahora puedes ver los datos de contacto.', 'success');
+      location.reload();
+    } else {
+      showToast('Error al inscribirse en la tutoría.', 'error');
+    }
+  });
+}
+
+// ── 12. Acciones del propietario (Editar, Eliminar, Cerrar) ──
+function initOwnerActions(offer, offerId, currentUserId) {
   if (offer.tutorId !== currentUserId) return;
 
-  // Ocultar panel de contacto, mostrar nota de propietario
   DetailsDOM.contactPanel()?.classList.add('hidden');
   DetailsDOM.ownerNote()?.classList.remove('hidden');
 
   const ownerDiv = DetailsDOM.ownerActions();
   const closeBtn = DetailsDOM.closeOfferBtn();
-  if (!ownerDiv || !closeBtn) return;
+  const editBtn  = DetailsDOM.editOfferBtn();
+  const deleteBtn = DetailsDOM.deleteOfferBtn();
 
-  ownerDiv.classList.remove('hidden');
+  if (ownerDiv) ownerDiv.classList.remove('hidden');
 
   if (offer.status === 'CLOSED') {
-    closeBtn.disabled    = true;
-    closeBtn.textContent = 'Tutoría ya cerrada';
-    return;
+    if (closeBtn) {
+      closeBtn.disabled    = true;
+      closeBtn.className   = "px-5 py-2.5 bg-gray-300 text-gray-500 font-bold text-xs uppercase tracking-wider rounded-xl cursor-not-allowed";
+      closeBtn.textContent = 'Tutoría ya cerrada';
+    }
+  } else if (closeBtn) {
+    closeBtn.addEventListener('click', async () => {
+      const confirmed = await Swal.fire({
+        title: '¿Cerrar esta tutoría?',
+        text: 'El anuncio dejará de aparecer como disponible en el catálogo.',
+        icon: 'warning', showCancelButton: true,
+        confirmButtonText: 'Sí, cerrar', cancelButtonText: 'No',
+        confirmButtonColor: '#ef4444',
+      });
+      if (!confirmed.isConfirmed) return;
+
+      closeBtn.disabled = true;
+      const res = await DetailsAPI.closeOffer(offerId, currentUserId);
+      if (res.ok) { showToast('Tutoría marcada como cerrada.'); location.reload(); }
+      else { showToast('No se pudo cerrar la tutoría.', 'error'); closeBtn.disabled = false; }
+    });
   }
 
-  closeBtn.addEventListener('click', async () => {
+  // Lógica de Edición Interactiva con SweetAlert2
+  editBtn?.addEventListener('click', async () => {
+    const { value: formValues } = await Swal.fire({
+      title: 'Editar Tutoría',
+      html: `
+        <input id="swal-subject" class="swal2-input" placeholder="Título" value="${offer.subject}">
+        <textarea id="swal-description" class="swal2-textarea" placeholder="Descripción">${offer.description ?? ''}</textarea>
+        <input id="swal-rate" type="number" class="swal2-input" placeholder="Tarifa por hora ($)" value="${offer.hourlyRate}">
+      `,
+      showCancelButton: true,
+      confirmButtonText: 'Guardar cambios',
+      confirmButtonColor: '#0A1628',
+      preConfirm: () => ({
+        subject: document.getElementById('swal-subject').value.trim(),
+        description: document.getElementById('swal-description').value.trim(),
+        hourlyRate: parseFloat(document.getElementById('swal-rate').value)
+      })
+    });
+
+    if (!formValues || !formValues.subject || isNaN(formValues.hourlyRate)) return;
+
+    const res = await fetch(`${API_BASE}/api/tutoring/${offerId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-User-Id': currentUserId },
+      body: JSON.stringify(formValues)
+    });
+
+    if (res.ok) {
+      await Swal.fire('¡Actualizado!', 'La tutoría se actualizó con éxito.', 'success');
+      location.reload();
+    } else {
+      showToast('Error al actualizar la tutoría.', 'error');
+    }
+  });
+
+  // Lógica de Eliminación Definitiva
+  deleteBtn?.addEventListener('click', async () => {
     const confirmed = await Swal.fire({
-      title: '¿Cerrar esta tutoría?',
-      text: 'El anuncio dejará de aparecer como disponible.',
+      title: '¿Eliminar tutoría?',
+      text: 'Esta acción es permanente y borrará la publicación por completo.',
       icon: 'warning', showCancelButton: true,
-      confirmButtonText: 'Sí, cerrar', cancelButtonText: 'No',
-      confirmButtonColor: '#ef4444',
+      confirmButtonText: 'Sí, eliminar', confirmButtonColor: '#ef4444',
+      cancelButtonText: 'Cancelar'
     });
     if (!confirmed.isConfirmed) return;
 
-    closeBtn.disabled = true;
-    const res = await DetailsAPI.closeOffer(offer.id, currentUserId);
-    if (res.ok) { showToast('Tutoría marcada como cerrada.'); location.reload(); }
-    else { showToast('No se pudo cerrar la tutoría.', 'error'); closeBtn.disabled = false; }
+    const res = await fetch(`${API_BASE}/api/tutoring/${offerId}`, {
+      method: 'DELETE',
+      headers: { 'X-User-Id': currentUserId }
+    });
+
+    if (res.ok) {
+      await Swal.fire('Eliminada', 'La tutoría fue removida del sistema.', 'success');
+      window.location.href = "/modules/tutoring/tutoring-catalog.html";
+    } else {
+      showToast('Error al eliminar la tutoría.', 'error');
+    }
   });
 }
 
-// ── 12. Orquestación principal ───────────────────────────────
+// ── 13. Orquestación principal ───────────────────────────────
 async function loadDetails(offerId, currentUserId) {
   try {
     const offerRes = await DetailsAPI.fetchOffer(offerId);
@@ -391,7 +488,8 @@ async function loadDetails(offerId, currentUserId) {
     renderTutorPanel(offer, reputation);
     renderReviews(reviews, currentUserId);
     initRevealContact(offer);
-    initOwnerActions(offer, currentUserId);
+    initEnrollmentButton(offer, offerId, currentUserId);
+    initOwnerActions(offer, offerId, currentUserId);
     await initReviewForm(offer, currentUserId);
 
     setPageLoaded();
@@ -406,7 +504,7 @@ async function loadDetails(offerId, currentUserId) {
   }
 }
 
-// ── 13. Bootstrap ────────────────────────────────────────────
+// ── 14. Bootstrap ────────────────────────────────────────────
 window.addEventListener('load', async () => {
   await Clerk.load();
   if (!Clerk.user) { window.location.href = '/modules/identity/signin.html'; return; }

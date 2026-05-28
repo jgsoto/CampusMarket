@@ -1,23 +1,11 @@
-/**
- * my-listings.js — Módulo Marketplace
- * CampusMarket · Universidad Central del Ecuador · 2025
- *
- * Responsabilidades:
- *  - Cargar publicaciones del usuario autenticado
- *  - Renderizar cards con acciones según estado
- *  - Editar, publicar, marcar vendido y eliminar
- */
-
 'use strict';
 
-// ─── Status config ────────────────────────────────────────────────────────────
 const STATUS_STYLES = {
   BORRADOR:  { badge: 'bg-yellow-50 text-yellow-700',  label: 'Borrador'  },
   PUBLICADA: { badge: 'bg-green-50 text-green-700',    label: 'Publicada' },
   VENDIDO:   { badge: 'bg-gray-100 text-gray-500',     label: 'Vendido'   },
 };
 
-// ─── Render de una card ───────────────────────────────────────────────────────
 function createMyListingCard(listing) {
   const style    = STATUS_STYLES[listing.status] ?? STATUS_STYLES.BORRADOR;
   const isSold   = listing.status === 'VENDIDO';
@@ -30,7 +18,6 @@ function createMyListingCard(listing) {
                     shadow-sm flex flex-col`;
 
   card.innerHTML = `
-    <!-- Imagen -->
     <div class="relative aspect-[4/3] overflow-hidden bg-gray-100">
       <img src="${thumb}" alt="${listing.title}" loading="lazy"
            class="w-full h-full object-cover ${isSold ? 'opacity-50 grayscale' : ''}"
@@ -41,7 +28,6 @@ function createMyListingCard(listing) {
       </span>
     </div>
 
-    <!-- Contenido -->
     <div class="p-5 flex flex-col gap-2 flex-1">
       <h3 class="font-display text-base font-bold text-uce-navy leading-snug line-clamp-2">
         ${listing.title}
@@ -53,7 +39,6 @@ function createMyListingCard(listing) {
       </span>
     </div>
 
-    <!-- Acciones -->
     <div class="px-5 pb-5 flex flex-wrap gap-2">
       ${!isSold ? `
         <button onclick="openEditModal('${listing.id}', \`${listing.title.replace(/`/g, '\\`')}\`, \`${listing.description.replace(/`/g, '\\`')}\`, ${listing.price})"
@@ -98,7 +83,6 @@ function createMyListingCard(listing) {
   return card;
 }
 
-// ─── Cargar mis publicaciones ─────────────────────────────────────────────────
 async function loadMyListings() {
   const container = document.getElementById('my-listings-container');
   const ownerId   = getOwnerId();
@@ -112,7 +96,6 @@ async function loadMyListings() {
     return;
   }
 
-  // Skeletons
   container.innerHTML = Array(3).fill(0).map(() =>
     `<div class="skeleton rounded-2xl h-80"></div>`
   ).join('');
@@ -154,7 +137,6 @@ async function loadMyListings() {
   }
 }
 
-// ─── Modal editar ─────────────────────────────────────────────────────────────
 function openEditModal(id, title, desc, price) {
   document.getElementById('edit-id').value    = id;
   document.getElementById('edit-title').value = title;
@@ -172,7 +154,6 @@ function closeEditModal() {
   document.getElementById('edit-images').value = '';
 }
 
-// ─── Acciones API ─────────────────────────────────────────────────────────────
 async function handleEditSubmit(e) {
   e.preventDefault();
   const ownerId = getOwnerId();
@@ -209,6 +190,7 @@ async function deleteListing(id) {
   if (!ok) return;
 
   try {
+    //  Realiza un borrado físico destructivo (HTTP DELETE) del recurso en la base de datos de Supabase.
     const res = await fetch(`${API_BASE}/api/listings/${id}`, {
       method:  'DELETE',
       headers: { 'X-User-Id': getOwnerId() },
@@ -264,7 +246,6 @@ async function markAsSold(id) {
   }
 }
 
-// ─── Bootstrap ────────────────────────────────────────────────────────────────
 window.addEventListener('load', async () => {
   await Clerk.load();
 
@@ -279,7 +260,6 @@ window.addEventListener('load', async () => {
   document.getElementById('edit-listing-form')
     .addEventListener('submit', handleEditSubmit);
 
-  // Cerrar modal al hacer click fuera
   document.getElementById('edit-modal')
     .addEventListener('click', e => {
       if (e.target === e.currentTarget) closeEditModal();

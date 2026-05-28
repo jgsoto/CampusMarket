@@ -90,6 +90,9 @@ function renderAction(product) {
 }
 
 function renderProduct(product) {
+  const reputation = product.averageRating || 0;
+  const totalReviews = product.totalReviews || 0;
+
   document.getElementById('breadcrumb-title').textContent    = product.title;
   document.title                                             = `CampusMarket | ${product.title}`;
 
@@ -101,6 +104,15 @@ function renderProduct(product) {
   document.getElementById('product-description').textContent = product.description;
   document.getElementById('product-date').textContent        =
     `Publicado el ${new Date(product.createdAt).toLocaleDateString('es-EC', { dateStyle: 'long' })}`;
+
+  const ratingEl = document.getElementById('product-rating-container');
+  if (ratingEl) {
+    ratingEl.innerHTML = `
+      <div class="flex items-center gap-1.5 text-sm my-1">
+        <span class="font-bold text-amber-500">★ ${reputation.toFixed(1)}</span>
+        <span class="text-gray-400">(${totalReviews} reseñas)</span>
+      </div>`;
+  }
 
   const statusEl      = document.getElementById('product-status');
   statusEl.textContent = product.status;

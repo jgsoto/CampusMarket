@@ -1,5 +1,6 @@
 package org.uce.campusmarket.marketplace.infrastructure.persistence;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.uce.campusmarket.marketplace.domain.model.Category;
 import org.uce.campusmarket.marketplace.domain.repository.CategoryRepository;
@@ -11,15 +12,11 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class CategoryRepositoryImpl implements CategoryRepository {
 
     private final JpaCategoryRepository jpaCategoryRepository;
     private final CategoryMapper categoryMapper;
-
-    public CategoryRepositoryImpl(JpaCategoryRepository jpaCategoryRepository, CategoryMapper categoryMapper) {
-        this.jpaCategoryRepository = jpaCategoryRepository;
-        this.categoryMapper = categoryMapper;
-    }
 
     @Override
     public Category save(Category category) {

@@ -19,10 +19,6 @@ const CreateDOM = Object.freeze({
 
 // ── 2. API ───────────────────────────────────────────────────
 const CreateAPI = Object.freeze({
-  /**
-   * Sincroniza el usuario de Clerk con la base de datos interna.
-   * Devuelve el User con su UUID interno (el que necesita el backend).
-   */
   syncUser: (clerkUser) =>
     fetch(`${API_BASE}/api/v1/users/sync`, {
       method:  'POST',
@@ -34,26 +30,18 @@ const CreateAPI = Object.freeze({
       }),
     }),
 
-  /**
-   * Envía la oferta con el Header X-User-Id requerido por el TutoringController
-   */
   publish: (payload, internalUserId) =>
     fetch(`${API_BASE}/api/tutoring`, {
       method:  'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-User-Id':    internalUserId, // ◄ CORREGIDO: Ahora sí inyecta dinámicamente tu UUID
+        'X-User-Id':    internalUserId,
       },
       body: JSON.stringify(payload),
     }),
 });
 
 // ── 3. Sync defensivo de sesión ──────────────────────────────
-/**
- * Garantiza que campusMarketUserId en localStorage sea el UUID
- * interno correcto, independientemente de si el usuario pasó
- * por el dashboard antes o no.
- */
 async function ensureUserSynced(clerkUser) {
   const syncPayload = {
     clerkUserId: clerkUser.id,
@@ -73,7 +61,7 @@ async function ensureUserSynced(clerkUser) {
     }
 
     const user = await res.json();
-    console.log('[CreateTutoring] Sync exitoso, user.id =', user.id, '| user completo:', user);
+    console.log('[CreateTutoring] Sync exitoso, user.id =', user.id);
 
     if (!user.id) {
       throw new Error('El servidor no devolvió un ID de usuario válido');
@@ -122,6 +110,22 @@ function showFieldError(fieldId, message) {
   input?.parentElement?.appendChild(span);
 }
 
+function showToast(message, type = 'success') {
+  const container = CreateDOM.toast();
+  if (!container) return;
+  const border = { success: 'border-l-green-500', error: 'border-l-red-500', warning: 'border-l-yellow-500' }[type] ?? 'border-l-green-500';
+  const toast = document.createElement('div');
+  toast.className = `bg-uce-navy text-white px-5 py-3.5 rounded-xl shadow-xl text-sm border-l-4 ${border}`;
+  toast.setAttribute('role', 'alert');
+  toast.textContent = message;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.transition = 'opacity .3s';
+    toast.style.opacity = '0';
+    setTimeout(() => toast.remove(), 320);
+  }, 3500);
+}
+
 function clearFieldError(fieldId) {
   document.getElementById(`err-${fieldId}`)?.remove();
   const input = document.getElementById(fieldId);
@@ -149,22 +153,6 @@ function setSaving(isSaving) {
     : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="inline mr-2" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Publicar Tutoría`;
 }
 
-function showToast(message, type = 'success') {
-  const container = CreateDOM.toast();
-  if (!container) return;
-  const border = { success: 'border-l-green-500', error: 'border-l-red-500', warning: 'border-l-yellow-500' }[type] ?? 'border-l-green-500';
-  const toast = document.createElement('div');
-  toast.className = `bg-uce-navy text-white px-5 py-3.5 rounded-xl shadow-xl text-sm border-l-4 ${border}`;
-  toast.setAttribute('role', 'alert');
-  toast.textContent = message;
-  container.appendChild(toast);
-  setTimeout(() => {
-    toast.style.transition = 'opacity .3s';
-    toast.style.opacity = '0';
-    setTimeout(() => toast.remove(), 320);
-  }, 3500);
-}
-
 // ── 6. Bootstrap ─────────────────────────────────────────────
 window.addEventListener('load', async () => {
   await Clerk.load();
@@ -176,7 +164,6 @@ window.addEventListener('load', async () => {
 
   MarketplaceLayout.mountNavbar('tutorias', Clerk.user);
 
-  // Sincronizar sesión al entrar a la página (no solo en dashboard)
   let internalUserId;
   try {
     internalUserId = await ensureUserSynced(Clerk.user);
@@ -199,14 +186,13 @@ window.addEventListener('load', async () => {
   CreateDOM.subject()?.addEventListener('input',    () => clearFieldError('subject'));
   CreateDOM.hourlyRate()?.addEventListener('input', () => clearFieldError('hourlyRate'));
 
-  // Submit
+  // Submit Formulario
   CreateDOM.form()?.addEventListener('submit', async e => {
     e.preventDefault();
     if (!validateAll()) return;
 
     setSaving(true);
     try {
-      // Leer UUID desde localStorage — guardado por ensureUserSynced al cargar
       const userId = localStorage.getItem('campusMarketUserId');
       console.log('[CreateTutoring] userId recuperado:', userId);
 
@@ -214,7 +200,6 @@ window.addEventListener('load', async () => {
         throw new Error('No se encontró el ID de usuario. Vuelve al Dashboard primero.');
       }
 
-      // Payload idéntico al DTO Java: CreateTutoringOfferRequest
       const payload = {
         tutorId:     userId,
         subject:     CreateDOM.subject().value.trim(),
