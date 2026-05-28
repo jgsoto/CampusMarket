@@ -1,215 +1,236 @@
-window.addEventListener("load", async () => {
-    await Clerk.load();
+'use strict';
 
-    if (!Clerk.user) {
-        window.location.href = "/signin.html";
-        return;
-    }
+// ══════════════════════════════════════════════════════════════
+// MÓDULO: TutoringCatalog
+// Responsabilidad: listar, filtrar y buscar ofertas de tutoría.
+// ══════════════════════════════════════════════════════════════
 
-    await loadTutoringOffers();
+// ── 1. Selectores ────────────────────────────────────────────
+const CatalogDOM = Object.freeze({
+  grid:         () => document.getElementById('tutoring-catalog'),
+  searchInput:  () => document.getElementById('search-input'),
+  filterBtns:   () => document.querySelectorAll('.filter-btn'),
+  resultsCount: () => document.getElementById('results-count'),
 });
 
-async function loadTutoringOffers() {
+// ── 2. Estado local ──────────────────────────────────────────
+let _allOffers     = [];
+let _activeFilter  = 'ALL';
+let _searchQuery   = '';
 
-    const container = document.getElementById("tutoring-catalog");
+// ── 3. API ───────────────────────────────────────────────────
+const CatalogAPI = Object.freeze({
+  fetchOffers:     ()      => fetch(`${API_BASE}/api/tutoring`),
+  fetchReputation: (tutorId) =>
+    fetch(`${API_BASE}/api/reviews/users/${tutorId}/reputation`),
+});
 
-    try {
-
-        const response = await fetch("http://localhost:8080/api/tutoring");
-
-        if (!response.ok) {
-            throw new Error("No se pudieron cargar las tutorías");
-        }
-
-        const offers = await response.json();
-
-        container.innerHTML = "";
-
-        if (!offers.length) {
-            container.innerHTML = `
-                <p style="text-align: center;">
-                    No hay tutorías disponibles actualmente.
-                </p>
-            `;
-            return;
-        }
-
-        for (const offer of offers) {
-
-            const reputation = await loadTutorReputation(offer.tutorId);
-
-            const card = createTutoringCard(offer, reputation);
-
-            container.appendChild(card);
-        }
-
-    } catch (error) {
-
-        console.error(error);
-
-        container.innerHTML = `
-            <p style="color: red; text-align: center;">
-                Error al cargar las tutorías.
-            </p>
-        `;
-    }
+// ── 4. Utilidades ────────────────────────────────────────────
+function buildInitials(name) {
+  if (!name) return '?';
+  return name.split(' ').filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('');
 }
 
-async function loadTutorReputation(tutorId) {
-
-    try {
-
-        const response = await fetch(
-            `http://localhost:8080/api/reviews/users/${tutorId}/reputation`
-        );
-
-        if (!response.ok) {
-            return 0;
-        }
-
-        const data = await response.json();
-
-        return data.reputation || 0;
-
-    } catch (error) {
-
-        console.error("Error al cargar reputación:", error);
-
-        return 0;
-    }
+function buildStarString(score) {
+  const r = Math.round(score);
+  return Array.from({ length: 5 }, (_, i) => i < r ? '★' : '☆').join('');
 }
 
-function createTutoringCard(offer, reputation) {
+function truncate(text, max = 120) {
+  if (!text) return '';
+  return text.length <= max ? text : text.slice(0, max) + '…';
+}
 
-    const card = document.createElement("div");
+// ── 5. Renderizado de tarjeta ────────────────────────────────
+function buildCardHTML(offer, reputation) {
+  const isOpen    = offer.status !== 'CLOSED';
+  const badgeCls  = isOpen
+    ? 'bg-emerald-100 text-emerald-700 border border-emerald-200'
+    : 'bg-gray-100 text-gray-500 border border-gray-200';
+  const badgeText = isOpen ? 'Disponible' : 'Cerrada';
+  const initials  = buildInitials(offer.tutorName);
+  const stars     = buildStarString(reputation);
+  const score     = Number(reputation).toFixed(1);
 
-    card.style.cssText = `
-        border: 1px solid #e0e0e0;
-        border-radius: 12px;
-        padding: 18px;
-        width: 320px;
-        background-color: #ffffff;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    `;
+  return `
+    <article class="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col gap-4 cursor-pointer group"
+             data-id="${offer.id}" role="article" aria-label="Tutoría de ${offer.subject}">
 
-    card.innerHTML = `
-    <div style="
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    ">
-        <h3 style="
-            margin: 0;
-            color: #6f42c1;
-            font-size: 1.2rem;
-        ">
-            ${offer.subject}
+      <!-- Header: materia + badge -->
+      <div class="flex items-start justify-between gap-2">
+        <h3 class="font-display font-bold text-uce-navy text-base group-hover:text-uce-navy-light transition-colors leading-tight">
+          ${offer.subject}
         </h3>
-
-        <span style="
-            padding: 6px 10px;
-            border-radius: 999px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: white;
-            background-color:
-                ${offer.status === "CLOSED"
-        ? "#dc3545"
-        : "#28a745"};
-        ">
-            ${offer.status === "CLOSED"
-        ? "Finalizada"
-        : "Disponible"}
+        <span class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full flex-shrink-0 ${badgeCls}">
+          ${badgeText}
         </span>
-    </div>
+      </div>
 
-    <p style="
-        margin-top: 10px;
-        color: #555;
-        line-height: 1.5;
-        min-height: 72px;
-    ">
-        ${truncateText(offer.description, 120)}
-    </p>
+      <!-- Descripción -->
+      <p class="text-sm text-gray-500 leading-relaxed flex-1">${truncate(offer.description)}</p>
 
-    <div style="
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    ">
-        <span style="
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: #28a745;
-        ">
-            $${offer.hourlyRate} / hora
-        </span>
+      <!-- Footer: precio + reputación + avatar -->
+      <div class="flex items-center justify-between pt-3 border-t border-gray-50">
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-full bg-gradient-to-br from-uce-navy to-uce-navy-light border border-uce-gold/50 flex items-center justify-center flex-shrink-0">
+            <span class="font-display text-[10px] font-bold text-uce-gold">${initials}</span>
+          </div>
+          <div class="flex items-center gap-0.5">
+            <span class="text-amber-400 text-xs">${stars}</span>
+            <span class="text-xs text-gray-400 ml-1">${score}</span>
+          </div>
+        </div>
+        <span class="font-bold text-emerald-600 text-sm">$${offer.hourlyRate}/h</span>
+      </div>
 
-        <span style="
-            font-size: 0.95rem;
-            color: #444;
-        ">
-            ${renderStars(reputation)} (${reputation.toFixed(1)})
-        </span>
-    </div>
+    </article>`;
+}
 
-    <button
-        data-id="${offer.id}"
-        style="
-            background-color:
-                ${offer.status === "CLOSED"
-        ? "#6c757d"
-        : "#6f42c1"};
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 10px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: background-color 0.2s ease;
-        "
-    >
-        ${offer.status === "CLOSED"
-        ? "Ver detalles y reseñas"
-        : "Ver detalles"}
-    </button>
-`   ;
+// ── 6. Filtrado y búsqueda ───────────────────────────────────
+function applyFilters() {
+  const query = _searchQuery.toLowerCase();
 
-    const button = card.querySelector("button");
+  const visible = _allOffers.filter(({ offer }) => {
+    const matchesFilter =
+      _activeFilter === 'ALL'   ? true :
+      _activeFilter === 'OPEN'  ? offer.status !== 'CLOSED' :
+      _activeFilter === 'CLOSED'? offer.status === 'CLOSED' : true;
 
-    button.addEventListener("click", () => {
-        window.location.href =
-            `/tutoring-details.html?id=${offer.id}`;
+    const matchesSearch = !query ||
+      offer.subject.toLowerCase().includes(query) ||
+      (offer.description ?? '').toLowerCase().includes(query);
+
+    return matchesFilter && matchesSearch;
+  });
+
+  const grid = CatalogDOM.grid();
+  const count = CatalogDOM.resultsCount();
+
+  if (!grid) return;
+
+  if (visible.length === 0) {
+    grid.innerHTML = `
+      <div class="col-span-full py-16 text-center">
+        <p class="text-gray-400 text-sm">No se encontraron tutorías con esos criterios.</p>
+        <button onclick="resetFilters()" class="mt-3 text-uce-navy text-xs font-semibold underline hover:no-underline">
+          Ver todas
+        </button>
+      </div>`;
+  } else {
+    grid.innerHTML = visible.map(({ offer, reputation }) => buildCardHTML(offer, reputation)).join('');
+    grid.querySelectorAll('article[data-id]').forEach(card => {
+      card.addEventListener('click', () => {
+        window.location.href = `/modules/tutoring/tutoring-details.html?id=${card.dataset.id}`;
+      });
     });
+  }
 
-    return card;
+  if (count) {
+    count.textContent = `${visible.length} ${visible.length === 1 ? 'resultado' : 'resultados'}`;
+  }
 }
 
-function renderStars(reputation) {
-
-    const rounded = Math.round(reputation);
-
-    let stars = "";
-
-    for (let i = 1; i <= 5; i++) {
-        stars += i <= rounded ? "★" : "☆";
-    }
-
-    return stars;
+function resetFilters() {
+  _activeFilter = 'ALL';
+  _searchQuery  = '';
+  if (CatalogDOM.searchInput()) CatalogDOM.searchInput().value = '';
+  CatalogDOM.filterBtns().forEach(b => {
+    const isAll = b.dataset.filter === 'ALL';
+    b.classList.toggle('active-filter', isAll);
+    b.classList.toggle('bg-uce-navy',    isAll);
+    b.classList.toggle('text-uce-gold',  isAll);
+    b.classList.toggle('border-uce-navy',isAll);
+    b.classList.toggle('bg-white',       !isAll);
+    b.classList.toggle('text-gray-500',  !isAll);
+    b.classList.toggle('border-gray-200',!isAll);
+  });
+  applyFilters();
 }
 
-function truncateText(text, maxLength) {
-
-    if (!text) {
-        return "";
-    }
-
-    if (text.length <= maxLength) {
-        return text;
-    }
-
-    return text.substring(0, maxLength) + "...";
+function styleFilterBtns() {
+  CatalogDOM.filterBtns().forEach(btn => {
+    const isActive = btn.dataset.filter === _activeFilter;
+    btn.classList.toggle('bg-uce-navy',    isActive);
+    btn.classList.toggle('text-uce-gold',  isActive);
+    btn.classList.toggle('border-uce-navy',isActive);
+    btn.classList.toggle('bg-white',       !isActive);
+    btn.classList.toggle('text-gray-500',  !isActive);
+    btn.classList.toggle('border-gray-200',!isActive);
+  });
 }
+
+// ── 7. Carga de datos ────────────────────────────────────────
+async function loadOffers() {
+  const grid = CatalogDOM.grid();
+  try {
+    const res = await CatalogAPI.fetchOffers();
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const offers = await res.json();
+
+    if (!offers.length) {
+      grid.innerHTML = `
+        <div class="col-span-full py-16 text-center">
+          <p class="text-gray-400 text-sm">No hay tutorías publicadas aún.</p>
+          <a href="/modules/tutoring/create-tutoring.html" class="mt-3 inline-block text-uce-navy text-xs font-semibold underline hover:no-underline">
+            Sé el primero en publicar
+          </a>
+        </div>`;
+      return;
+    }
+
+    // Cargar reputaciones en paralelo (con fallback a 0)
+    const withRep = await Promise.all(
+      offers.map(async offer => {
+        try {
+          const r = await CatalogAPI.fetchReputation(offer.tutorId);
+          const d = r.ok ? await r.json() : { reputation: 0 };
+          return { offer, reputation: d.reputation ?? 0 };
+        } catch {
+          return { offer, reputation: 0 };
+        }
+      })
+    );
+
+    _allOffers = withRep;
+    applyFilters();
+
+  } catch (err) {
+    console.error('[TutoringCatalog] Error cargando ofertas:', err);
+    grid.innerHTML = `<p class="col-span-full text-sm text-red-400 text-center py-10">Error al cargar las tutorías.</p>`;
+  }
+}
+
+// ── 8. Bootstrap ─────────────────────────────────────────────
+window.addEventListener('load', async () => {
+  const userId = localStorage.getItem('campusMarketUserId');
+  await Clerk.load();
+
+  if (!Clerk.user) {
+    window.location.href = '/modules/identity/signin.html';
+    return;
+  }
+
+  MarketplaceLayout.mountNavbar('tutorias', Clerk.user);
+  styleFilterBtns();
+
+  // Filtros
+  CatalogDOM.filterBtns().forEach(btn => {
+    btn.addEventListener('click', () => {
+      _activeFilter = btn.dataset.filter;
+      styleFilterBtns();
+      applyFilters();
+    });
+  });
+
+  // Búsqueda con debounce
+  let debounceTimer;
+  CatalogDOM.searchInput()?.addEventListener('input', function () {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      _searchQuery = this.value.trim();
+      applyFilters();
+    }, 250);
+  });
+
+  await loadOffers();
+});

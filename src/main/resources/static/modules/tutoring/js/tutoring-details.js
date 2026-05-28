@@ -1,718 +1,425 @@
-window.addEventListener("load", async () => {
-    await Clerk.load();
+'use strict';
 
-    if (!Clerk.user) {
-        window.location.href = "/signin.html";
-        return;
-    }
+// ══════════════════════════════════════════════════════════════
+// MÓDULO: TutoringDetails
+// Responsabilidad: mostrar detalle de una tutoría, panel de
+// contacto con reveal, reseñas y acción de cierre del tutor.
+// ══════════════════════════════════════════════════════════════
 
-    const urlParams =
-        new URLSearchParams(
-            window.location.search
-        );
-
-    const offerId =
-        urlParams.get("id");
-
-    if (!offerId) {
-
-        alert(
-            "No se especificó la tutoría."
-        );
-
-        window.location.href =
-            "/tutoring-catalog.html";
-
-        return;
-    }
-
-    const currentUserId =
-        localStorage.getItem(
-            "campusMarketUserId"
-        );
-
-    await loadTutoringDetails(
-        offerId,
-        currentUserId
-    );
+// ── 1. Selectores ────────────────────────────────────────────
+const DetailsDOM = Object.freeze({
+  pageLoading:        () => document.getElementById('page-loading'),
+  pageContent:        () => document.getElementById('page-content'),
+  breadcrumbSubject:  () => document.getElementById('breadcrumb-subject'),
+  subject:            () => document.getElementById('tutoring-subject'),
+  price:              () => document.getElementById('tutoring-price'),
+  description:        () => document.getElementById('tutoring-description'),
+  statusBadge:        () => document.getElementById('status-badge'),
+  reputationScore:    () => document.getElementById('tutor-reputation-score'),
+  reputationStars:    () => document.getElementById('tutor-reputation-stars'),
+  tutorInitials:      () => document.getElementById('tutor-initials'),
+  tutorName:          () => document.getElementById('tutor-name'),
+  tutorEmail:         () => document.getElementById('tutor-email'),
+  contactPanel:       () => document.getElementById('contact-panel'),
+  contactHidden:      () => document.getElementById('contact-hidden'),
+  contactRevealed:    () => document.getElementById('contact-revealed'),
+  revealBtn:          () => document.getElementById('reveal-contact-btn'),
+  contactWhatsapp:    () => document.getElementById('contact-whatsapp'),
+  contactPhoneText:   () => document.getElementById('contact-phone-text'),
+  contactEmailLink:   () => document.getElementById('contact-email-link'),
+  contactEmailText:   () => document.getElementById('contact-email-text'),
+  contactSocialWrap:  () => document.getElementById('contact-social-wrap'),
+  contactSocialText:  () => document.getElementById('contact-social-text'),
+  reviewsTitle:       () => document.getElementById('reviews-title'),
+  reviewsContainer:   () => document.getElementById('reviews-container'),
+  reviewSection:      () => document.getElementById('review-section'),
+  reviewForm:         () => document.getElementById('review-form'),
+  reviewRating:       () => document.getElementById('review-rating'),
+  reviewComment:      () => document.getElementById('review-comment'),
+  starBtns:           () => document.querySelectorAll('.star-btn'),
+  ownerActions:       () => document.getElementById('owner-actions'),
+  ownerNote:          () => document.getElementById('owner-note'),
+  closeOfferBtn:      () => document.getElementById('close-offer-btn'),
+  toast:              () => document.getElementById('toast-container'),
 });
 
-async function loadTutoringDetails(
-    offerId,
-    currentUserId
-) {
+// ── 2. API ───────────────────────────────────────────────────
+const DetailsAPI = Object.freeze({
+  fetchOffer:      (id)    => fetch(`${API_BASE}/api/tutoring/${id}`),
+  fetchReputation: (uid)   => fetch(`${API_BASE}/api/reviews/users/${uid}/reputation`),
+  fetchReviews:    (uid)   => fetch(`${API_BASE}/api/reviews/users/${uid}/reviews`),
+  fetchEnrolled:   (id, uid) =>
+    fetch(`${API_BASE}/api/tutoring/${id}/enrolled`, { headers: { 'X-User-Id': uid } }),
+  closeOffer:      (id, uid) =>
+    fetch(`${API_BASE}/api/tutoring/${id}/close`, { method: 'POST', headers: { 'X-User-Id': uid } }),
+  createReview:    (payload, uid) =>
+    fetch(`${API_BASE}/api/reviews`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-User-Id': uid },
+      body: JSON.stringify(payload),
+    }),
+  deleteReview: (reviewId, uid) =>
+    fetch(`${API_BASE}/api/reviews/${reviewId}`, { method: 'DELETE', headers: { 'X-User-Id': uid } }),
+  updateReview: (reviewId, payload, uid) =>
+    fetch(`${API_BASE}/api/reviews/${reviewId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-User-Id': uid },
+      body: JSON.stringify(payload),
+    }),
+});
 
-    const detailsContainer =
-        document.getElementById(
-            "tutoring-details"
-        );
+// ── 3. Utilidades ────────────────────────────────────────────
+function buildInitials(name) {
+  if (!name) return '?';
+  return name.split(' ').filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('');
+}
 
-    try {
+function buildStarString(score) {
+  const r = Math.round(score);
+  return Array.from({ length: 5 }, (_, i) => i < r ? '★' : '☆').join('');
+}
 
-        const offerResponse =
-            await fetch(
-                `http://localhost:8080/api/tutoring/${offerId}`
-            );
+function formatDate(iso) {
+  if (!iso) return '';
+  return new Date(iso).toLocaleDateString('es-EC', { day: 'numeric', month: 'long', year: 'numeric' });
+}
 
-        if (!offerResponse.ok) {
+function showToast(message, type = 'success') {
+  const container = DetailsDOM.toast();
+  if (!container) return;
+  const borderColor = { success: 'border-l-green-500', error: 'border-l-red-500', warning: 'border-l-yellow-500' }[type] ?? 'border-l-green-500';
+  const toast = document.createElement('div');
+  toast.className = `bg-uce-navy text-white px-5 py-3.5 rounded-xl shadow-xl text-sm border-l-4 ${borderColor}`;
+  toast.setAttribute('role', 'alert');
+  toast.textContent = message;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.transition = 'opacity .3s';
+    toast.style.opacity = '0';
+    setTimeout(() => toast.remove(), 320);
+  }, 3500);
+}
 
-            throw new Error(
-                "No se pudo cargar la tutoría."
-            );
-        }
+// ── 4. Estado de pantalla ────────────────────────────────────
+function setPageLoaded() {
+  DetailsDOM.pageLoading()?.classList.add('hidden');
+  DetailsDOM.pageContent()?.classList.remove('hidden');
+}
 
-        const offer =
-            await offerResponse.json();
+// ── 5. Renderizado de info principal ─────────────────────────
+function renderOfferInfo(offer) {
+  const isOpen = offer.status !== 'CLOSED';
 
-        const tutorId =
-            offer.tutorId;
+  if (DetailsDOM.breadcrumbSubject()) DetailsDOM.breadcrumbSubject().textContent = offer.subject;
+  if (DetailsDOM.subject())          DetailsDOM.subject().textContent            = offer.subject;
+  if (DetailsDOM.price())            DetailsDOM.price().textContent              = `$${offer.hourlyRate} / hora`;
+  if (DetailsDOM.description())      DetailsDOM.description().textContent        = offer.description ?? '—';
 
-        const [
-            reputationResponse,
-            reviewsResponse
-        ] = await Promise.all([
+  const badge = DetailsDOM.statusBadge();
+  if (badge) {
+    badge.textContent  = isOpen ? 'Disponible' : 'Cerrada';
+    badge.className    = `px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
+      isOpen ? 'bg-emerald-100 text-emerald-700 border border-emerald-200'
+              : 'bg-gray-100 text-gray-500 border border-gray-200'
+    }`;
+  }
+}
 
-            fetch(
-                `http://localhost:8080/api/reviews/users/${tutorId}/reputation`
-            ),
+// ── 6. Renderizado del panel del tutor ───────────────────────
+function renderTutorPanel(offer, reputation) {
+  const score = (reputation?.reputation ?? 0);
+  if (DetailsDOM.reputationScore()) DetailsDOM.reputationScore().textContent = score.toFixed(1);
+  if (DetailsDOM.reputationStars()) DetailsDOM.reputationStars().textContent = buildStarString(score);
 
-            fetch(
-                `http://localhost:8080/api/reviews/users/${tutorId}/reviews`
-            )
+  const name = offer.tutorName ?? 'Tutor UCE';
+  if (DetailsDOM.tutorInitials()) DetailsDOM.tutorInitials().textContent = buildInitials(name);
+  if (DetailsDOM.tutorName())     DetailsDOM.tutorName().textContent     = name;
+  if (DetailsDOM.tutorEmail())    DetailsDOM.tutorEmail().textContent    = offer.tutorEmail ?? '—';
+}
 
-        ]);
+// ── 7. Reveal de contacto ────────────────────────────────────
+function initRevealContact(offer) {
+  DetailsDOM.revealBtn()?.addEventListener('click', () => {
+    // Construir los links de contacto la primera vez
+    const phone   = offer.tutorPhone;
+    const email   = offer.tutorEmail;
+    const social  = offer.tutorSocialMedia;
 
-        let reputation = {
-            reputation: 0
-        };
-
-        let reviews = [];
-
-        if (
-            reputationResponse.ok
-        ) {
-
-            reputation =
-                await reputationResponse.json();
-        }
-
-        if (
-            reviewsResponse.ok
-        ) {
-
-            reviews =
-                await reviewsResponse.json();
-        }
-
-        renderTutoringInfo(
-            offer
-        );
-
-        renderTutorInfo(
-            offer,
-            reputation
-        );
-
-        renderReviews(
-            reviews,
-            currentUserId
-        );
-
-        configureOwnerActions(
-            offer,
-            offerId,
-            currentUserId
-        );
-
-        configureEnrollmentButton(
-            offer,
-            offerId,
-            currentUserId
-        );
-
-        configureReviewForm(
-            offer,
-            offerId,
-            currentUserId
-        );
-
-    } catch (error) {
-
-        console.error(error);
-
-        detailsContainer.innerHTML = `
-            <p style="color:red;">
-                Error al cargar.
-            </p>
-        `;
+    if (phone) {
+      const wa = DetailsDOM.contactWhatsapp();
+      const ph = DetailsDOM.contactPhoneText();
+      if (wa && ph) {
+        wa.href = `https://wa.me/${phone.replace(/\D/g, '')}`;
+        ph.textContent = phone;
+        wa.classList.remove('hidden');
+      }
     }
-}
-
-function renderTutoringInfo(
-    offer
-) {
-
-    document.getElementById(
-        "tutoring-subject"
-    ).textContent =
-        offer.subject;
-
-    document.getElementById(
-        "tutoring-price"
-    ).textContent =
-        `$${offer.hourlyRate}/hora`;
-
-    document.getElementById(
-        "tutoring-description"
-    ).textContent =
-        offer.description;
-}
-
-function renderTutorInfo(
-    offer,
-    reputation
-) {
-
-    document.getElementById(
-        "tutor-name"
-    ).textContent =
-        offer.tutorName ||
-        "No disponible";
-
-    document.getElementById(
-        "tutor-email"
-    ).textContent =
-        offer.tutorEmail ||
-        "No disponible";
-
-    document.getElementById(
-        "tutor-phone"
-    ).textContent =
-        offer.tutorPhone ||
-        "No disponible";
-
-    document.getElementById(
-        "tutor-social"
-    ).textContent =
-        offer.tutorSocialMedia ||
-        "No disponible";
-
-    document.getElementById(
-        "tutor-reputation"
-    ).textContent =
-        `${reputation.reputation.toFixed(1)} / 5`;
-}
-
-function renderReviews(
-    reviews,
-    currentUserId
-) {
-
-    const container =
-        document.getElementById(
-            "reviews-container"
-        );
-
-    container.innerHTML = "";
-
-    if (!reviews?.length) {
-
-        container.innerHTML = `
-            <p>
-                No existen reseñas.
-            </p>
-        `;
-
-        return;
+    if (email) {
+      const el = DetailsDOM.contactEmailLink();
+      const et = DetailsDOM.contactEmailText();
+      if (el && et) {
+        el.href = `mailto:${email}`;
+        et.textContent = email;
+        el.classList.remove('hidden');
+      }
+    }
+    if (social) {
+      const sw = DetailsDOM.contactSocialWrap();
+      const st = DetailsDOM.contactSocialText();
+      if (sw && st) {
+        st.textContent = social;
+        sw.classList.remove('hidden');
+      }
     }
 
-    reviews.forEach(review => {
+    DetailsDOM.contactHidden()?.classList.add('hidden');
+    DetailsDOM.contactRevealed()?.classList.remove('hidden');
+  });
+}
 
-        const card =
-            document.createElement(
-                "div"
-            );
+// ── 8. Reseñas ───────────────────────────────────────────────
+function buildReviewCardHTML(review, currentUserId) {
+  const isOwner  = review.reviewerId === currentUserId;
+  const initials = buildInitials(review.reviewerName ?? 'U');
+  const stars    = buildStarString(review.rating ?? 0);
+  const ownerBtns = isOwner
+    ? `<div class="flex gap-2">
+         <button class="edit-review-btn text-[10px] font-semibold text-blue-500 hover:underline" data-id="${review.id}" data-rating="${review.rating}" data-comment="${encodeURIComponent(review.comment ?? '')}">Editar</button>
+         <button class="delete-review-btn text-[10px] font-semibold text-red-400 hover:underline" data-id="${review.id}">Eliminar</button>
+       </div>` : '';
 
-        card.style = `
-            border:1px solid #ddd;
-            border-radius:8px;
-            padding:16px;
-            margin-bottom:16px;
-            background:#fafafa;
-        `;
-
-        card.innerHTML = `
-
-        <div style="
-            display:flex;
-            justify-content:space-between;
-            align-items:flex-start;
-            margin-bottom:12px;
-        ">
-
-            <div>
-
-                <strong>
-                    ${
-            review.reviewerName ||
-            "Usuario"
-        }
-                </strong>
-
-                <div style="
-                    color:gray;
-                    font-size:13px;
-                    margin-top:4px;
-                ">
-                    Tutoría:
-                    ${
-            review.targetTitle ||
-            "Sin título"
-        }
-                </div>
-
-                <div style="
-                    color:#f5b301;
-                    margin-top:8px;
-                    font-size:18px;
-                ">
-                    ${"★".repeat(
-            review.rating
-        )}
-                    ${"☆".repeat(
-            5-review.rating
-        )}
-                </div>
-
-            </div>
-
-            ${
-            review.reviewerId
-            ===
-            currentUserId
-
-                ?
-
-                `
-                <div style="
-                    display:flex;
-                    gap:8px;
-                ">
-
-                    <button
-                        class="edit-review"
-                        data-id="${review.id}"
-                    >
-                        Editar
-                    </button>
-
-                    <button
-                        class="delete-review"
-                        data-id="${review.id}"
-                    >
-                        Eliminar
-                    </button>
-
-                </div>
-                `
-
-                :
-
-                ""
-        }
-
+  return `
+    <article class="review-card flex gap-3 items-start p-4 rounded-xl border border-gray-100 bg-white">
+      <div class="w-8 h-8 rounded-full bg-gradient-to-br from-uce-navy/10 to-uce-navy/20 flex items-center justify-center flex-shrink-0 font-bold text-xs text-uce-navy" aria-hidden="true">
+        ${initials}
+      </div>
+      <div class="flex flex-col gap-1 w-full min-w-0">
+        <div class="flex items-start justify-between gap-2">
+          <div>
+            <span class="font-semibold text-gray-800 text-sm">${review.reviewerName ?? 'Estudiante'}</span>
+            <div class="text-amber-400 text-xs mt-0.5">${stars}</div>
+          </div>
+          <div class="flex flex-col items-end gap-1">
+            <time class="text-[10px] text-gray-400">${formatDate(review.createdAt)}</time>
+            ${ownerBtns}
+          </div>
         </div>
+        <p class="text-gray-600 text-xs mt-1 italic">"${review.comment ?? 'Sin comentario'}"</p>
+      </div>
+    </article>`;
+}
 
-        <p style="
-            margin:12px 0;
-        ">
-            ${
-            review.comment ||
-            "Sin comentario"
-        }
-        </p>
+function renderReviews(reviews, currentUserId) {
+  const container = DetailsDOM.reviewsContainer();
+  const title     = DetailsDOM.reviewsTitle();
+  if (!container) return;
 
-        <small style="
-            color:gray;
-        ">
-            ${
-            formatDate(
-                review.createdAt
-            )
-        }
-        </small>
+  if (title) title.textContent = `Opiniones (${reviews.length})`;
 
-        `;
+  if (!reviews.length) {
+    container.innerHTML = `<p class="text-sm text-gray-400 text-center py-8 bg-gray-50/60 rounded-xl border border-dashed border-gray-200">Aún no hay opiniones para este tutor.</p>`;
+    return;
+  }
 
-        container.appendChild(
-            card
-        );
+  container.innerHTML = reviews.map(r => buildReviewCardHTML(r, currentUserId)).join('');
+  initReviewActions(currentUserId);
+}
 
+function initReviewActions(currentUserId) {
+  document.querySelectorAll('.delete-review-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const confirmed = await Swal.fire({
+        text: '¿Eliminar tu reseña?', icon: 'warning',
+        showCancelButton: true, confirmButtonText: 'Eliminar',
+        confirmButtonColor: '#ef4444', cancelButtonText: 'Cancelar',
+      });
+      if (!confirmed.isConfirmed) return;
+      const res = await DetailsAPI.deleteReview(btn.dataset.id, currentUserId);
+      if (res.ok) { showToast('Reseña eliminada.'); location.reload(); }
+      else showToast('No se pudo eliminar la reseña.', 'error');
     });
+  });
 
-    configureReviewActions(
-        currentUserId
+  document.querySelectorAll('.edit-review-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const { value: formValues } = await Swal.fire({
+        title: 'Editar reseña',
+        html: `
+          <select id="swal-rating" class="swal2-input">
+            ${[1,2,3,4,5].map(n => `<option value="${n}" ${n == btn.dataset.rating ? 'selected' : ''}>${n} estrella${n > 1 ? 's' : ''}</option>`).join('')}
+          </select>
+          <textarea id="swal-comment" class="swal2-textarea" placeholder="Comentario">${decodeURIComponent(btn.dataset.comment)}</textarea>`,
+        showCancelButton: true, confirmButtonText: 'Guardar',
+        confirmButtonColor: '#0A1628',
+        preConfirm: () => ({
+          rating:  parseInt(document.getElementById('swal-rating').value),
+          comment: document.getElementById('swal-comment').value,
+        }),
+      });
+      if (!formValues) return;
+      const res = await DetailsAPI.updateReview(btn.dataset.id, formValues, currentUserId);
+      if (res.ok) { showToast('Reseña actualizada.'); location.reload(); }
+      else showToast('No se pudo actualizar la reseña.', 'error');
+    });
+  });
+}
+
+// ── 9. Estrellas interactivas del formulario ─────────────────
+function initStarRating() {
+  const stars = DetailsDOM.starBtns();
+  const input = DetailsDOM.reviewRating();
+  stars.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const val = parseInt(btn.dataset.value);
+      if (input) input.value = val;
+      stars.forEach((s, i) => {
+        s.classList.toggle('selected', i < val);
+        s.classList.toggle('text-amber-400', i < val);
+        s.classList.toggle('text-gray-300', i >= val);
+      });
+    });
+    btn.addEventListener('mouseenter', () => {
+      const val = parseInt(btn.dataset.value);
+      stars.forEach((s, i) => s.classList.toggle('text-amber-300', i < val));
+    });
+    btn.addEventListener('mouseleave', () => {
+      const currentVal = parseInt(input?.value ?? 0);
+      stars.forEach((s, i) => {
+        s.classList.toggle('text-amber-400', i < currentVal);
+        s.classList.toggle('text-gray-300', i >= currentVal);
+        s.classList.remove('text-amber-300');
+      });
+    });
+  });
+}
+
+// ── 10. Formulario de reseña ─────────────────────────────────
+async function initReviewForm(offer, currentUserId) {
+  const section = DetailsDOM.reviewSection();
+  const form    = DetailsDOM.reviewForm();
+  if (!section || !form) return;
+
+  // Solo mostrar si: no es el tutor, oferta cerrada, y estuvo inscrito
+  if (offer.tutorId === currentUserId || offer.status !== 'CLOSED') return;
+
+  try {
+    const res      = await DetailsAPI.fetchEnrolled(offer.id, currentUserId);
+    const enrolled = res.ok ? await res.json() : false;
+    if (!enrolled) return;
+  } catch { return; }
+
+  section.classList.remove('hidden');
+  initStarRating();
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const rating  = parseInt(DetailsDOM.reviewRating()?.value ?? '0');
+    const comment = DetailsDOM.reviewComment()?.value?.trim() ?? '';
+
+    if (!rating) { showToast('Selecciona una calificación.', 'warning'); return; }
+    if (!comment) { showToast('Escribe un comentario.', 'warning'); return; }
+
+    const payload = {
+      reviewedUserId: offer.tutorId,
+      targetId:       offer.id,
+      targetType:     'TUTORING',
+      rating,
+      comment,
+    };
+
+    const res = await DetailsAPI.createReview(payload, currentUserId);
+    if (res.ok) { showToast('¡Reseña publicada!'); location.reload(); }
+    else showToast('No se pudo publicar la reseña.', 'error');
+  });
+}
+
+// ── 11. Acciones del propietario ─────────────────────────────
+function initOwnerActions(offer, currentUserId) {
+  if (offer.tutorId !== currentUserId) return;
+
+  // Ocultar panel de contacto, mostrar nota de propietario
+  DetailsDOM.contactPanel()?.classList.add('hidden');
+  DetailsDOM.ownerNote()?.classList.remove('hidden');
+
+  const ownerDiv = DetailsDOM.ownerActions();
+  const closeBtn = DetailsDOM.closeOfferBtn();
+  if (!ownerDiv || !closeBtn) return;
+
+  ownerDiv.classList.remove('hidden');
+
+  if (offer.status === 'CLOSED') {
+    closeBtn.disabled    = true;
+    closeBtn.textContent = 'Tutoría ya cerrada';
+    return;
+  }
+
+  closeBtn.addEventListener('click', async () => {
+    const confirmed = await Swal.fire({
+      title: '¿Cerrar esta tutoría?',
+      text: 'El anuncio dejará de aparecer como disponible.',
+      icon: 'warning', showCancelButton: true,
+      confirmButtonText: 'Sí, cerrar', cancelButtonText: 'No',
+      confirmButtonColor: '#ef4444',
+    });
+    if (!confirmed.isConfirmed) return;
+
+    closeBtn.disabled = true;
+    const res = await DetailsAPI.closeOffer(offer.id, currentUserId);
+    if (res.ok) { showToast('Tutoría marcada como cerrada.'); location.reload(); }
+    else { showToast('No se pudo cerrar la tutoría.', 'error'); closeBtn.disabled = false; }
+  });
+}
+
+// ── 12. Orquestación principal ───────────────────────────────
+async function loadDetails(offerId, currentUserId) {
+  try {
+    const offerRes = await DetailsAPI.fetchOffer(offerId);
+    if (!offerRes.ok) throw new Error(`HTTP ${offerRes.status}`);
+    const offer = await offerRes.json();
+
+    const [repRes, revRes] = await Promise.allSettled([
+      DetailsAPI.fetchReputation(offer.tutorId),
+      DetailsAPI.fetchReviews(offer.tutorId),
+    ]);
+
+    const reputation = repRes.status === 'fulfilled' && repRes.value.ok
+      ? await repRes.value.json() : { reputation: 0 };
+    const reviews    = revRes.status === 'fulfilled' && revRes.value.ok
+      ? await revRes.value.json() : [];
+
+    renderOfferInfo(offer);
+    renderTutorPanel(offer, reputation);
+    renderReviews(reviews, currentUserId);
+    initRevealContact(offer);
+    initOwnerActions(offer, currentUserId);
+    await initReviewForm(offer, currentUserId);
+
+    setPageLoaded();
+  } catch (err) {
+    console.error('[TutoringDetails] Error:', err);
+    DetailsDOM.pageLoading()?.replaceWith(
+      Object.assign(document.createElement('p'), {
+        className: 'text-red-400 text-sm py-10 text-center',
+        textContent: 'No se pudo cargar la tutoría.',
+      })
     );
+  }
 }
 
-function configureReviewActions(
-    currentUserId
-) {
-
-    document
-        .querySelectorAll(
-            ".delete-review"
-        )
-        .forEach(btn => {
-
-            btn.addEventListener(
-                "click",
-                async () => {
-
-                    const confirmed =
-                        confirm(
-                            "¿Eliminar reseña?"
-                        );
-
-                    if (!confirmed)
-                        return;
-
-                    await fetch(
-                        `http://localhost:8080/api/reviews/${btn.dataset.id}`,
-                        {
-                            method:"DELETE",
-                            headers:{
-                                "X-User-Id":
-                                currentUserId
-                            }
-                        }
-                    );
-
-                    location.reload();
-
-                }
-            );
-
-        });
-
-    document
-        .querySelectorAll(
-            ".edit-review"
-        )
-        .forEach(btn => {
-
-            btn.addEventListener(
-                "click",
-                async () => {
-
-                    const rating =
-                        prompt(
-                            "Nueva calificación (1-5):"
-                        );
-
-                    if (!rating)
-                        return;
-
-                    const comment =
-                        prompt(
-                            "Comentario:"
-                        );
-
-                    await fetch(
-                        `http://localhost:8080/api/reviews/${btn.dataset.id}`,
-                        {
-                            method:"PUT",
-
-                            headers:{
-                                "Content-Type":
-                                    "application/json",
-
-                                "X-User-Id":
-                                currentUserId
-                            },
-
-                            body:
-                                JSON.stringify({
-
-                                    rating:
-                                        parseInt(
-                                            rating
-                                        ),
-
-                                    comment
-                                })
-                        }
-                    );
-
-                    location.reload();
-
-                }
-            );
-
-        });
-}
-
-function configureOwnerActions(
-    offer,
-    offerId,
-    currentUserId
-) {
-
-    if (
-        offer.tutorId !==
-        currentUserId
-    ) {
-        return;
-    }
-
-    document.getElementById(
-        "contact-panel"
-    ).style.display =
-        "none";
-
-    document.getElementById(
-        "owner-actions"
-    ).style.display =
-        "block";
-
-    const closeBtn =
-        document.getElementById(
-            "close-offer-btn"
-        );
-
-    if (
-        offer.status ===
-        "CLOSED"
-    ) {
-
-        closeBtn.disabled =
-            true;
-
-        closeBtn.textContent =
-            "Tutoría cerrada";
-
-        return;
-    }
-
-    closeBtn.addEventListener(
-        "click",
-        async () => {
-
-            await closeOffer(
-                offerId,
-                currentUserId
-            );
-
-        }
-    );
-}
-
-function configureEnrollmentButton(
-    offer,
-    offerId,
-    currentUserId
-) {
-
-    if (
-        offer.tutorId ===
-        currentUserId
-        ||
-        offer.status ===
-        "CLOSED"
-    ) {
-        return;
-    }
-
-    const container =
-        document.getElementById(
-            "enroll-container"
-        );
-
-    container.innerHTML = `
-        <button id="enroll-btn">
-            Inscribirme
-        </button>
-    `;
-
-    document
-        .getElementById(
-            "enroll-btn"
-        )
-        .addEventListener(
-            "click",
-            async () => {
-
-                await fetch(
-                    `http://localhost:8080/api/tutoring/${offerId}/enroll`,
-                    {
-                        method:"POST",
-
-                        headers:{
-                            "X-User-Id":
-                            currentUserId
-                        }
-                    }
-                );
-
-                alert(
-                    "Inscripción exitosa"
-                );
-
-                location.reload();
-
-            }
-        );
-}
-
-async function configureReviewForm(
-    offer,
-    offerId,
-    currentUserId
-) {
-
-    const form =
-        document.getElementById(
-            "review-form"
-        );
-
-    if (!form)
-        return;
-
-    if (
-        offer.tutorId ===
-        currentUserId
-        ||
-        offer.status !==
-        "CLOSED"
-    ) {
-
-        form.style.display =
-            "none";
-
-        return;
-    }
-
-    try {
-
-        const response =
-            await fetch(
-                `http://localhost:8080/api/tutoring/${offerId}/enrolled`,
-                {
-                    headers:{
-                        "X-User-Id":
-                        currentUserId
-                    }
-                }
-            );
-
-        const enrolled =
-            await response.json();
-
-        if (!enrolled) {
-
-            form.style.display =
-                "none";
-
-            return;
-        }
-
-        form.style.display =
-            "block";
-
-    } catch {
-
-        form.style.display =
-            "none";
-    }
-
-    form.addEventListener(
-        "submit",
-        async event => {
-
-            event.preventDefault();
-
-            const payload = {
-
-                reviewedUserId:
-                offer.tutorId,
-
-                targetId:
-                offerId,
-
-                targetType:
-                    "TUTORING",
-
-                rating:
-                    parseInt(
-                        document.getElementById(
-                            "review-rating"
-                        ).value
-                    ),
-
-                comment:
-                document.getElementById(
-                    "review-comment"
-                ).value
-            };
-
-            await fetch(
-                "http://localhost:8080/api/reviews",
-                {
-                    method:"POST",
-
-                    headers:{
-                        "Content-Type":
-                            "application/json",
-
-                        "X-User-Id":
-                        currentUserId
-                    },
-
-                    body:
-                        JSON.stringify(
-                            payload
-                        )
-                }
-            );
-
-            location.reload();
-
-        }
-    );
-}
-
-async function closeOffer(
-    offerId,
-    currentUserId
-) {
-
-    await fetch(
-        `http://localhost:8080/api/tutoring/${offerId}/close`,
-        {
-            method:"POST",
-
-            headers:{
-                "X-User-Id":
-                currentUserId
-            }
-        }
-    );
-
-    location.reload();
-}
-
-function formatDate(
-    date
-) {
-
-    return new Date(
-        date
-    ).toLocaleDateString(
-        "es-EC",
-        {
-            day:"numeric",
-            month:"numeric",
-            year:"numeric"
-        }
-    );
-}
+// ── 13. Bootstrap ────────────────────────────────────────────
+window.addEventListener('load', async () => {
+  await Clerk.load();
+  if (!Clerk.user) { window.location.href = '/modules/identity/signin.html'; return; }
+
+  const userId  = localStorage.getItem('campusMarketUserId');
+  const offerId = new URLSearchParams(window.location.search).get('id');
+
+  if (!offerId) {
+    await Swal.fire({ text: 'No se especificó la tutoría.', icon: 'warning' });
+    window.location.href = '/modules/tutoring/tutoring-catalog.html';
+    return;
+  }
+
+  MarketplaceLayout.mountNavbar('tutorias', Clerk.user);
+  await loadDetails(offerId, userId);
+});
