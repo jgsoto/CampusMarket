@@ -43,9 +43,6 @@ function createCard(listing, reputation = 0) {
                    line-clamp-2 ${isSold ? 'opacity-50' : ''}">
           ${listing.title}
         </h3>
-        <span class="text-xs font-bold text-amber-500 flex items-center gap-1 shrink-0">
-          ⭐ ${reputation.toFixed(1)}
-        </span>
       </div>
 
       <p class="text-xs text-gray-500 line-clamp-2 flex-1 ${isSold ? 'opacity-50' : ''}">
@@ -150,25 +147,8 @@ async function renderCatalog(listings) {
     renderEmpty();
     return;
   }
-
-  // Usamos un bucle for...of para poder hacer los await de reputación de forma limpia
-  for (const listing of listings) {
-    let reputation = 0;
-
-    try {
-      const reputationResponse = await fetch(
-        `${API_BASE}/api/reviews/users/${listing.ownerId}/reputation`
-      );
-      if (reputationResponse.ok) {
-        const reputationData = await reputationResponse.json();
-        reputation = reputationData.reputation || 0;
-      }
-    } catch (e) {
-      console.warn('[Marketplace] No se pudo cargar reputación del vendedor:', e);
-    }
-
-    // Le pasamos el valor de la reputación a la tarjeta
-    container.appendChild(createCard(listing, reputation));
+ for (const listing of listings){
+  container.appendChild(createCard(listing));
   }
 }
 
