@@ -15,7 +15,7 @@ const MarketplaceLayout = (() => {
     const links = [
       { id: 'dashboard',   href: '/modules/marketplace/dashboard.html',    label: 'Marketplace' },
       { id: 'tutorias',    href: '/modules/tutoring/tutoring-catalog.html', label: 'Tutorías' },
-    { id: 'reputation',    href: '/modules/reputation/reputation.html', label: 'Reputación' },
+      { id: 'reputation',  href: '/modules/reputation/reputation.html', label: 'Reputación' },
     ];
 
     const navLinks = links.map(({ id, href, label }) => {
@@ -39,8 +39,6 @@ const MarketplaceLayout = (() => {
              : 'text-white/70 hover:text-uce-gold'}">${label}</a>`;
     }).join('');
 
-    const showCreateBtn = activePage === 'dashboard' || activePage === 'tutorias';
-
     const userName     = clerkUser?.fullName ?? 'Usuario';
     const userEmail    = clerkUser?.primaryEmailAddress?.emailAddress ?? '';
     const initials     = userName.split(' ').filter(Boolean).slice(0, 2)
@@ -48,16 +46,14 @@ const MarketplaceLayout = (() => {
 
     const desktopActionsHtml = `
       <div class="hidden md:flex items-center gap-3">
-
-        <!-- Dropdown perfil -->
         <div class="relative" id="profile-dropdown-wrapper">
           <button id="profile-dropdown-btn"
                   class="flex items-center gap-2 pl-1 pr-3 py-1 rounded-xl
                          hover:bg-white/10 transition-colors group"
                   aria-haspopup="true" aria-expanded="false">
-            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-uce-gold to-uce-gold-dark
+            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-uce-navy to-uce-navy-light border-2 border-uce-gold
                         flex items-center justify-center flex-shrink-0">
-              <span class="text-uce-navy text-xs font-bold">${initials}</span>
+              <span class="text-uce-gold text-xs font-bold font-display">${initials}</span>
             </div>
             <span class="text-white/80 text-sm font-medium max-w-[120px] truncate
                          group-hover:text-white transition-colors">
@@ -70,13 +66,10 @@ const MarketplaceLayout = (() => {
             </svg>
           </button>
 
-          <!-- Menú desplegable -->
           <div id="profile-dropdown-menu"
                class="absolute right-0 top-full mt-2 w-64 bg-white rounded-2xl shadow-xl
                       border border-gray-100 overflow-hidden z-50 hidden"
                role="menu">
-
-            <!-- Header del menú -->
             <div class="px-4 py-4 bg-gray-50 border-b border-gray-100">
               <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-full bg-gradient-to-br from-uce-navy to-uce-navy-light
@@ -90,7 +83,6 @@ const MarketplaceLayout = (() => {
               </div>
             </div>
 
-            <!-- Opciones del menú -->
             <div class="py-2">
               <a href="/modules/identity/profile.html"
                  class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700
@@ -103,7 +95,6 @@ const MarketplaceLayout = (() => {
                 </svg>
                 Mi Perfil
               </a>
-
               <a href="/modules/marketplace/my-listings.html"
                  class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700
                         hover:bg-gray-50 transition-colors ${activePage === 'my-listings' ? 'text-uce-navy font-semibold' : ''}"
@@ -132,62 +123,37 @@ const MarketplaceLayout = (() => {
                 Cerrar Sesión
               </button>
             </div>
-
           </div>
         </div>
       </div>`;
 
     const mobileButtonHtml = `
-  <a href="/modules/marketplace/my-listings.html"
-     class="py-2 text-sm text-white/70 hover:text-uce-gold transition-colors">
-    Mis Publicaciones
-  </a>
-  <a href="/modules/identity/profile.html"
-     class="py-2 text-sm text-white/70 hover:text-uce-gold transition-colors">
-    Mi Perfil
-  </a>
-  <button id="logout-btn-mobile"
-          class="mt-1 w-full flex items-center justify-center gap-2 py-2.5
-                 border border-white/20 text-white/70 text-sm rounded-lg
-                 hover:bg-white/10 transition-all">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-      <polyline points="16 17 21 12 16 7"/>
-      <line x1="21" y1="12" x2="9" y2="12"/>
-    </svg>
-    Cerrar Sesión
-  </button>`;
+      <a href="/modules/marketplace/my-listings.html" class="py-2 text-sm text-white/70 hover:text-uce-gold transition-colors">Mis Publicaciones</a>
+      <a href="/modules/identity/profile.html" class="py-2 text-sm text-white/70 hover:text-uce-gold transition-colors">Mi Perfil</a>
+      <button id="logout-btn-mobile" class="mt-1 w-full flex items-center justify-center gap-2 py-2.5 border border-white/20 text-white/70 text-sm rounded-lg hover:bg-white/10 transition-all">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        Cerrar Sesión
+      </button>`;
+
     placeholder.outerHTML = `
       <header class="bg-uce-navy sticky top-0 z-50 border-b border-uce-gold/15 w-full">
         <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between gap-8">
-
           <a href="/modules/marketplace/dashboard.html" class="flex items-center gap-3 flex-shrink-0">
             <img src="/assets/icons/logo.png" alt="CampusMarket" class="w-9 h-9 rounded-lg object-cover" />
-            <span class="font-display text-lg font-bold text-white tracking-tight">
-              Campus<span class="text-uce-gold">Market</span>
-            </span>
+            <span class="font-display text-lg font-bold text-white tracking-tight">Campus<span class="text-uce-gold">Market</span></span>
           </a>
-
-          <nav class="hidden md:flex items-center gap-6">
-            ${navLinks}
-          </nav>
-
+          <nav class="hidden md:flex items-center gap-6">${navLinks}</nav>
           ${desktopActionsHtml}
-
-          <button id="nav-toggle" aria-label="Abrir menú" aria-expanded="false"
-                  class="md:hidden flex flex-col justify-center items-center gap-1
-                         w-10 h-10 rounded-lg hover:bg-white/10 transition-colors">
+          <button id="nav-toggle" aria-label="Abrir menú" aria-expanded="false" class="md:hidden flex flex-col justify-center items-center gap-1 w-10 h-10 rounded-lg hover:bg-white/10 transition-colors">
             <span class="block w-5 h-0.5 bg-white transition-all duration-300"></span>
             <span class="block w-5 h-0.5 bg-white transition-all duration-300"></span>
             <span class="block w-5 h-0.5 bg-white transition-all duration-300"></span>
           </button>
-
         </div>
-
-        <nav id="mobile-menu" class="hidden flex-col gap-1 px-6 pb-5
-                                     bg-uce-navy border-t border-uce-gold/10">
-          ${mobileLinks}
-          ${mobileButtonHtml}
+        <nav id="mobile-menu" class="hidden flex-col gap-1 px-6 pb-5 bg-uce-navy border-t border-uce-gold/10">
+          ${mobileLinks}${mobileButtonHtml}
         </nav>
       </header>`;
 
@@ -200,14 +166,12 @@ const MarketplaceLayout = (() => {
     const toggle = document.getElementById('nav-toggle');
     const menu   = document.getElementById('mobile-menu');
     if (!toggle || !menu) return;
-
     toggle.addEventListener('click', (e) => {
       e.preventDefault();
       const isHidden = menu.classList.toggle('hidden');
       menu.classList.toggle('flex', !isHidden);
       toggle.setAttribute('aria-expanded', String(!isHidden));
     });
-
     window.addEventListener('resize', () => {
       if (window.innerWidth >= 768) {
         menu.classList.add('hidden');
@@ -222,7 +186,6 @@ const MarketplaceLayout = (() => {
     const menu    = document.getElementById('profile-dropdown-menu');
     const chevron = document.getElementById('dropdown-chevron');
     if (!btn || !menu) return;
-
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       const isOpen = !menu.classList.contains('hidden');
@@ -230,17 +193,8 @@ const MarketplaceLayout = (() => {
       btn.setAttribute('aria-expanded', String(!isOpen));
       if (chevron) chevron.style.transform = isOpen ? '' : 'rotate(180deg)';
     });
-
     document.addEventListener('click', (e) => {
       if (!document.getElementById('profile-dropdown-wrapper')?.contains(e.target)) {
-        menu.classList.add('hidden');
-        btn.setAttribute('aria-expanded', 'false');
-        if (chevron) chevron.style.transform = '';
-      }
-    });
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
         menu.classList.add('hidden');
         btn.setAttribute('aria-expanded', 'false');
         if (chevron) chevron.style.transform = '';
@@ -253,7 +207,6 @@ const MarketplaceLayout = (() => {
       if (typeof Clerk !== 'undefined') await Clerk.signOut();
       window.location.href = '/index.html';
     };
-
     document.getElementById('logout-btn')?.addEventListener('click', signOut);
     document.getElementById('logout-btn-mobile')?.addEventListener('click', signOut);
   }
@@ -262,25 +215,17 @@ const MarketplaceLayout = (() => {
 })();
 
 function showToast(message, type = 'success') {
-  const COLORS = {
-    success: 'border-l-green-500',
-    error:   'border-l-red-500',
-    warning: 'border-l-yellow-400',
-    info:    'border-l-blue-400',
-  };
-
+  const COLORS = { success: 'border-l-green-500', error: 'border-l-red-500', warning: 'border-l-yellow-400', info: 'border-l-blue-400' };
   let container = document.getElementById('toast-container');
   if (!container) {
     container = document.createElement('div');
-    container.id        = 'toast-container';
+    container.id = 'toast-container';
     container.className = 'fixed bottom-6 right-6 z-50 flex flex-col gap-3 max-w-sm';
     container.setAttribute('aria-live', 'polite');
     document.body.appendChild(container);
   }
-
-  const toast       = document.createElement('div');
-  toast.className   = `animate-toast bg-uce-navy text-white px-5 py-4 rounded-xl
-                       shadow-xl text-sm border-l-4 ${COLORS[type] ?? COLORS.success}`;
+  const toast = document.createElement('div');
+  toast.className = `animate-toast bg-uce-navy text-white px-5 py-4 rounded-xl shadow-xl text-sm border-l-4 ${COLORS[type] ?? COLORS.success}`;
   toast.textContent = message;
   container.appendChild(toast);
   setTimeout(() => toast.remove(), 3500);
@@ -289,13 +234,9 @@ function showToast(message, type = 'success') {
 async function showConfirm(message, confirmText = 'Confirmar') {
   if (typeof Swal !== 'undefined') {
     const result = await Swal.fire({
-      text:               message,
-      icon:               'question',
-      showCancelButton:   true,
-      confirmButtonText:  confirmText,
-      cancelButtonText:   'Cancelar',
-      confirmButtonColor: '#0A1628',
-      cancelButtonColor:  '#6b7280',
+      text: message, icon: 'question', showCancelButton: true,
+      confirmButtonText: confirmText, cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#0A1628', cancelButtonColor: '#6b7280',
     });
     return result.isConfirmed;
   }
