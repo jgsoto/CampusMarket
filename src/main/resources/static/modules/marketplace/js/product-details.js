@@ -102,13 +102,12 @@ function renderProduct(product) {
   document.getElementById('product-date').textContent         =
     `Publicado el ${new Date(product.createdAt).toLocaleDateString('es-EC', { dateStyle: 'long' })}`;
 
-  // Se remueven por completo las estrellas quemadas del producto
+
   const ratingEl = document.getElementById('product-rating-container');
   if (ratingEl) {
     ratingEl.innerHTML = '';
   }
 
-  // Se corrige la asignación de clases para evitar duplicados en renderizados consecutivos
   const statusEl      = document.getElementById('product-status');
   statusEl.textContent = product.status;
   statusEl.className   = `text-xs font-bold uppercase tracking-wide px-3 py-1 rounded-full ${
@@ -127,19 +126,17 @@ function showError(message) {
   document.getElementById('error-message').textContent  = message;
 }
 
-// ── CONTROL DE INICIALIZACIÓN ASÍNCRONA DE CLERK CON DEFENSIVA ──
 window.addEventListener('load', async () => {
   let authenticatedUser = null;
 
   try {
     if (typeof Clerk !== 'undefined') {
       await Clerk.load();
-      // Validamos estrictamente que la sesión esté recuperada antes de montar el layout
+      
       if (Clerk.user) {
         authenticatedUser = Clerk.user;
       }
     }
-    // Renderizamos el navbar pasándole de forma segura el usuario activo detectado
     MarketplaceLayout.mountNavbar('dashboard', authenticatedUser);
   } catch (clerkError) {
     console.warn('[ProductDetails] Error cargando Clerk Navbar:', clerkError);
