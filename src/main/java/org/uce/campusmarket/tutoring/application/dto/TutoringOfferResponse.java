@@ -26,7 +26,6 @@ public class TutoringOfferResponse {
 
     private LocalDateTime createdAt;
 
-    // Tutor info
     private String tutorName;
 
     private String tutorEmail;
@@ -37,7 +36,6 @@ public class TutoringOfferResponse {
 
     private String tutorSocialMedia;
 
-    // Reputation
     private Double averageRating;
 
     private Integer totalReviews;

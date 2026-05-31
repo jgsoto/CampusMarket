@@ -55,6 +55,11 @@ public class TutoringOfferRepositoryImpl implements TutoringOfferRepository {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public void deleteById(UUID id) {
+        jpaRepository.deleteById(id);
+    }
+
     private TutoringOffer toDomain(TutoringOfferJpaEntity entity) {
         return new TutoringOffer(
                 entity.getId(),

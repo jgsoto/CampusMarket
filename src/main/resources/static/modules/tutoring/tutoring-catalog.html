@@ -1,38 +1,73 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CampusMarket | Catálogo de Tutorías</title>
-    <link rel="stylesheet" href="/css/styles.css">
-    <script async crossorigin="anonymous"
-        data-clerk-publishable-key="pk_test_ZnVubnktbXVza294LTU5LmNsZXJrLmFjY291bnRzLmRldiQ"
-        src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@4/dist/clerk.browser.js">
-        </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CampusMarket | Catálogo de Tutorías</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/js/tailwind-config.js"></script>
+  <link rel="stylesheet" href="/css/styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script async crossorigin="anonymous"
+    data-clerk-publishable-key="pk_test_ZnVubnktbXVza294LTU5LmNsZXJrLmFjY291bnRzLmRldiQ"
+    src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@4/dist/clerk.browser.js">
+  </script>
 </head>
-<body>
-    <div class="container">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h1 style="margin: 0;">📚 Catálogo de Tutorías</h1>
-            <div>
-                <button onclick="window.location.href='/dashboard.html'"
-                    style="background: #6c757d; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-right: 10px;">
-                    Volver a Marketplace
-                </button>
-                <button onclick="window.location.href='/create-tutoring.html'"
-                    style="background: #6f42c1; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
-                    + Ofrecer Tutoría
-                </button>
-            </div>
-        </div>
+<body class="bg-gray-50 min-h-screen">
 
-        <div id="tutoring-section">
-            <div id="tutoring-catalog" style="display: flex; gap: 15px; flex-wrap: wrap;">
-                <p>Cargando ofertas de tutoría...</p>
-            </div>
-        </div>
+  <div id="navbar-placeholder"></div>
+
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8 pb-20">
+
+    <nav class="flex items-center gap-2 text-sm text-gray-400 mb-6">
+      <a href="/modules/marketplace/dashboard.html" class="hover:text-uce-navy transition-colors">Dashboard</a>
+      <span class="text-gray-300">›</span>
+      <span class="text-gray-700 font-medium" aria-current="page">Tutorías</span>
+    </nav>
+
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+      <div>
+        <h1 class="font-display text-2xl font-bold text-uce-navy">Catálogo de Tutorías</h1>
+        <p class="text-sm text-gray-400 mt-0.5">Encuentra un tutor o publica tu oferta académica.</p>
+      </div>
+      <a href="/modules/tutoring/create-tutoring.html"
+         class="inline-flex items-center gap-2 px-5 py-2.5 bg-uce-navy text-uce-gold font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-uce-navy-light transition-all shadow-sm">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Ofrecer Tutoría
+      </a>
     </div>
 
-    <script src="/js/tutoring-catalog.js"></script>
+    <div class="bg-white border border-gray-100 rounded-2xl p-4 mb-6 shadow-sm flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+      <div class="relative flex-1">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input id="search-input" type="search" placeholder="Buscar por materia o descripción..."
+               class="w-full pl-9 pr-4 py-2.5 text-sm border-2 border-gray-100 rounded-xl focus:border-uce-navy focus:outline-none transition-colors"
+               aria-label="Buscar tutorías" />
+      </div>
+      <div class="flex gap-2 flex-wrap">
+        <button data-filter="ALL"    class="filter-btn active-filter px-4 py-2 text-xs font-semibold rounded-xl border-2 transition-all">Todas</button>
+        <button data-filter="OPEN"   class="filter-btn px-4 py-2 text-xs font-semibold rounded-xl border-2 transition-all">Disponibles</button>
+        <button data-filter="CLOSED" class="filter-btn px-4 py-2 text-xs font-semibold rounded-xl border-2 transition-all">Cerradas</button>
+      </div>
+    </div>
+
+    <p id="results-count" class="text-xs text-gray-400 font-medium mb-4 px-1"></p>
+
+    <div id="tutoring-catalog" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5" aria-live="polite">
+      <div class="skeleton-blink bg-white rounded-2xl h-52 border border-gray-100"></div>
+      <div class="skeleton-blink bg-white rounded-2xl h-52 border border-gray-100"></div>
+      <div class="skeleton-blink bg-white rounded-2xl h-52 border border-gray-100"></div>
+    </div>
+
+  </main>
+
+  <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 max-w-sm" aria-live="polite"></div>
+
+  <script src="/modules/shared/components/js/marketplace-layout.js"></script>
+  <script src="/modules/tutoring/js/tutoring-catalog.js"></script>
 </body>
 </html>
