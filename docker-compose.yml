@@ -1,0 +1,32 @@
+services:
+
+  campusmarket-api:
+
+    build: .
+
+    container_name: campusmarket-api
+
+    restart: always
+
+    env_file:
+      - .env
+
+    ports:
+      - "8080:8080"
+
+  nginx:
+
+    image: nginx:latest
+
+    container_name: campusmarket-nginx
+
+    restart: always
+
+    ports:
+      - "80:80"
+
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+
+    depends_on:
+      - campusmarket-api
