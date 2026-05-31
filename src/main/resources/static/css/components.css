@@ -1,0 +1,32 @@
+/* ── Clerk widget overrides ── */
+.cl-card {
+  border-radius: 16px !important;
+  box-shadow: 0 16px 64px rgba(10,22,40,.18) !important;
+}
+.cl-formButtonPrimary {
+  background-color: var(--uce-navy) !important;
+  color: var(--uce-gold) !important;
+}
+
+/* ── Componente Tab (Antes embebido en profile.html) ── */
+.profile-tab { transition: all .2s ease; }
+.profile-tab.active {
+  color: var(--uce-navy);
+  border-bottom: 2px solid var(--uce-gold);
+  font-weight: 600;
+}
+.profile-tab:not(.active) {
+  color: #9ca3af;
+  border-bottom: 2px solid transparent;
+}
+
+/* ── Tarjetas Especiales ── */
+.stat-card {
+  background: linear-gradient(135deg, #0A1628 0%, #1A3260 100%);
+}
+.review-card { transition: box-shadow .2s ease; }
+.review-card:hover { box-shadow: 0 4px 20px rgba(10,22,40,.07); }
+
+/* ── Manejo de Paneles Ocultos ── */
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }

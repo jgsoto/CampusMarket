@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CampusMarket | Ofrecer Tutoría</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/js/tailwind-config.js"></script>
+  <link rel="stylesheet" href="/css/styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script async crossorigin="anonymous"
+    data-clerk-publishable-key="pk_test_ZnVubnktbXVza294LTU5LmNsZXJrLmFjY291bnRzLmRldiQ"
+    src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@4/dist/clerk.browser.js">
+  </script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+  <div id="navbar-placeholder"></div>
+
+  <main class="max-w-2xl mx-auto px-4 sm:px-6 py-10 pb-20">
+
+    <nav class="flex items-center gap-2 text-sm text-gray-400 mb-8">
+      <a href="/modules/marketplace/dashboard.html" class="hover:text-uce-navy transition-colors">Dashboard</a>
+      <span class="text-gray-300">›</span>
+      <a href="/modules/tutoring/tutoring-catalog.html" class="hover:text-uce-navy transition-colors">Tutorías</a>
+      <span class="text-gray-300">›</span>
+      <span class="text-gray-700 font-medium" aria-current="page">Ofrecer Tutoría</span>
+    </nav>
+
+    <div class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+
+      <div class="px-8 py-6 border-b border-gray-100">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-uce-navy/10 flex items-center justify-center">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-uce-navy" aria-hidden="true">
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+            </svg>
+          </div>
+          <div>
+            <h1 class="font-display text-xl font-bold text-uce-navy">Publicar Oferta de Tutoría</h1>
+            <p class="text-sm text-gray-400 mt-0.5">Completa los datos de tu anuncio académico.</p>
+          </div>
+        </div>
+      </div>
+
+      <form id="create-tutoring-form" class="px-8 py-6 flex flex-col gap-6" novalidate>
+
+        <div class="flex flex-col gap-1.5">
+          <label class="text-sm font-medium text-gray-700" for="subject">
+            Materia o Tema <span class="text-red-400">*</span>
+          </label>
+          <input id="subject" type="text" required maxlength="100"
+            placeholder="Ej: Matemáticas Básicas, Cálculo I, Inglés conversacional..."
+            class="px-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:border-uce-navy focus:outline-none focus:ring-2 focus:ring-uce-navy/10 transition-colors" />
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label class="text-sm font-medium text-gray-700" for="description">
+            Descripción <span class="text-red-400">*</span>
+          </label>
+          <textarea id="description" rows="4" required maxlength="500"
+            placeholder="¿Qué temas cubres? ¿Cuál es tu metodología? ¿Presencial u online?..."
+            class="px-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:border-uce-navy focus:outline-none focus:ring-2 focus:ring-uce-navy/10 transition-colors resize-none"></textarea>
+          <span class="text-xs text-gray-400 text-right">
+            <span id="desc-count">0</span>/500 caracteres
+          </span>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label class="text-sm font-medium text-gray-700" for="hourlyRate">
+            Tarifa por Hora ($) <span class="text-red-400">*</span>
+          </label>
+          <div class="relative">
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-semibold text-sm" aria-hidden="true">$</span>
+            <input id="hourlyRate" type="number" step="0.50" min="1" max="200" required
+              placeholder="0.00"
+              class="w-full pl-8 pr-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:border-uce-navy focus:outline-none focus:ring-2 focus:ring-uce-navy/10 transition-colors" />
+          </div>
+          <span class="text-xs text-gray-400">Precio referencial por hora de clase.</span>
+        </div>
+
+        <div class="flex gap-3 p-4 bg-uce-gold-pale border border-uce-gold/30 rounded-xl">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-uce-gold-dark shrink-0 mt-0.5" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <p class="text-xs text-uce-gold-dark leading-relaxed">
+            Los estudiantes interesados verán tus datos de contacto y te escribirán directamente para coordinar horarios.
+          </p>
+        </div>
+
+        <div class="flex gap-3 pt-2">
+          <a href="/modules/tutoring/tutoring-catalog.html"
+            class="flex-1 flex items-center justify-center px-5 py-3 border-2 border-gray-200 text-gray-600 font-semibold text-xs uppercase tracking-wider rounded-xl hover:bg-gray-50 transition-all">
+            Cancelar
+          </a>
+          <button type="submit" id="submit-btn"
+            class="flex-1 flex items-center justify-center gap-2 px-5 py-3 bg-uce-navy text-uce-gold font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-uce-navy-light transition-all shadow-sm disabled:opacity-60 disabled:cursor-not-allowed">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            Publicar Tutoría
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </main>
+
+  <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 max-w-sm" aria-live="polite"></div>
+
+  <script src="/modules/shared/components/js/marketplace-layout.js"></script>
+  <script src="/modules/tutoring/js/create-tutoring.js"></script>
+</body>
+</html>

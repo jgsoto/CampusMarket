@@ -31,3 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+### Entorno Local ###
+.env
+.mavenrc
+run.ps1
+
