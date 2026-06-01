@@ -1,4 +1,4 @@
-               # CampusMarket
+# CampusMarket
 
 Plataforma de marketplace académico desarrollada para estudiantes universitarios, donde los usuarios pueden comprar y vender productos, ofrecer servicios de tutoría y construir reputación dentro de un ecosistema universitario confiable.
 
@@ -58,14 +58,14 @@ El proyecto utiliza:
 ### Infraestructura
 
 - Supabase PostgreSQL
-- AWS/ Digital Ocean
+- AWS / Digital Ocean
 
 ---
 
 ## Estructura del Proyecto
 
 ```text
-src/main/java/com/campusmarket
+src/main/java/org/uce/campusmarket
 
 ├── shared
 ├── identity
