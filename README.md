@@ -65,7 +65,7 @@ El proyecto utiliza:
 ## Estructura del Proyecto
 
 ```text
-src/main/java/com/campusmarket
+src/main/java/org/uce/campusmarket
 
 ├── shared
 ├── identity
