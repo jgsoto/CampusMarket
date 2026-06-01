@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CampusMarket | Historial de Reseñas</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/js/tailwind-config.js"></script>
+  <link rel="stylesheet" href="/css/styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script async crossorigin="anonymous" src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@4/dist/clerk.browser.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen text-gray-900">
+
+  <div id="navbar-placeholder"></div>
+
+  <main class="max-w-3xl mx-auto px-4 sm:px-6 py-8 pb-20">
+    <nav class="flex items-center gap-2 text-sm text-gray-400 mb-8" aria-label="Breadcrumb">
+      <a href="/modules/marketplace/dashboard.html" class="hover:text-uce-navy transition-colors">Dashboard</a>
+      <span class="text-gray-300">›</span>
+      <span id="breadcrumb-name" class="text-gray-700 font-medium truncate max-w-[200px]">Historial</span>
+    </nav>
+
+    <div id="page-loading" class="flex flex-col gap-5">
+      <div class="skeleton-blink h-32 rounded-2xl"></div>
+      <div class="skeleton-blink h-24 rounded-2xl"></div>
+    </div>
+
+    <div id="page-content" class="hidden flex flex-col gap-6">
+      <section class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm flex items-center gap-5">
+        <div class="w-14 h-14 rounded-full bg-gradient-to-br from-uce-navy to-uce-navy-light border-2 border-uce-gold flex items-center justify-center flex-shrink-0">
+          <span id="user-initials" class="font-display text-lg font-bold text-uce-gold">??</span>
+        </div>
+        <div>
+          <h1 id="user-name" class="font-display text-xl font-bold text-uce-navy">---</h1>
+          <div class="flex items-center gap-2">
+            <span id="user-score-stars" class="text-amber-400 text-base">☆☆☆☆☆</span>
+            <span id="user-score-text" class="text-sm font-bold text-uce-navy">0.0</span>
+            <span id="user-review-count" class="text-xs text-gray-400">(0 reseñas)</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100">
+          <h2 id="reviews-title" class="font-display text-base font-bold text-uce-navy">Opiniones (0)</h2>
+        </div>
+        <div id="reviews-container" class="p-6 flex flex-col gap-3"></div>
+      </section>
+    </div>
+  </main>
+
+  <script src="/modules/shared/components/js/marketplace-layout.js"></script>
+  <script src="/modules/reputation/js/historial-votos.js"></script>
+</body>
+</html>

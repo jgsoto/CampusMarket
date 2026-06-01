@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CampusMarket | Reputación</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/js/tailwind-config.js"></script>
+  <link rel="stylesheet" href="/css/styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script async crossorigin="anonymous"
+    data-clerk-publishable-key="pk_test_ZnVubnktbXVza294LTU5LmNsZXJrLmFjY291bnRzLmRldiQ"
+    src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@4/dist/clerk.browser.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <div id="navbar-placeholder"></div>
+
+  <main class="max-w-5xl mx-auto px-4 sm:px-6 py-8 pb-20">
+    <nav class="flex items-center gap-2 text-sm text-gray-400 mb-8">
+      <a href="/modules/marketplace/dashboard.html" class="hover:text-uce-navy transition-colors">Dashboard</a>
+      <span class="text-gray-300">›</span>
+      <span class="text-gray-700 font-medium" aria-current="page">Mi Reputación</span>
+    </nav>
+
+    <header class="mb-8">
+      <h1 class="font-display text-2xl font-bold text-uce-navy">Mi Reputación</h1>
+      <p class="text-sm text-gray-400 mt-1">Cómo te han calificado otros estudiantes como vendedor y tutor.</p>
+    </header>
+
+    <div id="page-loading" class="flex flex-col gap-6">
+      <div class="skeleton-blink h-40 rounded-2xl"></div>
+      <div class="skeleton-blink h-64 rounded-2xl"></div>
+    </div>
+
+    <div id="page-content" class="hidden flex flex-col gap-8">
+      <section class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+        <div class="h-1.5 bg-gradient-to-r from-uce-navy via-uce-navy-light to-uce-gold"></div>
+        <div class="p-6 sm:p-8">
+          <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-6">Resumen global</p>
+          <div class="grid grid-cols-1 sm:grid-cols-[auto_1fr] gap-8 items-center">
+            <div class="flex flex-col items-center text-center sm:border-r border-gray-100 sm:pr-8">
+              <span id="global-score" class="font-display text-6xl font-black text-uce-navy">0.0</span>
+              <div id="global-stars" class="text-amber-400 text-2xl my-2">☆☆☆☆☆</div>
+              <span id="global-count" class="text-xs text-gray-400 font-medium">(0 reseñas)</span>
+            </div>
+            <div id="rating-bars-container" class="flex flex-col gap-2 w-full text-xs text-gray-600 font-medium">
+              </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="grid grid-cols-3 gap-4">
+        <div class="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm text-center">
+          <p id="stat-marketplace" class="font-display text-3xl font-black text-uce-navy">0</p>
+          <p class="text-xs text-gray-400 mt-1 font-medium">Reseñas de Marketplace</p>
+        </div>
+        <div class="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm text-center">
+          <p id="stat-tutoring" class="font-display text-3xl font-black text-uce-navy">0</p>
+          <p class="text-xs text-gray-400 mt-1 font-medium">Reseñas de Tutorías</p>
+        </div>
+        <div class="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm text-center">
+          <p id="stat-total" class="font-display text-3xl font-black text-uce-gold-dark">0</p>
+          <p class="text-xs text-gray-400 mt-1 font-medium">Total de Reseñas</p>
+        </div>
+      </section>
+
+      <section class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-6 pt-6 pb-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <h2 id="reviews-title" class="font-display text-base font-bold text-uce-navy">Opiniones recibidas (0)</h2>
+          <div class="flex gap-2" role="group">
+            <button data-type="ALL" class="rev-filter-btn active-rev-filter px-3 py-1.5 text-xs font-semibold rounded-xl border-2">Todas</button>
+            <button data-type="MARKETPLACE" class="rev-filter-btn px-3 py-1.5 text-xs font-semibold rounded-xl border-2">Marketplace</button>
+            <button data-type="TUTORING" class="rev-filter-btn px-3 py-1.5 text-xs font-semibold rounded-xl border-2">Tutorías</button>
+          </div>
+        </div>
+        <div id="reviews-container" class="p-6 flex flex-col gap-3"></div>
+      </section>
+    </div>
+  </main>
+  <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3"></div>
+  <script src="/modules/shared/components/js/marketplace-layout.js"></script>
+  <script src="/modules/reputation/js/reputation.js"></script>
+</body>
+</html>
