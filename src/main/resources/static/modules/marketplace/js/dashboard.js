@@ -1,13 +1,15 @@
 'use strict';
 
+let _activeStatus = 'TODOS';
+
 async function syncUser(clerkUser) {
   const res = await fetch(`${API_BASE}/api/v1/users/sync`, {
-    method:  'POST',
+    method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       clerkUserId: clerkUser.id,
-      fullName:    clerkUser.fullName,
-      email:       clerkUser.primaryEmailAddress.emailAddress,
+      fullName: clerkUser.fullName,
+      email: clerkUser.primaryEmailAddress.emailAddress,
     }),
   });
   if (!res.ok) throw new Error(`Sync HTTP ${res.status}`);
@@ -28,82 +30,48 @@ function populateUserSection(clerkUser) {
   if (section) section.style.display = 'flex';
 
   const name = clerkUser.fullName ?? 'Usuario';
-  document.getElementById('user-name').textContent     = name;
-  document.getElementById('user-email').textContent    = clerkUser.primaryEmailAddress.emailAddress;
+  document.getElementById('user-name').textContent = name;
+  document.getElementById('user-email').textContent = clerkUser.primaryEmailAddress.emailAddress;
   document.getElementById('user-initials').textContent = getInitials(name);
 }
 
-function initSearchBar() {
-  const selectorBtn      = document.getElementById('category-selector-btn');
-  const dropdown         = document.getElementById('category-dropdown');
-  const categoryLabel    = document.getElementById('category-label');
-  const categoryChevron  = document.getElementById('category-chevron');
-  const searchInput      = document.getElementById('search-input');
-  const searchBtn        = document.getElementById('search-btn');
+function initFilters() {
+  const searchInput = document.getElementById('search-input');
+  const filterBtns = document.querySelectorAll('.filter-btn');
 
-  let activeCategory = 'all';
+  searchInput.addEventListener('input', () => applyFilters(searchInput.value));
 
-  selectorBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const isOpen = !dropdown.classList.contains('hidden');
-    dropdown.classList.toggle('hidden', isOpen);
-    selectorBtn.setAttribute('aria-expanded', String(!isOpen));
-    categoryChevron.style.transform = isOpen ? '' : 'rotate(180deg)';
-  });
-
-  document.addEventListener('click', (e) => {
-    if (!document.getElementById('category-selector-wrapper')?.contains(e.target)) {
-      dropdown.classList.add('hidden');
-      selectorBtn.setAttribute('aria-expanded', 'false');
-      categoryChevron.style.transform = '';
-    }
-  });
-
-  dropdown.querySelectorAll('.category-option').forEach(option => {
-    option.addEventListener('click', () => {
-      activeCategory = option.dataset.category;
-      categoryLabel.textContent = option.dataset.label;
-      dropdown.classList.add('hidden');
-      selectorBtn.setAttribute('aria-expanded', 'false');
-      categoryChevron.style.transform = '';
-      applyFilters();
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      _activeStatus = btn.dataset.filter;
+      
+      filterBtns.forEach(b => {
+        const isActive = b.dataset.filter === _activeStatus;
+        b.className = isActive 
+          ? "filter-btn px-4 py-2 text-xs font-semibold rounded-xl border-2 transition-all bg-uce-navy text-uce-gold border-uce-navy"
+          : "filter-btn px-4 py-2 text-xs font-semibold rounded-xl border-2 transition-all bg-white text-gray-500 border-gray-200 hover:bg-gray-50";
+      });
+      
+      applyFilters(searchInput.value);
     });
   });
+}
 
-  searchInput.addEventListener('input', () => applyFilters());
+function applyFilters(query = '') {
+  const q = query.toLowerCase();
 
-  searchInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') applyFilters();
+  const filtered = _catalogCache.filter(item => {
+    const matchesStatus = _activeStatus === 'TODOS' || item.status === _activeStatus;
+    const matchesSearch = !q || 
+                          item.title.toLowerCase().includes(q) || 
+                          (item.description ?? '').toLowerCase().includes(q);
+    return matchesStatus && matchesSearch;
   });
-  searchBtn.addEventListener('click', () => applyFilters());
 
-  function applyFilters() {
-    const query = searchInput.value.trim().toLowerCase();
-
-    let filtered = _catalogCache;
-
-    if (activeCategory !== 'all') {
-      filtered = filtered.filter(l =>
-        (l.categoryName ?? '').toLowerCase().includes(activeCategory)
-      );
-    }
-
-    if (query) {
-      filtered = filtered.filter(l =>
-        l.title.toLowerCase().includes(query) ||
-        l.description.toLowerCase().includes(query) ||
-        (l.categoryName ?? '').toLowerCase().includes(query)
-      );
-    }
-
-    if (filtered.length) {
-      renderCatalog(filtered);
-    } else {
-      renderEmpty(query
-        ? `No se encontraron productos para "${query}".`
-        : 'No hay productos en esta categoría.'
-      );
-    }
+  if (filtered.length > 0) {
+    renderCatalog(filtered);
+  } else {
+    renderEmpty(q ? `No se encontraron productos para "${q}".` : 'No hay productos en este estado.');
   }
 }
 
@@ -126,8 +94,11 @@ window.addEventListener('load', async () => {
   }
 
   populateUserSection(Clerk.user);
-  loadCatalog();
-  initSearchBar();
+  
+  // IMPORTANTE: En tu marketplace.js (donde está loadCatalog), 
+  // asegúrate de que al terminar el fetch hagas: _catalogCache = data; renderCatalog(data);
+  await loadCatalog(); 
+  initFilters();
 
   document.getElementById('logout-btn')?.addEventListener('click', async () => {
     await Clerk.signOut();

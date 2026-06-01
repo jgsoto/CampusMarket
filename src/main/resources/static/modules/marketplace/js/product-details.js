@@ -90,35 +90,29 @@ function renderAction(product) {
 }
 
 function renderProduct(product) {
-  const reputation = product.averageRating || 0;
-  const totalReviews = product.totalReviews || 0;
-
-  document.getElementById('breadcrumb-title').textContent    = product.title;
-  document.title                                             = `CampusMarket | ${product.title}`;
+  document.getElementById('breadcrumb-title').textContent     = product.title;
+  document.title                                              = `CampusMarket | ${product.title}`;
 
   initGallery(product.images);
 
-  document.getElementById('product-title').textContent       = product.title;
-  document.getElementById('product-category').textContent    = product.categoryName ?? '';
-  document.getElementById('product-price').textContent       = `$${product.price.toFixed(2)}`;
-  document.getElementById('product-description').textContent = product.description;
-  document.getElementById('product-date').textContent        =
+  document.getElementById('product-title').textContent        = product.title;
+  document.getElementById('product-category').textContent     = product.categoryName ?? '';
+  document.getElementById('product-price').textContent        = `$${product.price.toFixed(2)}`;
+  document.getElementById('product-description').textContent  = product.description;
+  document.getElementById('product-date').textContent         =
     `Publicado el ${new Date(product.createdAt).toLocaleDateString('es-EC', { dateStyle: 'long' })}`;
+
 
   const ratingEl = document.getElementById('product-rating-container');
   if (ratingEl) {
-    ratingEl.innerHTML = `
-      <div class="flex items-center gap-1.5 text-sm my-1">
-        <span class="font-bold text-amber-500">★ ${reputation.toFixed(1)}</span>
-        <span class="text-gray-400">(${totalReviews} reseñas)</span>
-      </div>`;
+    ratingEl.innerHTML = '';
   }
 
   const statusEl      = document.getElementById('product-status');
   statusEl.textContent = product.status;
-  statusEl.className  += product.status === 'VENDIDO'
-    ? ' bg-red-50 text-red-600'
-    : ' bg-green-50 text-green-700';
+  statusEl.className   = `text-xs font-bold uppercase tracking-wide px-3 py-1 rounded-full ${
+    product.status === 'VENDIDO' ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-700'
+  }`;
 
   renderAction(product);
 
@@ -133,7 +127,21 @@ function showError(message) {
 }
 
 window.addEventListener('load', async () => {
-  MarketplaceLayout.mountNavbar('dashboard', null);
+  let authenticatedUser = null;
+
+  try {
+    if (typeof Clerk !== 'undefined') {
+      await Clerk.load();
+      
+      if (Clerk.user) {
+        authenticatedUser = Clerk.user;
+      }
+    }
+    MarketplaceLayout.mountNavbar('dashboard', authenticatedUser);
+  } catch (clerkError) {
+    console.warn('[ProductDetails] Error cargando Clerk Navbar:', clerkError);
+    MarketplaceLayout.mountNavbar('dashboard', null);
+  }
 
   const productId = new URLSearchParams(window.location.search).get('id');
 
@@ -148,6 +156,6 @@ window.addEventListener('load', async () => {
     renderProduct(await res.json());
   } catch (err) {
     console.error('[ProductDetails]', err);
-    showError('No se pudo cargar el producto. Verifica que el servidor esté activo.');
+    showError('No se pudo cargar el producto.');
   }
 });
