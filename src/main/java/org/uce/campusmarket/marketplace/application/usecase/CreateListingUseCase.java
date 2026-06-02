@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.uce.campusmarket.marketplace.application.dto.CreateListingRequest;
 import org.uce.campusmarket.marketplace.application.dto.ListingImageResponse;
 import org.uce.campusmarket.marketplace.application.dto.ListingResponse;
+import org.uce.campusmarket.marketplace.application.port.ImageStoragePort;
 
 import org.uce.campusmarket.marketplace.domain.model.Category;
 import org.uce.campusmarket.marketplace.domain.model.Listing;
@@ -19,8 +20,6 @@ import org.uce.campusmarket.marketplace.domain.repository.ListingRepository;
 import org.uce.campusmarket.marketplace.domain.valueobject.ListingDescription;
 import org.uce.campusmarket.marketplace.domain.valueobject.ListingTitle;
 import org.uce.campusmarket.marketplace.domain.valueobject.Price;
-
-import org.uce.campusmarket.marketplace.infrastructure.storage.SupabaseStorageService;
 
 import org.uce.campusmarket.reputation.domain.repository.ReviewRepository;
 
@@ -36,7 +35,7 @@ public class CreateListingUseCase {
 
     private final ListingRepository listingRepository;
     private final CategoryRepository categoryRepository;
-    private final SupabaseStorageService storageService;
+    private final ImageStoragePort imageStoragePort;
     private final ReviewRepository reviewRepository;
 
     public ListingResponse execute(CreateListingRequest request) {
@@ -66,7 +65,7 @@ public class CreateListingUseCase {
 
                 MultipartFile file = images.get(i);
 
-                String imageUrl = storageService.upload(file);
+                String imageUrl = imageStoragePort.upload(file);
 
                 ListingImage listingImage = new ListingImage(
                         UUID.randomUUID(),

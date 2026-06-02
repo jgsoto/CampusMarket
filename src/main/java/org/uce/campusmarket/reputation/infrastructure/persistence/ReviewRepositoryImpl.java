@@ -1,11 +1,11 @@
-package org.uce.campusmarket.reputation.infraestructure.persistence;
+package org.uce.campusmarket.reputation.infrastructure.persistence;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import org.uce.campusmarket.reputation.domain.model.Review;
 import org.uce.campusmarket.reputation.domain.repository.ReviewRepository;
-import org.uce.campusmarket.reputation.infraestructure.mapper.ReviewMapper;
+import org.uce.campusmarket.reputation.infrastructure.mapper.ReviewMapper;
 
 import java.util.List;
 import java.util.Optional;

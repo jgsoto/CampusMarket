@@ -1,8 +1,8 @@
-package org.uce.campusmarket.reputation.infraestructure.mapper;
+package org.uce.campusmarket.reputation.infrastructure.mapper;
 
 import org.springframework.stereotype.Component;
 import org.uce.campusmarket.reputation.domain.model.Review;
-import org.uce.campusmarket.reputation.infraestructure.persistence.ReviewJpaEntity;
+import org.uce.campusmarket.reputation.infrastructure.persistence.ReviewJpaEntity;
 
 @Component
 public class ReviewMapper {

@@ -1,4 +1,4 @@
-package org.uce.campusmarket.tutoring.infraestructure.persistence;
+package org.uce.campusmarket.tutoring.infrastructure.persistence;
 
 import org.springframework.stereotype.Repository;
 import org.uce.campusmarket.tutoring.domain.model.TutoringOffer;

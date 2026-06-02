@@ -1,0 +1,1 @@
+src/main/java/org/uce/campusmarket/marketplace/application/port/ImageStoragePort.java

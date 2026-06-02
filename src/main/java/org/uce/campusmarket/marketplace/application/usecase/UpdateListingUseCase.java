@@ -11,6 +11,7 @@ import org.uce.campusmarket.identity.domain.repository.UserRepository;
 import org.uce.campusmarket.marketplace.application.dto.ListingImageResponse;
 import org.uce.campusmarket.marketplace.application.dto.ListingResponse;
 import org.uce.campusmarket.marketplace.application.dto.UpdateListingRequest;
+import org.uce.campusmarket.marketplace.application.port.ImageStoragePort;
 
 import org.uce.campusmarket.marketplace.domain.model.Listing;
 import org.uce.campusmarket.marketplace.domain.model.ListingImage;
@@ -20,8 +21,6 @@ import org.uce.campusmarket.marketplace.domain.repository.ListingRepository;
 import org.uce.campusmarket.marketplace.domain.valueobject.ListingDescription;
 import org.uce.campusmarket.marketplace.domain.valueobject.ListingTitle;
 import org.uce.campusmarket.marketplace.domain.valueobject.Price;
-
-import org.uce.campusmarket.marketplace.infrastructure.storage.SupabaseStorageService;
 
 import org.uce.campusmarket.reputation.domain.repository.ReviewRepository;
 
@@ -36,7 +35,7 @@ import java.util.UUID;
 public class UpdateListingUseCase {
 
     private final ListingRepository listingRepository;
-    private final SupabaseStorageService storageService;
+    private final ImageStoragePort imageStoragePort;
     private final UserRepository userRepository;
     private final ReviewRepository reviewRepository;
 
@@ -81,7 +80,7 @@ public class UpdateListingUseCase {
         if (hasRealFiles) {
 
             listing.getImages().forEach(image ->
-                    storageService.delete(image.getUrl())
+                    imageStoragePort.delete(image.getUrl())
             );
 
             listing.getImages().clear();
@@ -93,7 +92,7 @@ public class UpdateListingUseCase {
                 if (!file.isEmpty()) {
 
                     String imageUrl =
-                            storageService.upload(file);
+                            imageStoragePort.upload(file);
 
                     ListingImage listingImage =
                             new ListingImage(

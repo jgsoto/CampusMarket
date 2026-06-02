@@ -1,4 +1,4 @@
-package org.uce.campusmarket.tutoring.infraestructure.persistence;
+package org.uce.campusmarket.tutoring.infrastructure.persistence;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

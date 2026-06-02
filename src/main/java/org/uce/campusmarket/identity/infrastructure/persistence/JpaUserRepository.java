@@ -1,4 +1,4 @@
-package org.uce.campusmarket.identity.infraestructure.persistence;
+package org.uce.campusmarket.identity.infrastructure.persistence;
 
 import org.uce.campusmarket.identity.domain.model.User;
 import org.uce.campusmarket.identity.domain.repository.UserRepository;

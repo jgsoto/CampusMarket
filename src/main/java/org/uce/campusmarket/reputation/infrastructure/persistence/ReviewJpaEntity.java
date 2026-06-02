@@ -1,4 +1,4 @@
-package org.uce.campusmarket.reputation.infraestructure.persistence;
+package org.uce.campusmarket.reputation.infrastructure.persistence;
 
 import jakarta.persistence.*;
 import lombok.*;
