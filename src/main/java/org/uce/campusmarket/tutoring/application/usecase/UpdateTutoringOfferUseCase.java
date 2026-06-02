@@ -24,23 +24,17 @@ public class UpdateTutoringOfferUseCase {
 
     public TutoringOfferResponse execute(UUID offerId, UpdateTutoringOfferRequest request, UUID requesterId) {
         TutoringOffer offer = repository.findById(offerId)
-                .orElseThrow(() -> new IllegalArgumentException("Tutoring offer not found"));
+                .orElseThrow(() -> new DomainException("La oferta de tutoría no existe"));
 
         if (!offer.getTutorId().equals(requesterId)) {
-            throw new IllegalArgumentException("Only the creator can edit this tutoring offer");
+            throw new DomainException("Solo el creador puede editar esta tutoría");
         }
 
-        if (request.getSubject() != null && !request.getSubject().trim().isEmpty()) {
-            offer.setSubject(request.getSubject());
-        }
-
-        if (request.getDescription() != null && !request.getDescription().trim().isEmpty()) {
-            offer.setDescription(request.getDescription());
-        }
-
-        if (request.getHourlyRate() != null) {
-            offer.setHourlyRate(new HourlyRate(request.getHourlyRate()));
-        }
+        offer.updateDetails(
+                request.getSubject(),
+                request.getDescription(),
+                new HourlyRate(request.getHourlyRate())
+        );
 
         TutoringOffer updatedOffer = repository.save(offer);
 

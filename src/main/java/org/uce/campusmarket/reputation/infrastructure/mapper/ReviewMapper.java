@@ -30,7 +30,8 @@ public class ReviewMapper {
                 entity.getTargetId(),
                 entity.getTargetType(),
                 entity.getRating(),
-                entity.getComment()
+                entity.getComment(),
+                entity.getCreatedAt()
         );
     }
 }

@@ -61,6 +61,56 @@ public class Review {
         this.createdAt = LocalDateTime.now();
     }
 
+    public Review(
+            UUID id,
+            UUID reviewerId,
+            UUID reviewedUserId,
+            UUID targetId,
+            ReviewTargetType targetType,
+            int rating,
+            String comment,
+            LocalDateTime createdAt
+    ) {
+
+        validate(
+                reviewerId,
+                reviewedUserId,
+                targetId,
+                rating
+        );
+
+        this.id = id != null ? id : UUID.randomUUID();
+
+        this.reviewerId = reviewerId;
+
+        this.reviewedUserId = reviewedUserId;
+
+        this.targetId = targetId;
+
+        this.targetType = targetType;
+
+        this.rating = rating;
+
+        this.comment = comment;
+
+        this.createdAt = createdAt != null ? createdAt : LocalDateTime.now();
+    }
+
+    public void update(
+            int rating,
+            String comment
+    ) {
+        validate(
+                this.reviewerId,
+                this.reviewedUserId,
+                this.targetId,
+                rating
+        );
+
+        this.rating = rating;
+        this.comment = comment;
+    }
+
     private void validate(
             UUID reviewerId,
             UUID reviewedUserId,

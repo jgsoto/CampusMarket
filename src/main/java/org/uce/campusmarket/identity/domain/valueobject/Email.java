@@ -1,5 +1,7 @@
 package org.uce.campusmarket.identity.domain.valueobject;
 
+import org.uce.campusmarket.shared.exception.DomainException;
+
 import java.util.regex.Pattern;
 
 public class Email {
@@ -11,11 +13,11 @@ public class Email {
 
     public Email(String value) {
 
-        if (!EMAIL_PATTERN.matcher(value).matches()) {
-            throw new IllegalArgumentException("Invalid university email");
+        if (value == null || !EMAIL_PATTERN.matcher(value).matches()) {
+            throw new DomainException("El correo institucional no es válido");
         }
 
-        this.value = value;
+        this.value = value.toLowerCase();
     }
 
     public String getValue() {

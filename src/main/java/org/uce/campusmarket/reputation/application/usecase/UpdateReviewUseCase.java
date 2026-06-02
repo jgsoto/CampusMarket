@@ -46,11 +46,8 @@ public class UpdateReviewUseCase {
             );
         }
 
-        review.setRating(
-                rating
-        );
-
-        review.setComment(
+        review.update(
+                rating,
                 comment
         );
 

@@ -21,10 +21,12 @@ public class UpdateUserProfileUseCase {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado con ID: " + userId));
 
-        user.setPhone(request.phone());
-        user.setAddress(request.address());
-        user.setDescription(request.description());
-        user.setSocialMedia(request.socialMedia());
+        user.updateProfile(
+                request.phone(),
+                request.address(),
+                request.description(),
+                request.socialMedia()
+        );
 
         userRepository.save(user);
     }
