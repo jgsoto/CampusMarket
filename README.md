@@ -4,6 +4,7 @@ Plataforma de marketplace académico desarrollada para estudiantes universitario
 
 ---
 
+
 ## Descripción
 
 CampusMarket es una aplicación basada en Domain-Driven Design (DDD) que organiza el sistema alrededor de capacidades del negocio y contextos delimitados.
