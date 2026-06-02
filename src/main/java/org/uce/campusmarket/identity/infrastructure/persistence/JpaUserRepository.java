@@ -1,15 +1,15 @@
 package org.uce.campusmarket.identity.infrastructure.persistence;
 
-import org.uce.campusmarket.identity.domain.model.User;
-import org.uce.campusmarket.identity.domain.repository.UserRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 import java.util.UUID;
 
-public interface JpaUserRepository extends JpaRepository<User, UUID>, UserRepository {
+@Repository
+public interface JpaUserRepository extends JpaRepository<UserJpaEntity, UUID> {
 
-    Optional<User> findByEmail(String email);
+    Optional<UserJpaEntity> findByEmail(String email);
 
-    Optional<User> findByClerkId(String clerkId);
+    Optional<UserJpaEntity> findByClerkId(String clerkId);
 }
