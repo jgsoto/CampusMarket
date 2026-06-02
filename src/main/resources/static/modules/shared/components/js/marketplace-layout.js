@@ -1,6 +1,6 @@
 'use strict';
 
-const API_BASE = 'http://localhost:8080';
+const API_BASE = '';
 
 function getOwnerId() {
   return localStorage.getItem('campusMarketUserId');
