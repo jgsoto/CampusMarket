@@ -1,0 +1,40 @@
+name: Deploy CampusMarket
+
+on:
+
+  push:
+    branches:
+      - main
+
+jobs:
+
+  deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deploy to DigitalOcean
+
+        uses: appleboy/ssh-action@v1.0.3
+
+        with:
+
+          host: ${{ secrets.HOST }}
+
+          username: ${{ secrets.USERNAME }}
+
+          key: ${{ secrets.SSH_KEY }}
+
+          script: |
+
+            cd ~/projects/CampusMarket
+
+            git pull
+
+            docker compose down
+
+            docker compose up -d --build
