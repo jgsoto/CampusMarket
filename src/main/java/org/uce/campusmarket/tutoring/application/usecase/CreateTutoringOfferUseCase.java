@@ -31,21 +31,12 @@ public class CreateTutoringOfferUseCase {
         User tutor = userRepository.findById(request.getTutorId())
                 .orElseThrow(() -> new DomainException("El tutor no existe"));
 
-        if (tutor == null) {
-            throw new DomainException("Tutor inválido");
-        }
-
-        if (request.getHourlyRate() == null || request.getHourlyRate() <= 0) {
-            throw new DomainException("La tarifa por hora debe ser mayor a 0");
-        }
-
-        TutoringOffer offer = TutoringOffer.builder()
-                .id(UUID.randomUUID())
-                .tutorId(request.getTutorId())
-                .subject(request.getSubject())
-                .description(request.getDescription())
-                .hourlyRate(new HourlyRate(request.getHourlyRate()))
-                .build();
+        TutoringOffer offer = TutoringOffer.create(
+                request.getTutorId(),
+                request.getSubject(),
+                request.getDescription(),
+                new HourlyRate(request.getHourlyRate())
+        );
 
         TutoringOffer savedOffer = repository.save(offer);
 

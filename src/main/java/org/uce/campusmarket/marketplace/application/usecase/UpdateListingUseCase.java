@@ -83,7 +83,7 @@ public class UpdateListingUseCase {
                     imageStoragePort.delete(image.getUrl())
             );
 
-            listing.getImages().clear();
+            List<ListingImage> uploadedImages = new java.util.ArrayList<>();
 
             for (int i = 0; i < newImages.size(); i++) {
 
@@ -101,9 +101,11 @@ public class UpdateListingUseCase {
                                     i == 0
                             );
 
-                    listing.addImage(listingImage);
+                    uploadedImages.add(listingImage);
                 }
             }
+
+            listing.replaceImages(uploadedImages);
         }
 
         Listing updatedListing =

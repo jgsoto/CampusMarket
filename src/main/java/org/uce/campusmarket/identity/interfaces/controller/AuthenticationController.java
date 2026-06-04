@@ -1,13 +1,12 @@
 package org.uce.campusmarket.identity.interfaces.controller;
 
-import org.uce.campusmarket.identity.application.usecase.GetCurrentUserUseCase;
-import org.uce.campusmarket.identity.application.usecase.RegisterUserUseCase;
-import org.uce.campusmarket.identity.domain.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
+import org.uce.campusmarket.identity.application.dto.UserProfileResponse;
+import org.uce.campusmarket.identity.application.service.UserSyncService;
+import org.uce.campusmarket.identity.application.usecase.GetCurrentUserUseCase;
+import org.uce.campusmarket.identity.domain.model.User;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -15,20 +14,42 @@ import java.time.LocalDateTime;
 @CrossOrigin("*")
 public class AuthenticationController {
 
-    private final RegisterUserUseCase registerUserUseCase;
+    private final UserSyncService userSyncService;
     private final GetCurrentUserUseCase getCurrentUserUseCase;
 
     @PostMapping("/sync")
-    public User synchronizeUser(@RequestBody User user) {
+    public UserProfileResponse synchronizeUser(@RequestBody SyncUserRequest request) {
 
-        return registerUserUseCase.execute(user);
+        User user = userSyncService.synchronizeUser(
+                request.clerkUserId(),
+                request.fullName(),
+                request.email()
+        );
+
+        return toResponse(user);
     }
 
     @GetMapping("/me")
-    public User currentUser(Authentication authentication) {
+    public UserProfileResponse currentUser(Authentication authentication) {
 
         String clerkId = authentication.getName();
 
-        return getCurrentUserUseCase.execute(clerkId);
+        User user = getCurrentUserUseCase.execute(clerkId);
+
+        return toResponse(user);
+    }
+
+    private UserProfileResponse toResponse(User user) {
+        return new UserProfileResponse(
+                user.getId(),
+                user.getFullName(),
+                user.getEmail(),
+                user.getTrustScore(),
+                user.getPhone(),
+                user.getAddress(),
+                user.getDescription(),
+                user.getSocialMedia(),
+                user.getCreatedAt()
+        );
     }
 }

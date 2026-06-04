@@ -1,19 +1,18 @@
 package org.uce.campusmarket.tutoring.domain.model;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.uce.campusmarket.shared.exception.DomainException;
 import org.uce.campusmarket.tutoring.domain.valueobject.HourlyRate;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Setter
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
 public class TutoringOffer {
@@ -29,6 +28,32 @@ public class TutoringOffer {
 
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    public static TutoringOffer create(
+            UUID tutorId,
+            String subject,
+            String description,
+            HourlyRate hourlyRate
+    ) {
+        if (tutorId == null) {
+            throw new DomainException("La tutoría debe tener un tutor");
+        }
+
+        TutoringOffer offer = TutoringOffer.builder()
+                .id(UUID.randomUUID())
+                .tutorId(tutorId)
+                .status(TutoringStatus.ACTIVE)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        offer.updateDetails(
+                subject,
+                description,
+                hourlyRate
+        );
+
+        return offer;
+    }
 
     public void close() {
         if (this.status == TutoringStatus.CLOSED) {
@@ -51,7 +76,9 @@ public class TutoringOffer {
             throw new DomainException("La materia o tema es obligatorio");
         }
 
-        if (subject.trim().length() < 3 || subject.trim().length() > 100) {
+        String normalizedSubject = subject.trim();
+
+        if (normalizedSubject.length() < 3 || normalizedSubject.length() > 100) {
             throw new DomainException("La materia debe tener entre 3 y 100 caracteres");
         }
 
@@ -59,7 +86,9 @@ public class TutoringOffer {
             throw new DomainException("La descripción es obligatoria");
         }
 
-        if (description.trim().length() < 10 || description.trim().length() > 500) {
+        String normalizedDescription = description.trim();
+
+        if (normalizedDescription.length() < 10 || normalizedDescription.length() > 500) {
             throw new DomainException("La descripción debe tener entre 10 y 500 caracteres");
         }
 
@@ -67,8 +96,8 @@ public class TutoringOffer {
             throw new DomainException("La tarifa por hora es obligatoria");
         }
 
-        this.subject = subject.trim();
-        this.description = description.trim();
+        this.subject = normalizedSubject;
+        this.description = normalizedDescription;
         this.hourlyRate = hourlyRate;
     }
 }

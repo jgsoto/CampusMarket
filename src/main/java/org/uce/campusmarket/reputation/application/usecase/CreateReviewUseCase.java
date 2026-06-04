@@ -164,8 +164,7 @@ public class CreateReviewUseCase {
         }
 
         Review review =
-                new Review(
-                        null,
+                Review.create(
                         reviewerId,
                         request.getReviewedUserId(),
                         request.getTargetId(),

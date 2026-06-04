@@ -10,9 +10,8 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
-@Setter
 @Builder
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class User {
 
@@ -51,7 +50,7 @@ public class User {
         TrustScore validTrustScore = new TrustScore(trustScore);
 
         return User.builder()
-                .clerkId(clerkId)
+                .clerkId(clerkId.trim())
                 .fullName(validFullName.getValue())
                 .email(validEmail.getValue())
                 .trustScore(validTrustScore.getValue())

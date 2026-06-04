@@ -13,9 +13,13 @@ public final class ListingDescription {
         if (value == null || value.trim().isEmpty()) {
             throw new DomainException("La descripción no puede estar vacía");
         }
-        if (value.length() < 10 || value.length() > 1000) {
+
+        String normalizedValue = value.trim();
+
+        if (normalizedValue.length() < 10 || normalizedValue.length() > 1000) {
             throw new DomainException("La descripción debe tener entre 10 y 1000 caracteres");
         }
-        this.value = value;
+
+        this.value = normalizedValue;
     }
 }
