@@ -15,7 +15,6 @@ public class ReviewMapper {
                 .reviewerId(review.getReviewerId())
                 .reviewedUserId(review.getReviewedUserId())
                 .targetId(review.getTargetId())
-                .targetType(review.getTargetType())
                 .rating(review.getRating())
                 .comment(review.getComment())
                 .createdAt(review.getCreatedAt())
@@ -29,7 +28,6 @@ public class ReviewMapper {
                 entity.getReviewerId(),
                 entity.getReviewedUserId(),
                 entity.getTargetId(),
-                entity.getTargetType(),
                 new Rating(entity.getRating()),
                 entity.getComment(),
                 entity.getCreatedAt()

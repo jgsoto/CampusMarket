@@ -1,4 +1,4 @@
-package org.uce.campusmarket.identity.interfaces.controller;
+package org.uce.campusmarket.identity.interfaces.rest;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

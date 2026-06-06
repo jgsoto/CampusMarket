@@ -87,7 +87,6 @@ public class CreateReviewUseCase {
                 reviewerId,
                 request.getReviewedUserId(),
                 request.getTargetId(),
-                request.getTargetType(),
                 rating,
                 request.getComment()
         );
@@ -99,7 +98,6 @@ public class CreateReviewUseCase {
                 .reviewerId(saved.getReviewerId())
                 .reviewedUserId(saved.getReviewedUserId())
                 .targetId(saved.getTargetId())
-                .targetType(saved.getTargetType().name())
                 .rating(saved.getRating())
                 .comment(saved.getComment())
                 .createdAt(saved.getCreatedAt())

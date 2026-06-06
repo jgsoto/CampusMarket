@@ -1,4 +1,4 @@
-package org.uce.campusmarket.marketplace.interfaces.controller;
+package org.uce.campusmarket.marketplace.interfaces.rest;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

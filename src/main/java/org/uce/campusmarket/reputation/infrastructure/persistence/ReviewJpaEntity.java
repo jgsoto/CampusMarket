@@ -2,7 +2,6 @@ package org.uce.campusmarket.reputation.infrastructure.persistence;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.uce.campusmarket.reputation.domain.model.ReviewTargetType;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -27,10 +26,6 @@ public class ReviewJpaEntity {
 
     @Column(nullable = false)
     private UUID targetId;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private ReviewTargetType targetType;
 
     @Column(nullable = false)
     private int rating;

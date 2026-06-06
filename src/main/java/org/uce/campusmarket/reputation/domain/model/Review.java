@@ -21,8 +21,6 @@ public class Review {
 
     private UUID targetId;
 
-    private ReviewTargetType targetType;
-
     private Rating rating;
 
     private String comment;
@@ -34,7 +32,6 @@ public class Review {
             UUID reviewerId,
             UUID reviewedUserId,
             UUID targetId,
-            ReviewTargetType targetType,
             Rating rating,
             String comment
     ) {
@@ -43,7 +40,6 @@ public class Review {
                 reviewerId,
                 reviewedUserId,
                 targetId,
-                targetType,
                 rating,
                 comment,
                 LocalDateTime.now()
@@ -55,7 +51,6 @@ public class Review {
             UUID reviewerId,
             UUID reviewedUserId,
             UUID targetId,
-            ReviewTargetType targetType,
             Rating rating,
             String comment,
             LocalDateTime createdAt
@@ -64,7 +59,6 @@ public class Review {
                 reviewerId,
                 reviewedUserId,
                 targetId,
-                targetType,
                 rating
         );
 
@@ -72,7 +66,6 @@ public class Review {
         this.reviewerId = reviewerId;
         this.reviewedUserId = reviewedUserId;
         this.targetId = targetId;
-        this.targetType = targetType;
         this.rating = rating;
         this.comment = normalizeComment(comment);
         this.createdAt = createdAt != null ? createdAt : LocalDateTime.now();
@@ -82,7 +75,6 @@ public class Review {
             UUID reviewerId,
             UUID reviewedUserId,
             UUID targetId,
-            ReviewTargetType targetType,
             Rating rating,
             String comment
     ) {
@@ -100,7 +92,6 @@ public class Review {
                 reviewerId,
                 reviewedUserId,
                 targetId,
-                targetType,
                 rating,
                 comment
         );
@@ -114,7 +105,6 @@ public class Review {
                 this.reviewerId,
                 this.reviewedUserId,
                 this.targetId,
-                this.targetType,
                 rating
         );
 
@@ -126,7 +116,6 @@ public class Review {
             UUID reviewerId,
             UUID reviewedUserId,
             UUID targetId,
-            ReviewTargetType targetType,
             Rating rating
     ) {
         if (reviewerId == null) {
@@ -139,10 +128,6 @@ public class Review {
 
         if (targetId == null) {
             throw new DomainException("El target es obligatorio");
-        }
-
-        if (targetType == null) {
-            throw new DomainException("El tipo de target es obligatorio");
         }
 
         if (reviewerId.equals(reviewedUserId)) {

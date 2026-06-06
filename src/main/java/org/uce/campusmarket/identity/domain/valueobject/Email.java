@@ -1,17 +1,13 @@
 package org.uce.campusmarket.identity.domain.valueobject;
 
-import lombok.Getter;
 import org.uce.campusmarket.shared.exception.DomainException;
 
 import java.util.regex.Pattern;
 
-@Getter
-public class Email {
+public record Email(String value) {
 
     private static final Pattern EMAIL_PATTERN =
             Pattern.compile("^[A-Za-z0-9+_.-]+@uce\\.edu\\.ec$");
-
-    private final String value;
 
     public Email(String value) {
 

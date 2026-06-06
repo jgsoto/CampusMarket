@@ -2,9 +2,7 @@ package org.uce.campusmarket.identity.domain.valueobject;
 
 import org.uce.campusmarket.shared.exception.DomainException;
 
-public class FullName {
-
-    private final String value;
+public record FullName(String value) {
 
     public FullName(String value) {
 
@@ -19,7 +17,4 @@ public class FullName {
         this.value = value.trim();
     }
 
-    public String getValue() {
-        return value;
-    }
 }

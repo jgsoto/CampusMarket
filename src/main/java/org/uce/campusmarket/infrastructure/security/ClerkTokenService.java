@@ -1,4 +1,4 @@
-package org.uce.campusmarket.shared.security;
+package org.uce.campusmarket.infrastructure.security;
 
 import com.nimbusds.jwt.SignedJWT;
 import org.springframework.stereotype.Service;

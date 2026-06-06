@@ -1,4 +1,4 @@
-package org.uce.campusmarket.reputation.interfaces.controller;
+package org.uce.campusmarket.reputation.interfaces.rest;
 
 import lombok.RequiredArgsConstructor;
 

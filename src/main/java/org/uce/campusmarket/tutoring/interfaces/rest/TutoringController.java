@@ -1,4 +1,4 @@
-package org.uce.campusmarket.tutoring.interfaces.controller;
+package org.uce.campusmarket.tutoring.interfaces.rest;
 
 import lombok.RequiredArgsConstructor;
 

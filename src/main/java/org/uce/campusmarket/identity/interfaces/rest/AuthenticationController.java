@@ -1,8 +1,9 @@
-package org.uce.campusmarket.identity.interfaces.controller;
+package org.uce.campusmarket.identity.interfaces.rest;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.uce.campusmarket.identity.application.dto.SyncUserRequest;
 import org.uce.campusmarket.identity.application.dto.UserProfileResponse;
 import org.uce.campusmarket.identity.application.service.UserSyncService;
 import org.uce.campusmarket.identity.application.usecase.GetCurrentUserUseCase;

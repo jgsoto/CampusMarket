@@ -51,9 +51,9 @@ public class User {
 
         return User.builder()
                 .clerkId(clerkId.trim())
-                .fullName(validFullName.getValue())
-                .email(validEmail.getValue())
-                .trustScore(validTrustScore.getValue())
+                .fullName(validFullName.value())
+                .email(validEmail.value())
+                .trustScore(validTrustScore.value())
                 .createdAt(LocalDateTime.now())
                 .build();
     }
@@ -77,13 +77,13 @@ public class User {
         FullName validFullName = new FullName(fullName);
         Email validEmail = new Email(email);
 
-        this.fullName = validFullName.getValue();
-        this.email = validEmail.getValue();
+        this.fullName = validFullName.value();
+        this.email = validEmail.value();
     }
 
     public void updateTrustScore(Double trustScore) {
         TrustScore validTrustScore = new TrustScore(trustScore);
-        this.trustScore = validTrustScore.getValue();
+        this.trustScore = validTrustScore.value();
     }
 
     private String normalizeOptional(String value) {

@@ -68,7 +68,6 @@ C:.
 ¦       ¦               ¦   ¦           
 ¦       ¦               ¦   +---domain
 ¦       ¦               ¦   ¦   +---exception
-¦       ¦               ¦   ¦   ¦       EmailAlreadyExistsException.java
 ¦       ¦               ¦   ¦   ¦       InvalidEmailException.java
 ¦       ¦               ¦   ¦   ¦       UserNotFoundException.java
 ¦       ¦               ¦   ¦   ¦       
@@ -97,9 +96,8 @@ C:.
 ¦       ¦               ¦   ¦           UserRepositoryImpl.java
 ¦       ¦               ¦   ¦           
 ¦       ¦               ¦   +---interfaces
-¦       ¦               ¦       +---controller
+¦       ¦               ¦       +---rest
 ¦       ¦               ¦               AuthenticationController.java
-¦       ¦               ¦               SyncUserRequest.java
 ¦       ¦               ¦               UserProfileController.java
 ¦       ¦               ¦               UserSyncController.java
 ¦       ¦               ¦               
@@ -135,10 +133,6 @@ C:.
 ¦       ¦               ¦   ¦   ¦       CategoryRepository.java
 ¦       ¦               ¦   ¦   ¦       ListingRepository.java
 ¦       ¦               ¦   ¦   ¦       
-¦       ¦               ¦   ¦   +---service
-¦       ¦               ¦   ¦   ¦       ContentModerationService.java
-¦       ¦               ¦   ¦   ¦       RecommendationService.java
-¦       ¦               ¦   ¦   ¦       
 ¦       ¦               ¦   ¦   +---valueobject
 ¦       ¦               ¦   ¦           ListingDescription.java
 ¦       ¦               ¦   ¦           ListingTitle.java
@@ -162,7 +156,7 @@ C:.
 ¦       ¦               ¦   ¦           SupabaseStorageService.java
 ¦       ¦               ¦   ¦           
 ¦       ¦               ¦   +---interfaces
-¦       ¦               ¦       +---controller
+¦       ¦               ¦       +---rest
 ¦       ¦               ¦               ListingController.java
 ¦       ¦               ¦               
 ¦       ¦               +---reputation
@@ -181,10 +175,15 @@ C:.
 ¦       ¦               ¦   +---domain
 ¦       ¦               ¦   ¦   +---model
 ¦       ¦               ¦   ¦   ¦       Review.java
-¦       ¦               ¦   ¦   ¦       ReviewTargetType.java
 ¦       ¦               ¦   ¦   ¦       
 ¦       ¦               ¦   ¦   +---repository
-¦       ¦               ¦   ¦           ReviewRepository.java
+¦       ¦               ¦   ¦   ¦       ReviewRepository.java
+¦       ¦               ¦   ¦   ¦       
+¦       ¦               ¦   ¦   +---service
+¦       ¦               ¦   ¦   ¦       ReviewPolicy.java
+¦       ¦               ¦   ¦   ¦       
+¦       ¦               ¦   ¦   +---valueobject
+¦       ¦               ¦   ¦           Rating.java
 ¦       ¦               ¦   ¦           
 ¦       ¦               ¦   +---infrastructure
 ¦       ¦               ¦   ¦   +---mapper
@@ -196,7 +195,7 @@ C:.
 ¦       ¦               ¦   ¦           ReviewRepositoryImpl.java
 ¦       ¦               ¦   ¦           
 ¦       ¦               ¦   +---interfaces
-¦       ¦               ¦       +---controller
+¦       ¦               ¦       +---rest
 ¦       ¦               ¦               ReviewController.java
 ¦       ¦               ¦               
 ¦       ¦               +---shared
@@ -239,6 +238,9 @@ C:.
 ¦       ¦                   ¦   ¦       TutoringEnrollmentRepository.java
 ¦       ¦                   ¦   ¦       TutoringOfferRepository.java
 ¦       ¦                   ¦   ¦       
+¦       ¦                   ¦   +---service
+¦       ¦                   ¦   ¦       TutoringReviewPolicy.java
+¦       ¦                   ¦   ¦       
 ¦       ¦                   ¦   +---valueobject
 ¦       ¦                   ¦           HourlyRate.java
 ¦       ¦                   ¦           
@@ -252,7 +254,7 @@ C:.
 ¦       ¦                   ¦           TutoringOfferRepositoryImpl.java
 ¦       ¦                   ¦           
 ¦       ¦                   +---interfaces
-¦       ¦                       +---controller
+¦       ¦                       +---rest
 ¦       ¦                               TutoringController.java
 ¦       ¦                               
 ¦       +---resources
@@ -339,12 +341,6 @@ C:.
     ¦   ¦           ¦   ¦   ¦       UserProfileRequest.class
     ¦   ¦           ¦   ¦   ¦       UserProfileResponse.class
     ¦   ¦           ¦   ¦   ¦       
-    ¦   ¦           ¦   ¦   +---listener
-    ¦   ¦           ¦   ¦   ¦       UserReputationListener.class
-    ¦   ¦           ¦   ¦   ¦       
-    ¦   ¦           ¦   ¦   +---port
-    ¦   ¦           ¦   ¦   ¦       ReputationServiceClient.class
-    ¦   ¦           ¦   ¦   ¦       
     ¦   ¦           ¦   ¦   +---service
     ¦   ¦           ¦   ¦   ¦       UserSyncService.class
     ¦   ¦           ¦   ¦   ¦       
@@ -356,11 +352,11 @@ C:.
     ¦   ¦           ¦   ¦           
     ¦   ¦           ¦   +---domain
     ¦   ¦           ¦   ¦   +---exception
-    ¦   ¦           ¦   ¦   ¦       EmailAlreadyExistsException.class
     ¦   ¦           ¦   ¦   ¦       InvalidEmailException.class
     ¦   ¦           ¦   ¦   ¦       UserNotFoundException.class
     ¦   ¦           ¦   ¦   ¦       
     ¦   ¦           ¦   ¦   +---model
+    ¦   ¦           ¦   ¦   ¦       User$UserBuilder.class
     ¦   ¦           ¦   ¦   ¦       User.class
     ¦   ¦           ¦   ¦   ¦       
     ¦   ¦           ¦   ¦   +---repository
@@ -376,12 +372,6 @@ C:.
     ¦   ¦           ¦   ¦           TrustScore.class
     ¦   ¦           ¦   ¦           
     ¦   ¦           ¦   +---infrastructure
-    ¦   ¦           ¦   ¦   +---client
-    ¦   ¦           ¦   ¦   ¦       ReputationServiceClientImpl.class
-    ¦   ¦           ¦   ¦   ¦       
-    ¦   ¦           ¦   ¦   +---config
-    ¦   ¦           ¦   ¦   ¦       IdentityConfig.class
-    ¦   ¦           ¦   ¦   ¦       
     ¦   ¦           ¦   ¦   +---mapper
     ¦   ¦           ¦   ¦   ¦       UserMapper.class
     ¦   ¦           ¦   ¦   ¦       
@@ -392,9 +382,8 @@ C:.
     ¦   ¦           ¦   ¦           UserRepositoryImpl.class
     ¦   ¦           ¦   ¦           
     ¦   ¦           ¦   +---interfaces
-    ¦   ¦           ¦       +---controller
+    ¦   ¦           ¦       +---rest
     ¦   ¦           ¦               AuthenticationController.class
-    ¦   ¦           ¦               SyncUserRequest.class
     ¦   ¦           ¦               UserProfileController.class
     ¦   ¦           ¦               UserSyncController.class
     ¦   ¦           ¦               
@@ -420,9 +409,6 @@ C:.
     ¦   ¦           ¦   ¦           UpdateListingUseCase.class
     ¦   ¦           ¦   ¦           
     ¦   ¦           ¦   +---domain
-    ¦   ¦           ¦   ¦   +---event
-    ¦   ¦           ¦   ¦   ¦       ListingSoldEvent.class
-    ¦   ¦           ¦   ¦   ¦       
     ¦   ¦           ¦   ¦   +---model
     ¦   ¦           ¦   ¦   ¦       Category.class
     ¦   ¦           ¦   ¦   ¦       Listing.class
@@ -432,10 +418,6 @@ C:.
     ¦   ¦           ¦   ¦   +---repository
     ¦   ¦           ¦   ¦   ¦       CategoryRepository.class
     ¦   ¦           ¦   ¦   ¦       ListingRepository.class
-    ¦   ¦           ¦   ¦   ¦       
-    ¦   ¦           ¦   ¦   +---service
-    ¦   ¦           ¦   ¦   ¦       ContentModerationService.class
-    ¦   ¦           ¦   ¦   ¦       RecommendationService.class
     ¦   ¦           ¦   ¦   ¦       
     ¦   ¦           ¦   ¦   +---valueobject
     ¦   ¦           ¦   ¦           ListingDescription.class
@@ -461,7 +443,7 @@ C:.
     ¦   ¦           ¦   ¦           SupabaseStorageService.class
     ¦   ¦           ¦   ¦           
     ¦   ¦           ¦   +---interfaces
-    ¦   ¦           ¦       +---controller
+    ¦   ¦           ¦       +---rest
     ¦   ¦           ¦               ListingController.class
     ¦   ¦           ¦               
     ¦   ¦           +---reputation
@@ -479,15 +461,17 @@ C:.
     ¦   ¦           ¦   ¦           UpdateReviewUseCase.class
     ¦   ¦           ¦   ¦           
     ¦   ¦           ¦   +---domain
-    ¦   ¦           ¦   ¦   +---event
-    ¦   ¦           ¦   ¦   ¦       ReviewCreatedEvent.class
-    ¦   ¦           ¦   ¦   ¦       
     ¦   ¦           ¦   ¦   +---model
     ¦   ¦           ¦   ¦   ¦       Review.class
-    ¦   ¦           ¦   ¦   ¦       ReviewTargetType.class
     ¦   ¦           ¦   ¦   ¦       
     ¦   ¦           ¦   ¦   +---repository
-    ¦   ¦           ¦   ¦           ReviewRepository.class
+    ¦   ¦           ¦   ¦   ¦       ReviewRepository.class
+    ¦   ¦           ¦   ¦   ¦       
+    ¦   ¦           ¦   ¦   +---service
+    ¦   ¦           ¦   ¦   ¦       ReviewPolicy.class
+    ¦   ¦           ¦   ¦   ¦       
+    ¦   ¦           ¦   ¦   +---valueobject
+    ¦   ¦           ¦   ¦           Rating.class
     ¦   ¦           ¦   ¦           
     ¦   ¦           ¦   +---infrastructure
     ¦   ¦           ¦   ¦   +---mapper
@@ -500,18 +484,12 @@ C:.
     ¦   ¦           ¦   ¦           ReviewRepositoryImpl.class
     ¦   ¦           ¦   ¦           
     ¦   ¦           ¦   +---interfaces
-    ¦   ¦           ¦       +---controller
+    ¦   ¦           ¦       +---rest
     ¦   ¦           ¦               ReviewController.class
     ¦   ¦           ¦               
     ¦   ¦           +---shared
     ¦   ¦           ¦   +---config
     ¦   ¦           ¦   ¦       SecurityConfiguration.class
-    ¦   ¦           ¦   ¦       
-    ¦   ¦           ¦   +---event
-    ¦   ¦           ¦   ¦       AggregateRoot.class
-    ¦   ¦           ¦   ¦       DomainEvent.class
-    ¦   ¦           ¦   ¦       DomainEventPublisher.class
-    ¦   ¦           ¦   ¦       SpringDomainEventPublisher.class
     ¦   ¦           ¦   ¦       
     ¦   ¦           ¦   +---exception
     ¦   ¦           ¦   ¦       DomainException.class
@@ -531,7 +509,6 @@ C:.
     ¦   ¦               ¦   ¦       
     ¦   ¦               ¦   +---usecase
     ¦   ¦               ¦           BrowseTutoringOffersUseCase.class
-    ¦   ¦               ¦           CheckTutoringEnrollmentUseCase.class
     ¦   ¦               ¦           CloseTutoringOfferUseCase.class
     ¦   ¦               ¦           CreateTutoringOfferUseCase.class
     ¦   ¦               ¦           DeleteTutoringOfferUseCase.class
@@ -544,12 +521,16 @@ C:.
     ¦   ¦               ¦   +---model
     ¦   ¦               ¦   ¦       TutoringEnrollment$TutoringEnrollmentBuilder.class
     ¦   ¦               ¦   ¦       TutoringEnrollment.class
+    ¦   ¦               ¦   ¦       TutoringOffer$TutoringOfferBuilder.class
     ¦   ¦               ¦   ¦       TutoringOffer.class
     ¦   ¦               ¦   ¦       TutoringStatus.class
     ¦   ¦               ¦   ¦       
     ¦   ¦               ¦   +---repository
     ¦   ¦               ¦   ¦       TutoringEnrollmentRepository.class
     ¦   ¦               ¦   ¦       TutoringOfferRepository.class
+    ¦   ¦               ¦   ¦       
+    ¦   ¦               ¦   +---service
+    ¦   ¦               ¦   ¦       TutoringReviewPolicy.class
     ¦   ¦               ¦   ¦       
     ¦   ¦               ¦   +---valueobject
     ¦   ¦               ¦           HourlyRate.class
@@ -566,7 +547,7 @@ C:.
     ¦   ¦               ¦           TutoringOfferRepositoryImpl.class
     ¦   ¦               ¦           
     ¦   ¦               +---interfaces
-    ¦   ¦                   +---controller
+    ¦   ¦                   +---rest
     ¦   ¦                           TutoringController.class
     ¦   ¦                           
     ¦   +---static

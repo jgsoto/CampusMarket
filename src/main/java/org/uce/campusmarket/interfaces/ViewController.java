@@ -1,4 +1,4 @@
-package org.uce.campusmarket.shared.security;
+package org.uce.campusmarket.interfaces;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
