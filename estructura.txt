@@ -1,0 +1,648 @@
+Listado de rutas de carpetas
+El número de serie del volumen es E246-1092
+C:.
+¦   .dockerignore
+¦   .env
+¦   .gitattributes
+¦   .gitignore
+¦   docker-compose.yml
+¦   Dockerfile
+¦   estructura.txt
+¦   mvnw
+¦   mvnw.cmd
+¦   pom.xml
+¦   qodana.yaml
+¦   README.md
+¦   
++---.github
+¦   +---workflows
+¦           deploy.yml
+¦           
++---.idea
+¦   ¦   .gitignore
+¦   ¦   compiler.xml
+¦   ¦   encodings.xml
+¦   ¦   jarRepositories.xml
+¦   ¦   misc.xml
+¦   ¦   vcs.xml
+¦   ¦   workspace.xml
+¦   ¦   
+¦   +---inspectionProfiles
+¦           Project_Default.xml
+¦           
++---.junie
+¦   +---plans
++---.mvn
+¦   +---wrapper
+¦           maven-wrapper.properties
+¦           
++---.vscode
+¦       settings.json
+¦       
++---nginx
+¦       nginx.conf
+¦       
++---src
+¦   +---main
+¦       +---java
+¦       ¦   +---org
+¦       ¦       +---uce
+¦       ¦           +---campusmarket
+¦       ¦               ¦   CampusMarketApplication.java
+¦       ¦               ¦   
+¦       ¦               +---identity
+¦       ¦               ¦   +---application
+¦       ¦               ¦   ¦   +---dto
+¦       ¦               ¦   ¦   ¦       SyncUserRequest.java
+¦       ¦               ¦   ¦   ¦       UserProfileRequest.java
+¦       ¦               ¦   ¦   ¦       UserProfileResponse.java
+¦       ¦               ¦   ¦   ¦       
+¦       ¦               ¦   ¦   +---service
+¦       ¦               ¦   ¦   ¦       UserSyncService.java
+¦       ¦               ¦   ¦   ¦       
+¦       ¦               ¦   ¦   +---usecase
+¦       ¦               ¦   ¦           GetCurrentUserUseCase.java
+¦       ¦               ¦   ¦           GetUserProfileUseCase.java
+¦       ¦               ¦   ¦           RegisterUserUseCase.java
+¦       ¦               ¦   ¦           UpdateUserProfileUseCase.java
+¦       ¦               ¦   ¦           
+¦       ¦               ¦   +---domain
+¦       ¦               ¦   ¦   +---exception
+¦       ¦               ¦   ¦   ¦       EmailAlreadyExistsException.java
+¦       ¦               ¦   ¦   ¦       InvalidEmailException.java
+¦       ¦               ¦   ¦   ¦       UserNotFoundException.java
+¦       ¦               ¦   ¦   ¦       
+¦       ¦               ¦   ¦   +---model
+¦       ¦               ¦   ¦   ¦       User.java
+¦       ¦               ¦   ¦   ¦       
+¦       ¦               ¦   ¦   +---repository
+¦       ¦               ¦   ¦   ¦       UserRepository.java
+¦       ¦               ¦   ¦   ¦       
+¦       ¦               ¦   ¦   +---service
+¦       ¦               ¦   ¦   ¦       EmailValidationService.java
+¦       ¦               ¦   ¦   ¦       TrustVerificationService.java
+¦       ¦               ¦   ¦   ¦       
+¦       ¦               ¦   ¦   +---valueobject
+¦       ¦               ¦   ¦           Email.java
+¦       ¦               ¦   ¦           FullName.java
+¦       ¦               ¦   ¦           TrustScore.java
+¦       ¦               ¦   ¦           
+¦       ¦               ¦   +---infrastructure
+¦       ¦               ¦   ¦   +---mapper
+¦       ¦               ¦   ¦   ¦       UserMapper.java
+¦       ¦               ¦   ¦   ¦       
+¦       ¦               ¦   ¦   +---persistence
+¦       ¦               ¦   ¦           JpaUserRepository.java
+¦       ¦               ¦   ¦           UserJpaEntity.java
+¦       ¦               ¦   ¦           UserRepositoryImpl.java
+¦       ¦               ¦   ¦           
+¦       ¦               ¦   +---interfaces
+¦       ¦               ¦       +---controller
+¦       ¦               ¦               AuthenticationController.java
+¦       ¦               ¦               SyncUserRequest.java
+¦       ¦               ¦               UserProfileController.java
+¦       ¦               ¦               UserSyncController.java
+¦       ¦               ¦               
+¦       ¦               +---marketplace
+¦       ¦               ¦   +---application
+¦       ¦               ¦   ¦   +---dto
+¦       ¦               ¦   ¦   ¦       CreateListingRequest.java
+¦       ¦               ¦   ¦   ¦       ListingImageResponse.java
+¦       ¦               ¦   ¦   ¦       ListingResponse.java
+¦       ¦               ¦   ¦   ¦       UpdateListingRequest.java
+¦       ¦               ¦   ¦   ¦       
+¦       ¦               ¦   ¦   +---port
+¦       ¦               ¦   ¦   ¦       ImageStoragePort.java
+¦       ¦               ¦   ¦   ¦       
+¦       ¦               ¦   ¦   +---usecase
+¦       ¦               ¦   ¦           BrowseListingsUseCase.java
+¦       ¦               ¦   ¦           CreateListingUseCase.java
+¦       ¦               ¦   ¦           DeleteListingUseCase.java
+¦       ¦               ¦   ¦           GetListingUseCase.java
+¦       ¦               ¦   ¦           GetMyListingsUseCase.java
+¦       ¦               ¦   ¦           MarkListingAsSoldUseCase.java
+¦       ¦               ¦   ¦           PublishListingUseCase.java
+¦       ¦               ¦   ¦           UpdateListingUseCase.java
+¦       ¦               ¦   ¦           
+¦       ¦               ¦   +---domain
+¦       ¦               ¦   ¦   +---model
+¦       ¦               ¦   ¦   ¦       Category.java
+¦       ¦               ¦   ¦   ¦       Listing.java
+¦       ¦               ¦   ¦   ¦       ListingImage.java
+¦       ¦               ¦   ¦   ¦       ListingStatus.java
+¦       ¦               ¦   ¦   ¦       
+¦       ¦               ¦   ¦   +---repository
+¦       ¦               ¦   ¦   ¦       CategoryRepository.java
+¦       ¦               ¦   ¦   ¦       ListingRepository.java
+¦       ¦               ¦   ¦   ¦       
+¦       ¦               ¦   ¦   +---service
+¦       ¦               ¦   ¦   ¦       ContentModerationService.java
+¦       ¦               ¦   ¦   ¦       RecommendationService.java
+¦       ¦               ¦   ¦   ¦       
+¦       ¦               ¦   ¦   +---valueobject
+¦       ¦               ¦   ¦           ListingDescription.java
+¦       ¦               ¦   ¦           ListingTitle.java
+¦       ¦               ¦   ¦           Price.java
+¦       ¦               ¦   ¦           
+¦       ¦               ¦   +---infrastructure
+¦       ¦               ¦   ¦   +---mapper
+¦       ¦               ¦   ¦   ¦       CategoryMapper.java
+¦       ¦               ¦   ¦   ¦       ListingMapper.java
+¦       ¦               ¦   ¦   ¦       
+¦       ¦               ¦   ¦   +---persistence
+¦       ¦               ¦   ¦   ¦       CategoryJpaEntity.java
+¦       ¦               ¦   ¦   ¦       CategoryRepositoryImpl.java
+¦       ¦               ¦   ¦   ¦       JpaCategoryRepository.java
+¦       ¦               ¦   ¦   ¦       JpaListingRepository.java
+¦       ¦               ¦   ¦   ¦       ListingImageJpaEntity.java
+¦       ¦               ¦   ¦   ¦       ListingJpaEntity.java
+¦       ¦               ¦   ¦   ¦       ListingRepositoryImpl.java
+¦       ¦               ¦   ¦   ¦       
+¦       ¦               ¦   ¦   +---storage
+¦       ¦               ¦   ¦           SupabaseStorageService.java
+¦       ¦               ¦   ¦           
+¦       ¦               ¦   +---interfaces
+¦       ¦               ¦       +---controller
+¦       ¦               ¦               ListingController.java
+¦       ¦               ¦               
+¦       ¦               +---reputation
+¦       ¦               ¦   +---application
+¦       ¦               ¦   ¦   +---dto
+¦       ¦               ¦   ¦   ¦       CreateReviewRequest.java
+¦       ¦               ¦   ¦   ¦       ReviewResponse.java
+¦       ¦               ¦   ¦   ¦       
+¦       ¦               ¦   ¦   +---usecase
+¦       ¦               ¦   ¦           CreateReviewUseCase.java
+¦       ¦               ¦   ¦           DeleteReviewUseCase.java
+¦       ¦               ¦   ¦           GetUserReputationUseCase.java
+¦       ¦               ¦   ¦           GetUserReviewsUseCase.java
+¦       ¦               ¦   ¦           UpdateReviewUseCase.java
+¦       ¦               ¦   ¦           
+¦       ¦               ¦   +---domain
+¦       ¦               ¦   ¦   +---model
+¦       ¦               ¦   ¦   ¦       Review.java
+¦       ¦               ¦   ¦   ¦       ReviewTargetType.java
+¦       ¦               ¦   ¦   ¦       
+¦       ¦               ¦   ¦   +---repository
+¦       ¦               ¦   ¦           ReviewRepository.java
+¦       ¦               ¦   ¦           
+¦       ¦               ¦   +---infrastructure
+¦       ¦               ¦   ¦   +---mapper
+¦       ¦               ¦   ¦   ¦       ReviewMapper.java
+¦       ¦               ¦   ¦   ¦       
+¦       ¦               ¦   ¦   +---persistence
+¦       ¦               ¦   ¦           ReviewJpaEntity.java
+¦       ¦               ¦   ¦           ReviewJpaRepository.java
+¦       ¦               ¦   ¦           ReviewRepositoryImpl.java
+¦       ¦               ¦   ¦           
+¦       ¦               ¦   +---interfaces
+¦       ¦               ¦       +---controller
+¦       ¦               ¦               ReviewController.java
+¦       ¦               ¦               
+¦       ¦               +---shared
+¦       ¦               ¦   +---config
+¦       ¦               ¦   ¦       SecurityConfiguration.java
+¦       ¦               ¦   ¦       
+¦       ¦               ¦   +---exception
+¦       ¦               ¦   ¦       DomainException.java
+¦       ¦               ¦   ¦       
+¦       ¦               ¦   +---security
+¦       ¦               ¦           ClerkAuthenticationFilter.java
+¦       ¦               ¦           ClerkJwtService.java
+¦       ¦               ¦           ClerkTokenService.java
+¦       ¦               ¦           ViewController.java
+¦       ¦               ¦           
+¦       ¦               +---tutoring
+¦       ¦                   +---application
+¦       ¦                   ¦   +---dto
+¦       ¦                   ¦   ¦       CreateTutoringOfferRequest.java
+¦       ¦                   ¦   ¦       TutoringOfferResponse.java
+¦       ¦                   ¦   ¦       UpdateTutoringOfferRequest.java
+¦       ¦                   ¦   ¦       
+¦       ¦                   ¦   +---usecase
+¦       ¦                   ¦           BrowseTutoringOffersUseCase.java
+¦       ¦                   ¦           CloseTutoringOfferUseCase.java
+¦       ¦                   ¦           CreateTutoringOfferUseCase.java
+¦       ¦                   ¦           DeleteTutoringOfferUseCase.java
+¦       ¦                   ¦           EnrollInTutoringUseCase.java
+¦       ¦                   ¦           GetMyTutoringOffersUseCase.java
+¦       ¦                   ¦           GetTutoringOfferUseCase.java
+¦       ¦                   ¦           UpdateTutoringOfferUseCase.java
+¦       ¦                   ¦           
+¦       ¦                   +---domain
+¦       ¦                   ¦   +---model
+¦       ¦                   ¦   ¦       TutoringEnrollment.java
+¦       ¦                   ¦   ¦       TutoringOffer.java
+¦       ¦                   ¦   ¦       TutoringStatus.java
+¦       ¦                   ¦   ¦       
+¦       ¦                   ¦   +---repository
+¦       ¦                   ¦   ¦       TutoringEnrollmentRepository.java
+¦       ¦                   ¦   ¦       TutoringOfferRepository.java
+¦       ¦                   ¦   ¦       
+¦       ¦                   ¦   +---valueobject
+¦       ¦                   ¦           HourlyRate.java
+¦       ¦                   ¦           
+¦       ¦                   +---infrastructure
+¦       ¦                   ¦   +---persistence
+¦       ¦                   ¦           JpaTutoringEnrollmentRepository.java
+¦       ¦                   ¦           JpaTutoringOfferRepository.java
+¦       ¦                   ¦           TutoringEnrollmentJpaEntity.java
+¦       ¦                   ¦           TutoringEnrollmentRepositoryImpl.java
+¦       ¦                   ¦           TutoringOfferJpaEntity.java
+¦       ¦                   ¦           TutoringOfferRepositoryImpl.java
+¦       ¦                   ¦           
+¦       ¦                   +---interfaces
+¦       ¦                       +---controller
+¦       ¦                               TutoringController.java
+¦       ¦                               
+¦       +---resources
+¦           ¦   application.properties
+¦           ¦   
+¦           +---static
+¦               ¦   index.html
+¦               ¦   
+¦               +---assets
+¦               ¦   +---icons
+¦               ¦           foto-estudiantes.jpg
+¦               ¦           logo.png
+¦               ¦           
+¦               +---css
+¦               ¦       animations.css
+¦               ¦       base.css
+¦               ¦       components.css
+¦               ¦       styles.css
+¦               ¦       
+¦               +---js
+¦               ¦       tailwind-config.js
+¦               ¦       
+¦               +---modules
+¦                   +---identity
+¦                   ¦   ¦   profile.html
+¦                   ¦   ¦   signin.html
+¦                   ¦   ¦   signup.html
+¦                   ¦   ¦   
+¦                   ¦   +---js
+¦                   ¦           auth-layout.js
+¦                   ¦           profile.js
+¦                   ¦           
+¦                   +---marketplace
+¦                   ¦   ¦   create-listing.html
+¦                   ¦   ¦   dashboard.html
+¦                   ¦   ¦   my-listings.html
+¦                   ¦   ¦   product-details.html
+¦                   ¦   ¦   
+¦                   ¦   +---js
+¦                   ¦           create-listing.js
+¦                   ¦           dashboard.js
+¦                   ¦           marketplace.js
+¦                   ¦           my-listings.js
+¦                   ¦           product-details.js
+¦                   ¦           
+¦                   +---reputation
+¦                   ¦   ¦   historial-votos.html
+¦                   ¦   ¦   reputacion.html
+¦                   ¦   ¦   reputation.html
+¦                   ¦   ¦   
+¦                   ¦   +---js
+¦                   ¦           historial-votos.js
+¦                   ¦           reputation.js
+¦                   ¦           
+¦                   +---shared
+¦                   ¦   +---components
+¦                   ¦       +---js
+¦                   ¦               clerk.js
+¦                   ¦               marketplace-layout.js
+¦                   ¦               
+¦                   +---tutoring
+¦                       ¦   create-tutoring.html
+¦                       ¦   tutoring-catalog.html
+¦                       ¦   tutoring-details.html
+¦                       ¦   
+¦                       +---js
+¦                               create-tutoring.js
+¦                               tutoring-catalog.js
+¦                               tutoring-details.js
+¦                               
++---target
+    +---classes
+    ¦   ¦   application.properties
+    ¦   ¦   
+    ¦   +---org
+    ¦   ¦   +---uce
+    ¦   ¦       +---campusmarket
+    ¦   ¦           ¦   CampusMarketApplication.class
+    ¦   ¦           ¦   
+    ¦   ¦           +---identity
+    ¦   ¦           ¦   +---application
+    ¦   ¦           ¦   ¦   +---dto
+    ¦   ¦           ¦   ¦   ¦       SyncUserRequest.class
+    ¦   ¦           ¦   ¦   ¦       UserProfileRequest.class
+    ¦   ¦           ¦   ¦   ¦       UserProfileResponse.class
+    ¦   ¦           ¦   ¦   ¦       
+    ¦   ¦           ¦   ¦   +---listener
+    ¦   ¦           ¦   ¦   ¦       UserReputationListener.class
+    ¦   ¦           ¦   ¦   ¦       
+    ¦   ¦           ¦   ¦   +---port
+    ¦   ¦           ¦   ¦   ¦       ReputationServiceClient.class
+    ¦   ¦           ¦   ¦   ¦       
+    ¦   ¦           ¦   ¦   +---service
+    ¦   ¦           ¦   ¦   ¦       UserSyncService.class
+    ¦   ¦           ¦   ¦   ¦       
+    ¦   ¦           ¦   ¦   +---usecase
+    ¦   ¦           ¦   ¦           GetCurrentUserUseCase.class
+    ¦   ¦           ¦   ¦           GetUserProfileUseCase.class
+    ¦   ¦           ¦   ¦           RegisterUserUseCase.class
+    ¦   ¦           ¦   ¦           UpdateUserProfileUseCase.class
+    ¦   ¦           ¦   ¦           
+    ¦   ¦           ¦   +---domain
+    ¦   ¦           ¦   ¦   +---exception
+    ¦   ¦           ¦   ¦   ¦       EmailAlreadyExistsException.class
+    ¦   ¦           ¦   ¦   ¦       InvalidEmailException.class
+    ¦   ¦           ¦   ¦   ¦       UserNotFoundException.class
+    ¦   ¦           ¦   ¦   ¦       
+    ¦   ¦           ¦   ¦   +---model
+    ¦   ¦           ¦   ¦   ¦       User.class
+    ¦   ¦           ¦   ¦   ¦       
+    ¦   ¦           ¦   ¦   +---repository
+    ¦   ¦           ¦   ¦   ¦       UserRepository.class
+    ¦   ¦           ¦   ¦   ¦       
+    ¦   ¦           ¦   ¦   +---service
+    ¦   ¦           ¦   ¦   ¦       EmailValidationService.class
+    ¦   ¦           ¦   ¦   ¦       TrustVerificationService.class
+    ¦   ¦           ¦   ¦   ¦       
+    ¦   ¦           ¦   ¦   +---valueobject
+    ¦   ¦           ¦   ¦           Email.class
+    ¦   ¦           ¦   ¦           FullName.class
+    ¦   ¦           ¦   ¦           TrustScore.class
+    ¦   ¦           ¦   ¦           
+    ¦   ¦           ¦   +---infrastructure
+    ¦   ¦           ¦   ¦   +---client
+    ¦   ¦           ¦   ¦   ¦       ReputationServiceClientImpl.class
+    ¦   ¦           ¦   ¦   ¦       
+    ¦   ¦           ¦   ¦   +---config
+    ¦   ¦           ¦   ¦   ¦       IdentityConfig.class
+    ¦   ¦           ¦   ¦   ¦       
+    ¦   ¦           ¦   ¦   +---mapper
+    ¦   ¦           ¦   ¦   ¦       UserMapper.class
+    ¦   ¦           ¦   ¦   ¦       
+    ¦   ¦           ¦   ¦   +---persistence
+    ¦   ¦           ¦   ¦           JpaUserRepository.class
+    ¦   ¦           ¦   ¦           UserJpaEntity$UserJpaEntityBuilder.class
+    ¦   ¦           ¦   ¦           UserJpaEntity.class
+    ¦   ¦           ¦   ¦           UserRepositoryImpl.class
+    ¦   ¦           ¦   ¦           
+    ¦   ¦           ¦   +---interfaces
+    ¦   ¦           ¦       +---controller
+    ¦   ¦           ¦               AuthenticationController.class
+    ¦   ¦           ¦               SyncUserRequest.class
+    ¦   ¦           ¦               UserProfileController.class
+    ¦   ¦           ¦               UserSyncController.class
+    ¦   ¦           ¦               
+    ¦   ¦           +---marketplace
+    ¦   ¦           ¦   +---application
+    ¦   ¦           ¦   ¦   +---dto
+    ¦   ¦           ¦   ¦   ¦       CreateListingRequest.class
+    ¦   ¦           ¦   ¦   ¦       ListingImageResponse.class
+    ¦   ¦           ¦   ¦   ¦       ListingResponse.class
+    ¦   ¦           ¦   ¦   ¦       UpdateListingRequest.class
+    ¦   ¦           ¦   ¦   ¦       
+    ¦   ¦           ¦   ¦   +---port
+    ¦   ¦           ¦   ¦   ¦       ImageStoragePort.class
+    ¦   ¦           ¦   ¦   ¦       
+    ¦   ¦           ¦   ¦   +---usecase
+    ¦   ¦           ¦   ¦           BrowseListingsUseCase.class
+    ¦   ¦           ¦   ¦           CreateListingUseCase.class
+    ¦   ¦           ¦   ¦           DeleteListingUseCase.class
+    ¦   ¦           ¦   ¦           GetListingUseCase.class
+    ¦   ¦           ¦   ¦           GetMyListingsUseCase.class
+    ¦   ¦           ¦   ¦           MarkListingAsSoldUseCase.class
+    ¦   ¦           ¦   ¦           PublishListingUseCase.class
+    ¦   ¦           ¦   ¦           UpdateListingUseCase.class
+    ¦   ¦           ¦   ¦           
+    ¦   ¦           ¦   +---domain
+    ¦   ¦           ¦   ¦   +---event
+    ¦   ¦           ¦   ¦   ¦       ListingSoldEvent.class
+    ¦   ¦           ¦   ¦   ¦       
+    ¦   ¦           ¦   ¦   +---model
+    ¦   ¦           ¦   ¦   ¦       Category.class
+    ¦   ¦           ¦   ¦   ¦       Listing.class
+    ¦   ¦           ¦   ¦   ¦       ListingImage.class
+    ¦   ¦           ¦   ¦   ¦       ListingStatus.class
+    ¦   ¦           ¦   ¦   ¦       
+    ¦   ¦           ¦   ¦   +---repository
+    ¦   ¦           ¦   ¦   ¦       CategoryRepository.class
+    ¦   ¦           ¦   ¦   ¦       ListingRepository.class
+    ¦   ¦           ¦   ¦   ¦       
+    ¦   ¦           ¦   ¦   +---service
+    ¦   ¦           ¦   ¦   ¦       ContentModerationService.class
+    ¦   ¦           ¦   ¦   ¦       RecommendationService.class
+    ¦   ¦           ¦   ¦   ¦       
+    ¦   ¦           ¦   ¦   +---valueobject
+    ¦   ¦           ¦   ¦           ListingDescription.class
+    ¦   ¦           ¦   ¦           ListingTitle.class
+    ¦   ¦           ¦   ¦           Price.class
+    ¦   ¦           ¦   ¦           
+    ¦   ¦           ¦   +---infrastructure
+    ¦   ¦           ¦   ¦   +---mapper
+    ¦   ¦           ¦   ¦   ¦       CategoryMapper.class
+    ¦   ¦           ¦   ¦   ¦       ListingMapper.class
+    ¦   ¦           ¦   ¦   ¦       
+    ¦   ¦           ¦   ¦   +---persistence
+    ¦   ¦           ¦   ¦   ¦       CategoryJpaEntity.class
+    ¦   ¦           ¦   ¦   ¦       CategoryRepositoryImpl.class
+    ¦   ¦           ¦   ¦   ¦       JpaCategoryRepository.class
+    ¦   ¦           ¦   ¦   ¦       JpaListingRepository.class
+    ¦   ¦           ¦   ¦   ¦       ListingImageJpaEntity.class
+    ¦   ¦           ¦   ¦   ¦       ListingJpaEntity$ListingJpaEntityBuilder.class
+    ¦   ¦           ¦   ¦   ¦       ListingJpaEntity.class
+    ¦   ¦           ¦   ¦   ¦       ListingRepositoryImpl.class
+    ¦   ¦           ¦   ¦   ¦       
+    ¦   ¦           ¦   ¦   +---storage
+    ¦   ¦           ¦   ¦           SupabaseStorageService.class
+    ¦   ¦           ¦   ¦           
+    ¦   ¦           ¦   +---interfaces
+    ¦   ¦           ¦       +---controller
+    ¦   ¦           ¦               ListingController.class
+    ¦   ¦           ¦               
+    ¦   ¦           +---reputation
+    ¦   ¦           ¦   +---application
+    ¦   ¦           ¦   ¦   +---dto
+    ¦   ¦           ¦   ¦   ¦       CreateReviewRequest.class
+    ¦   ¦           ¦   ¦   ¦       ReviewResponse$ReviewResponseBuilder.class
+    ¦   ¦           ¦   ¦   ¦       ReviewResponse.class
+    ¦   ¦           ¦   ¦   ¦       
+    ¦   ¦           ¦   ¦   +---usecase
+    ¦   ¦           ¦   ¦           CreateReviewUseCase.class
+    ¦   ¦           ¦   ¦           DeleteReviewUseCase.class
+    ¦   ¦           ¦   ¦           GetUserReputationUseCase.class
+    ¦   ¦           ¦   ¦           GetUserReviewsUseCase.class
+    ¦   ¦           ¦   ¦           UpdateReviewUseCase.class
+    ¦   ¦           ¦   ¦           
+    ¦   ¦           ¦   +---domain
+    ¦   ¦           ¦   ¦   +---event
+    ¦   ¦           ¦   ¦   ¦       ReviewCreatedEvent.class
+    ¦   ¦           ¦   ¦   ¦       
+    ¦   ¦           ¦   ¦   +---model
+    ¦   ¦           ¦   ¦   ¦       Review.class
+    ¦   ¦           ¦   ¦   ¦       ReviewTargetType.class
+    ¦   ¦           ¦   ¦   ¦       
+    ¦   ¦           ¦   ¦   +---repository
+    ¦   ¦           ¦   ¦           ReviewRepository.class
+    ¦   ¦           ¦   ¦           
+    ¦   ¦           ¦   +---infrastructure
+    ¦   ¦           ¦   ¦   +---mapper
+    ¦   ¦           ¦   ¦   ¦       ReviewMapper.class
+    ¦   ¦           ¦   ¦   ¦       
+    ¦   ¦           ¦   ¦   +---persistence
+    ¦   ¦           ¦   ¦           ReviewJpaEntity$ReviewJpaEntityBuilder.class
+    ¦   ¦           ¦   ¦           ReviewJpaEntity.class
+    ¦   ¦           ¦   ¦           ReviewJpaRepository.class
+    ¦   ¦           ¦   ¦           ReviewRepositoryImpl.class
+    ¦   ¦           ¦   ¦           
+    ¦   ¦           ¦   +---interfaces
+    ¦   ¦           ¦       +---controller
+    ¦   ¦           ¦               ReviewController.class
+    ¦   ¦           ¦               
+    ¦   ¦           +---shared
+    ¦   ¦           ¦   +---config
+    ¦   ¦           ¦   ¦       SecurityConfiguration.class
+    ¦   ¦           ¦   ¦       
+    ¦   ¦           ¦   +---event
+    ¦   ¦           ¦   ¦       AggregateRoot.class
+    ¦   ¦           ¦   ¦       DomainEvent.class
+    ¦   ¦           ¦   ¦       DomainEventPublisher.class
+    ¦   ¦           ¦   ¦       SpringDomainEventPublisher.class
+    ¦   ¦           ¦   ¦       
+    ¦   ¦           ¦   +---exception
+    ¦   ¦           ¦   ¦       DomainException.class
+    ¦   ¦           ¦   ¦       
+    ¦   ¦           ¦   +---security
+    ¦   ¦           ¦           ClerkAuthenticationFilter.class
+    ¦   ¦           ¦           ClerkJwtService.class
+    ¦   ¦           ¦           ClerkTokenService.class
+    ¦   ¦           ¦           ViewController.class
+    ¦   ¦           ¦           
+    ¦   ¦           +---tutoring
+    ¦   ¦               +---application
+    ¦   ¦               ¦   +---dto
+    ¦   ¦               ¦   ¦       CreateTutoringOfferRequest.class
+    ¦   ¦               ¦   ¦       TutoringOfferResponse.class
+    ¦   ¦               ¦   ¦       UpdateTutoringOfferRequest.class
+    ¦   ¦               ¦   ¦       
+    ¦   ¦               ¦   +---usecase
+    ¦   ¦               ¦           BrowseTutoringOffersUseCase.class
+    ¦   ¦               ¦           CheckTutoringEnrollmentUseCase.class
+    ¦   ¦               ¦           CloseTutoringOfferUseCase.class
+    ¦   ¦               ¦           CreateTutoringOfferUseCase.class
+    ¦   ¦               ¦           DeleteTutoringOfferUseCase.class
+    ¦   ¦               ¦           EnrollInTutoringUseCase.class
+    ¦   ¦               ¦           GetMyTutoringOffersUseCase.class
+    ¦   ¦               ¦           GetTutoringOfferUseCase.class
+    ¦   ¦               ¦           UpdateTutoringOfferUseCase.class
+    ¦   ¦               ¦           
+    ¦   ¦               +---domain
+    ¦   ¦               ¦   +---model
+    ¦   ¦               ¦   ¦       TutoringEnrollment$TutoringEnrollmentBuilder.class
+    ¦   ¦               ¦   ¦       TutoringEnrollment.class
+    ¦   ¦               ¦   ¦       TutoringOffer.class
+    ¦   ¦               ¦   ¦       TutoringStatus.class
+    ¦   ¦               ¦   ¦       
+    ¦   ¦               ¦   +---repository
+    ¦   ¦               ¦   ¦       TutoringEnrollmentRepository.class
+    ¦   ¦               ¦   ¦       TutoringOfferRepository.class
+    ¦   ¦               ¦   ¦       
+    ¦   ¦               ¦   +---valueobject
+    ¦   ¦               ¦           HourlyRate.class
+    ¦   ¦               ¦           
+    ¦   ¦               +---infrastructure
+    ¦   ¦               ¦   +---persistence
+    ¦   ¦               ¦           JpaTutoringEnrollmentRepository.class
+    ¦   ¦               ¦           JpaTutoringOfferRepository.class
+    ¦   ¦               ¦           TutoringEnrollmentJpaEntity$TutoringEnrollmentJpaEntityBuilder.class
+    ¦   ¦               ¦           TutoringEnrollmentJpaEntity.class
+    ¦   ¦               ¦           TutoringEnrollmentRepositoryImpl.class
+    ¦   ¦               ¦           TutoringOfferJpaEntity$TutoringOfferJpaEntityBuilder.class
+    ¦   ¦               ¦           TutoringOfferJpaEntity.class
+    ¦   ¦               ¦           TutoringOfferRepositoryImpl.class
+    ¦   ¦               ¦           
+    ¦   ¦               +---interfaces
+    ¦   ¦                   +---controller
+    ¦   ¦                           TutoringController.class
+    ¦   ¦                           
+    ¦   +---static
+    ¦       ¦   index.html
+    ¦       ¦   
+    ¦       +---assets
+    ¦       ¦   +---icons
+    ¦       ¦           foto-estudiantes.jpg
+    ¦       ¦           logo.png
+    ¦       ¦           
+    ¦       +---css
+    ¦       ¦       animations.css
+    ¦       ¦       base.css
+    ¦       ¦       components.css
+    ¦       ¦       styles.css
+    ¦       ¦       
+    ¦       +---js
+    ¦       ¦       tailwind-config.js
+    ¦       ¦       
+    ¦       +---modules
+    ¦           +---identity
+    ¦           ¦   ¦   profile.html
+    ¦           ¦   ¦   signin.html
+    ¦           ¦   ¦   signup.html
+    ¦           ¦   ¦   
+    ¦           ¦   +---js
+    ¦           ¦           auth-layout.js
+    ¦           ¦           profile.js
+    ¦           ¦           
+    ¦           +---marketplace
+    ¦           ¦   ¦   create-listing.html
+    ¦           ¦   ¦   dashboard.html
+    ¦           ¦   ¦   my-listings.html
+    ¦           ¦   ¦   product-details.html
+    ¦           ¦   ¦   
+    ¦           ¦   +---js
+    ¦           ¦           create-listing.js
+    ¦           ¦           dashboard.js
+    ¦           ¦           marketplace.js
+    ¦           ¦           my-listings.js
+    ¦           ¦           product-details.js
+    ¦           ¦           
+    ¦           +---reputation
+    ¦           ¦   ¦   historial-votos.html
+    ¦           ¦   ¦   reputacion.html
+    ¦           ¦   ¦   reputation.html
+    ¦           ¦   ¦   
+    ¦           ¦   +---js
+    ¦           ¦           historial-votos.js
+    ¦           ¦           reputation.js
+    ¦           ¦           
+    ¦           +---shared
+    ¦           ¦   +---components
+    ¦           ¦       +---js
+    ¦           ¦               clerk.js
+    ¦           ¦               marketplace-layout.js
+    ¦           ¦               
+    ¦           +---tutoring
+    ¦               ¦   create-tutoring.html
+    ¦               ¦   tutoring-catalog.html
+    ¦               ¦   tutoring-details.html
+    ¦               ¦   
+    ¦               +---js
+    ¦                       create-tutoring.js
+    ¦                       tutoring-catalog.js
+    ¦                       tutoring-details.js
+    ¦                       
+    +---generated-sources
+    ¦   +---annotations
+    +---generated-test-sources
+    ¦   +---test-annotations
+    +---maven-status
+    ¦   +---maven-compiler-plugin
+    ¦       +---compile
+    ¦           +---default-compile
+    ¦                   createdFiles.lst
+    ¦                   inputFiles.lst
+    ¦                   
+    +---test-classes

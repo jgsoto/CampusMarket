@@ -2,6 +2,7 @@ package org.uce.campusmarket.reputation.infrastructure.mapper;
 
 import org.springframework.stereotype.Component;
 import org.uce.campusmarket.reputation.domain.model.Review;
+import org.uce.campusmarket.reputation.domain.valueobject.Rating;
 import org.uce.campusmarket.reputation.infrastructure.persistence.ReviewJpaEntity;
 
 @Component
@@ -29,7 +30,7 @@ public class ReviewMapper {
                 entity.getReviewedUserId(),
                 entity.getTargetId(),
                 entity.getTargetType(),
-                entity.getRating(),
+                new Rating(entity.getRating()),
                 entity.getComment(),
                 entity.getCreatedAt()
         );

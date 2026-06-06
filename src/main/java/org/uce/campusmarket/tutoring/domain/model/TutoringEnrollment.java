@@ -32,7 +32,7 @@ public class TutoringEnrollment {
             throw new DomainException("La inscripción debe tener un estudiante");
         }
 
-        this.id = id != null ? id : UUID.randomUUID();
+        this.id = id;
         this.tutoringOfferId = tutoringOfferId;
         this.studentId = studentId;
     }
@@ -42,7 +42,7 @@ public class TutoringEnrollment {
             UUID studentId
     ) {
         return new TutoringEnrollment(
-                UUID.randomUUID(),
+                null,
                 tutoringOfferId,
                 studentId
         );

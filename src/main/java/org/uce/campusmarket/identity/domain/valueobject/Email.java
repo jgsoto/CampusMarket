@@ -1,9 +1,11 @@
 package org.uce.campusmarket.identity.domain.valueobject;
 
+import lombok.Getter;
 import org.uce.campusmarket.shared.exception.DomainException;
 
 import java.util.regex.Pattern;
 
+@Getter
 public class Email {
 
     private static final Pattern EMAIL_PATTERN =
@@ -20,7 +22,4 @@ public class Email {
         this.value = value.toLowerCase();
     }
 
-    public String getValue() {
-        return value;
-    }
 }

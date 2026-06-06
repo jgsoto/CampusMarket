@@ -3,6 +3,7 @@ package org.uce.campusmarket.reputation.domain.model;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.uce.campusmarket.reputation.domain.valueobject.Rating;
 import org.uce.campusmarket.shared.exception.DomainException;
 
 import java.time.LocalDateTime;
@@ -22,7 +23,7 @@ public class Review {
 
     private ReviewTargetType targetType;
 
-    private int rating;
+    private Rating rating;
 
     private String comment;
 
@@ -34,7 +35,7 @@ public class Review {
             UUID reviewedUserId,
             UUID targetId,
             ReviewTargetType targetType,
-            int rating,
+            Rating rating,
             String comment
     ) {
         this(
@@ -55,7 +56,7 @@ public class Review {
             UUID reviewedUserId,
             UUID targetId,
             ReviewTargetType targetType,
-            int rating,
+            Rating rating,
             String comment,
             LocalDateTime createdAt
     ) {
@@ -82,9 +83,18 @@ public class Review {
             UUID reviewedUserId,
             UUID targetId,
             ReviewTargetType targetType,
-            int rating,
+            Rating rating,
             String comment
     ) {
+
+        if (reviewerId.equals(reviewedUserId)) {
+
+            throw new DomainException(
+                    "No puedes calificarte a ti mismo"
+            );
+        }
+
+
         return new Review(
                 UUID.randomUUID(),
                 reviewerId,
@@ -97,7 +107,7 @@ public class Review {
     }
 
     public void update(
-            int rating,
+            Rating rating,
             String comment
     ) {
         validate(
@@ -117,7 +127,7 @@ public class Review {
             UUID reviewedUserId,
             UUID targetId,
             ReviewTargetType targetType,
-            int rating
+            Rating rating
     ) {
         if (reviewerId == null) {
             throw new DomainException("El reviewer es obligatorio");
@@ -138,10 +148,6 @@ public class Review {
         if (reviewerId.equals(reviewedUserId)) {
             throw new DomainException("No puedes evaluarte a ti mismo");
         }
-
-        if (rating < 1 || rating > 5) {
-            throw new DomainException("La calificación debe estar entre 1 y 5");
-        }
     }
 
     private String normalizeComment(String comment) {
@@ -156,5 +162,9 @@ public class Review {
         }
 
         return normalizedComment;
+    }
+
+    public int getRating() {
+        return rating.getValue();
     }
 }

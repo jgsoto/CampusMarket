@@ -23,41 +23,28 @@ public class ReviewController {
     private final GetUserReviewsUseCase getUserReviewsUseCase;
     private final UpdateReviewUseCase updateReviewUseCase;
 
-    private final DeleteReviewUseCase
-            deleteReviewUseCase;
+    private final DeleteReviewUseCase deleteReviewUseCase;
 
     @PostMapping
-    public ResponseEntity<ReviewResponse> createReview(
-            @RequestHeader("X-User-Id") UUID reviewerId,
-            @RequestBody CreateReviewRequest request
-    ) {
+    public ResponseEntity<ReviewResponse> createReview(@RequestHeader("X-User-Id") UUID reviewerId, @RequestBody CreateReviewRequest request) {
 
-        ReviewResponse response =
-                createReviewUseCase.execute(reviewerId, request);
+        ReviewResponse response = createReviewUseCase.execute(reviewerId, request);
 
         return ResponseEntity.status(201).body(response);
     }
 
     @GetMapping("/users/{userId}/reputation")
-    public ResponseEntity<Map<String, Double>> getReputation(
-            @PathVariable UUID userId
-    ) {
+    public ResponseEntity<Map<String, Double>> getReputation(@PathVariable UUID userId) {
 
-        double reputation =
-                getUserReputationUseCase.execute(userId);
+        double reputation = getUserReputationUseCase.execute(userId);
 
-        return ResponseEntity.ok(
-                Map.of("reputation", reputation)
-        );
+        return ResponseEntity.ok(Map.of("reputation", reputation));
     }
 
     @GetMapping("/users/{userId}/reviews")
-    public ResponseEntity<List<ReviewResponse>> getUserReviews(
-            @PathVariable UUID userId
-    ) {
+    public ResponseEntity<List<ReviewResponse>> getUserReviews(@PathVariable UUID userId) {
 
-        List<ReviewResponse> response =
-                getUserReviewsUseCase.execute(userId);
+        List<ReviewResponse> response = getUserReviewsUseCase.execute(userId);
 
         return ResponseEntity.ok(response);
     }
@@ -65,17 +52,11 @@ public class ReviewController {
     @PutMapping("/{reviewId}")
     public ResponseEntity<Void> updateReview(
 
-            @PathVariable
-            UUID reviewId,
+            @PathVariable UUID reviewId,
 
-            @RequestHeader(
-                    "X-User-Id"
-            )
-            UUID userId,
+            @RequestHeader("X-User-Id") UUID userId,
 
-            @RequestBody
-            Map<String,Object> body
-    ){
+            @RequestBody Map<String, Object> body) {
 
         updateReviewUseCase.execute(
 
@@ -83,37 +64,22 @@ public class ReviewController {
 
                 userId,
 
-                (Integer) body.get(
-                        "rating"
-                ),
+                (Integer) body.get("rating"),
 
-                body.get(
-                        "comment"
-                ).toString()
-        );
+                body.get("comment").toString());
 
-        return ResponseEntity.ok()
-                .build();
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{reviewId}")
     public ResponseEntity<Void> deleteReview(
 
-            @PathVariable
-            UUID reviewId,
+            @PathVariable UUID reviewId,
 
-            @RequestHeader(
-                    "X-User-Id"
-            )
-            UUID userId
-    ){
+            @RequestHeader("X-User-Id") UUID userId) {
 
-        deleteReviewUseCase.execute(
-                reviewId,
-                userId
-        );
+        deleteReviewUseCase.execute(reviewId, userId);
 
-        return ResponseEntity.ok()
-                .build();
+        return ResponseEntity.ok().build();
     }
 }
