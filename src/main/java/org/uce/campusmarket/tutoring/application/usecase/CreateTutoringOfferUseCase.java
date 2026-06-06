@@ -16,46 +16,43 @@ import org.uce.campusmarket.identity.domain.model.User;
 
 import org.uce.campusmarket.shared.exception.DomainException;
 
-import java.util.UUID;
-
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class CreateTutoringOfferUseCase {
 
-    private final TutoringOfferRepository repository;
-    private final UserRepository userRepository;
+        private final TutoringOfferRepository repository;
+        private final UserRepository userRepository;
 
-    public TutoringOfferResponse execute(CreateTutoringOfferRequest request) {
+        public TutoringOfferResponse execute(CreateTutoringOfferRequest request) {
 
-        User tutor = userRepository.findById(request.getTutorId())
-                .orElseThrow(() -> new DomainException("El tutor no existe"));
+                User tutor = userRepository.findById(request.getTutorId())
+                                .orElseThrow(() -> new DomainException("El tutor no existe"));
 
-        TutoringOffer offer = TutoringOffer.create(
-                request.getTutorId(),
-                request.getSubject(),
-                request.getDescription(),
-                new HourlyRate(request.getHourlyRate())
-        );
+                TutoringOffer offer = TutoringOffer.create(
+                                request.getTutorId(),
+                                request.getSubject(),
+                                request.getDescription(),
+                                new HourlyRate(request.getHourlyRate()));
 
-        TutoringOffer savedOffer = repository.save(offer);
+                TutoringOffer savedOffer = repository.save(offer);
 
-        return new TutoringOfferResponse(
-                savedOffer.getId(),
-                savedOffer.getTutorId(),
-                savedOffer.getSubject(),
-                savedOffer.getDescription(),
-                savedOffer.getHourlyRate().getValue().doubleValue(),
-                savedOffer.getStatus().name(),
-                savedOffer.getCreatedAt(),
+                return new TutoringOfferResponse(
+                                savedOffer.getId(),
+                                savedOffer.getTutorId(),
+                                savedOffer.getSubject(),
+                                savedOffer.getDescription(),
+                                savedOffer.getHourlyRate().getValue().doubleValue(),
+                                savedOffer.getStatus().name(),
+                                savedOffer.getCreatedAt(),
 
-                tutor.getFullName(),
-                tutor.getEmail(),
-                tutor.getPhone(),
-                tutor.getAddress(),
-                tutor.getSocialMedia(),
+                                tutor.getFullName(),
+                                tutor.getEmail(),
+                                tutor.getPhone(),
+                                tutor.getAddress(),
+                                tutor.getSocialMedia(),
 
-                null,
-                null);
-    }
+                                null,
+                                null);
+        }
 }

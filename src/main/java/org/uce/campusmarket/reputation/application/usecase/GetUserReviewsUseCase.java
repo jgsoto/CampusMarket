@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.uce.campusmarket.identity.domain.repository.UserRepository;
 import org.uce.campusmarket.reputation.application.dto.ReviewResponse;
-import org.uce.campusmarket.reputation.domain.model.Review;
 import org.uce.campusmarket.reputation.domain.repository.ReviewRepository;
 import org.uce.campusmarket.tutoring.domain.repository.TutoringOfferRepository;
 
@@ -17,90 +16,69 @@ import java.util.UUID;
 @Transactional(readOnly = true)
 public class GetUserReviewsUseCase {
 
-    private final ReviewRepository reviewRepository;
+        private final ReviewRepository reviewRepository;
 
-    private final UserRepository userRepository;
+        private final UserRepository userRepository;
 
-    private final TutoringOfferRepository
-            tutoringOfferRepository;
+        private final TutoringOfferRepository tutoringOfferRepository;
 
-    public List<ReviewResponse> execute(
-            UUID userId
-    ) {
+        public List<ReviewResponse> execute(
+                        UUID userId) {
 
-        return reviewRepository
-                .findByReviewedUserId(userId)
-                .stream()
-                .map(review -> {
+                return reviewRepository
+                                .findByReviewedUserId(userId)
+                                .stream()
+                                .map(review -> {
 
-                    String reviewerName =
-                            userRepository
-                                    .findById(
-                                            review.getReviewerId()
-                                    )
-                                    .map(
-                                            user ->
-                                                    user.getFullName()
-                                    )
-                                    .orElse(
-                                            "Usuario"
-                                    );
+                                        String reviewerName = userRepository
+                                                        .findById(
+                                                                        review.getReviewerId())
+                                                        .map(
+                                                                        user -> user.getFullName())
+                                                        .orElse(
+                                                                        "Usuario");
 
-                    String targetTitle =
-                            tutoringOfferRepository
-                                    .findById(
-                                            review.getTargetId()
-                                    )
-                                    .map(
-                                            tutoring ->
-                                                    tutoring.getSubject()
-                                    )
-                                    .orElse(
-                                            "Tutoría"
-                                    );
+                                        String targetTitle = tutoringOfferRepository
+                                                        .findById(
+                                                                        review.getTargetId())
+                                                        .map(
+                                                                        tutoring -> tutoring.getSubject())
+                                                        .orElse(
+                                                                        "Tutoría");
 
-                    return ReviewResponse
-                            .builder()
+                                        return ReviewResponse
+                                                        .builder()
 
-                            .id(
-                                    review.getId()
-                            )
+                                                        .id(
+                                                                        review.getId())
 
-                            .reviewerId(
-                                    review.getReviewerId()
-                            )
+                                                        .reviewerId(
+                                                                        review.getReviewerId())
 
-                            .reviewedUserId(
-                                    review.getReviewedUserId()
-                            )
+                                                        .reviewedUserId(
+                                                                        review.getReviewedUserId())
 
-                            .targetId(
-                                    review.getTargetId()
-                            )
+                                                        .targetId(
+                                                                        review.getTargetId())
 
-                            .rating(
-                                    review.getRating()
-                            )
+                                                        .rating(
+                                                                        review.getRating())
 
-                            .comment(
-                                    review.getComment()
-                            )
+                                                        .comment(
+                                                                        review.getComment())
 
-                            .createdAt(
-                                    review.getCreatedAt()
-                            )
+                                                        .createdAt(
+                                                                        review.getCreatedAt())
 
-                            .reviewerName(
-                                    reviewerName
-                            )
+                                                        .reviewerName(
+                                                                        reviewerName)
 
-                            .targetTitle(
-                                    targetTitle
-                            )
+                                                        .targetTitle(
+                                                                        targetTitle)
 
-                            .build();
+                                                        .build();
 
-                })
-                .toList();
-    }
+                                })
+                                .toList();
+        }
 }
