@@ -97,7 +97,6 @@ public class Listing {
     public List<ListingImage> getImages() {
         return Collections.unmodifiableList(images);
     }
-
     public void publish() {
         if (this.status != ListingStatus.BORRADOR) {
             throw new DomainException("Solo se pueden publicar productos en borrador");
@@ -138,7 +137,6 @@ public class Listing {
         if (title == null || description == null || price == null) {
             throw new DomainException("Título, descripción y precio son obligatorios");
         }
-
         this.title = title;
         this.description = description;
         this.price = price;
