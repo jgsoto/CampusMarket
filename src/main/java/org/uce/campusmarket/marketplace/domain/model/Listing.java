@@ -28,11 +28,11 @@ public class Listing {
     private Long version;
     private List<ListingImage> images = new ArrayList<>();
 
-    public Listing(UUID id, ListingTitle title, ListingDescription description, Price price, 
-                   Category category, UUID ownerId) {
-        
+    public Listing(UUID id, ListingTitle title, ListingDescription description, Price price,
+            Category category, UUID ownerId) {
+
         validateRequiredFields(ownerId, category);
-        
+
         this.id = id != null ? id : UUID.randomUUID();
         this.title = title;
         this.description = description;
@@ -52,13 +52,13 @@ public class Listing {
         }
     }
 
-
     public void publish() {
         this.status = ListingStatus.PUBLICADA;
     }
 
     public void addImage(ListingImage image) {
-        if (image == null) return;
+        if (image == null)
+            return;
         this.images.add(image);
     }
 
@@ -67,10 +67,6 @@ public class Listing {
             throw new DomainException("Solo se pueden marcar como vendidos los productos que estén publicados");
         }
         this.status = ListingStatus.VENDIDO;
-    }
-
-    public void markAsDeleted() {
-        this.status = ListingStatus.ELIMINADO;
     }
 
     public void updateDetails(ListingTitle title, ListingDescription description, Price price) {
