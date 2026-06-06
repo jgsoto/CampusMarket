@@ -6,6 +6,6 @@ import org.springframework.stereotype.Service;
 public class TrustVerificationService {
 
     public Double initialTrustScore() {
-        return 3.0;
+        return 100.0;
     }
 }

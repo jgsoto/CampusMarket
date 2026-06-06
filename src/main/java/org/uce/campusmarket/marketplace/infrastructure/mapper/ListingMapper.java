@@ -71,25 +71,23 @@ public class ListingMapper {
                 entity.getOwnerId()
         );
 
-        if (entity.getImages() != null) {
+        List<ListingImage> images = entity.getImages() == null
+                ? List.of()
+                : entity.getImages()
+                  .stream()
+                  .map(img -> new ListingImage(
+                          img.getId(),
+                          img.getUrl(),
+                          img.isThumbnail()
+                  ))
+                  .toList();
 
-            entity.getImages().forEach(img ->
-                    listing.addImage(
-                            new ListingImage(
-                                    img.getId(),
-                                    img.getUrl(),
-                                    img.isThumbnail()
-                            )
-                    )
-            );
-        }
-
-        listing.setStatus(
-                ListingStatus.valueOf(entity.getStatus())
+        listing.restoreFromPersistence(
+                ListingStatus.valueOf(entity.getStatus()),
+                entity.getCreatedAt(),
+                entity.getVersion(),
+                images
         );
-
-        listing.setCreatedAt(entity.getCreatedAt());
-        listing.setVersion(entity.getVersion());
 
         return listing;
     }

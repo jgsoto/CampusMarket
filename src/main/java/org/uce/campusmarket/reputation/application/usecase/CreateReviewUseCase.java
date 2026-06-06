@@ -5,26 +5,20 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import org.uce.campusmarket.marketplace.domain.model.Listing;
-import org.uce.campusmarket.marketplace.domain.model.ListingStatus;
-import org.uce.campusmarket.marketplace.domain.repository.ListingRepository;
-
 import org.uce.campusmarket.reputation.application.dto.CreateReviewRequest;
 import org.uce.campusmarket.reputation.application.dto.ReviewResponse;
+
 import org.uce.campusmarket.reputation.domain.model.Review;
-import org.uce.campusmarket.reputation.domain.model.ReviewTargetType;
 import org.uce.campusmarket.reputation.domain.repository.ReviewRepository;
+import org.uce.campusmarket.reputation.domain.service.ReviewPolicy;
+import org.uce.campusmarket.reputation.domain.valueobject.Rating;
 
 import org.uce.campusmarket.shared.exception.DomainException;
 
 import org.uce.campusmarket.tutoring.domain.model.TutoringOffer;
-import org.uce.campusmarket.tutoring.domain.model.TutoringStatus;
-
-import org.uce.campusmarket.tutoring.domain.repository
-        .TutoringOfferRepository;
-
-import org.uce.campusmarket.tutoring.domain.repository
-        .TutoringEnrollmentRepository;
+import org.uce.campusmarket.tutoring.domain.repository.TutoringEnrollmentRepository;
+import org.uce.campusmarket.tutoring.domain.repository.TutoringOfferRepository;
+import org.uce.campusmarket.tutoring.domain.service.TutoringReviewPolicy;
 
 import java.util.UUID;
 
@@ -35,174 +29,78 @@ public class CreateReviewUseCase {
 
     private final ReviewRepository reviewRepository;
 
-    private final ListingRepository listingRepository;
+    private final TutoringOfferRepository tutoringOfferRepository;
 
-    private final TutoringOfferRepository
-            tutoringOfferRepository;
+    private final TutoringEnrollmentRepository tutoringEnrollmentRepository;
 
-    private final TutoringEnrollmentRepository
-            tutoringEnrollmentRepository;
+    private final ReviewPolicy reviewPolicy;
+
+    private final TutoringReviewPolicy tutoringReviewPolicy;
 
     public ReviewResponse execute(
             UUID reviewerId,
             CreateReviewRequest request
     ) {
 
-        if (
-                reviewerId.equals(
-                        request.getReviewedUserId()
+        reviewPolicy.validateNotSelfReview(
+                reviewerId,
+                request.getReviewedUserId()
+        );
+
+        reviewPolicy.validateAlreadyReviewed(
+                reviewRepository.existsByReviewerIdAndTargetId(
+                        reviewerId,
+                        request.getTargetId()
                 )
-        ) {
+        );
 
-            throw new DomainException(
-                    "No puedes calificarte a ti mismo"
-            );
-        }
-
-        boolean alreadyReviewed =
-                reviewRepository
-                        .existsByReviewerIdAndTargetId(
-                                reviewerId,
-                                request.getTargetId()
+        TutoringOffer tutoring =
+                tutoringOfferRepository
+                        .findById(request.getTargetId())
+                        .orElseThrow(() ->
+                                new DomainException(
+                                        "La tutoría no existe"
+                                )
                         );
 
-        if (alreadyReviewed) {
-
-            throw new DomainException(
-                    "Ya calificaste esta tutoría"
-            );
-        }
-
-        if (
-                request.getTargetType()
-                        == ReviewTargetType.MARKETPLACE
-        ) {
-
-            Listing listing =
-                    listingRepository
-                            .findById(
-                                    request.getTargetId()
-                            )
-                            .orElseThrow(
-                                    () ->
-                                            new DomainException(
-                                                    "La publicación no existe"
-                                            )
-                            );
-
-            if (
-                    listing.getStatus()
-                            != ListingStatus.VENDIDO
-            ) {
-
-                throw new DomainException(
-                        "Solo puedes reseñar productos vendidos"
-                );
-            }
-
-            if (
-                    !listing.getOwnerId().equals(
-                            request.getReviewedUserId()
-                    )
-            ) {
-
-                throw new DomainException(
-                        "El usuario reseñado no coincide"
-                );
-            }
-        }
-
-        if (
-                request.getTargetType()
-                        == ReviewTargetType.TUTORING
-        ) {
-
-            TutoringOffer tutoring =
-                    tutoringOfferRepository
-                            .findById(
-                                    request.getTargetId()
-                            )
-                            .orElseThrow(
-                                    () ->
-                                            new DomainException(
-                                                    "La tutoría no existe"
-                                            )
-                            );
-
-            if (
-                    tutoring.getStatus()
-                            != TutoringStatus.CLOSED
-            ) {
-
-                throw new DomainException(
-                        "Solo puedes reseñar tutorías cerradas"
-                );
-            }
-
-            tutoringEnrollmentRepository
-                    .findByTutoringOfferIdAndStudentId(
-                            tutoring.getId(),
-                            reviewerId
-                    )
-                    .orElseThrow(
-                            () ->
-                                    new DomainException(
-                                            "No estás inscrito en esta tutoría"
-                                    )
-                    );
-
-            if (
-                    !tutoring.getTutorId().equals(
-                            request.getReviewedUserId()
-                    )
-            ) {
-
-                throw new DomainException(
-                        "El tutor no coincide"
-                );
-            }
-        }
-
-        Review review =
-                new Review(
-                        null,
-                        reviewerId,
-                        request.getReviewedUserId(),
-                        request.getTargetId(),
-                        request.getTargetType(),
-                        request.getRating(),
-                        request.getComment()
+        tutoringEnrollmentRepository
+                .findByTutoringOfferIdAndStudentId(
+                        tutoring.getId(),
+                        reviewerId
+                )
+                .orElseThrow(() ->
+                        new DomainException(
+                                "No estás inscrito en esta tutoría"
+                        )
                 );
 
-        Review saved =
-                reviewRepository.save(
-                        review
-                );
+        tutoringReviewPolicy.validate(
+                tutoring,
+                request.getReviewedUserId()
+        );
 
-        return ReviewResponse
-                .builder()
+        Rating rating = new Rating(
+                request.getRating()
+        );
+
+        Review review = Review.create(
+                reviewerId,
+                request.getReviewedUserId(),
+                request.getTargetId(),
+                rating,
+                request.getComment()
+        );
+
+        Review saved = reviewRepository.save(review);
+
+        return ReviewResponse.builder()
                 .id(saved.getId())
-                .reviewerId(
-                        saved.getReviewerId()
-                )
-                .reviewedUserId(
-                        saved.getReviewedUserId()
-                )
-                .targetId(
-                        saved.getTargetId()
-                )
-                .targetType(
-                        saved.getTargetType().name()
-                )
-                .rating(
-                        saved.getRating()
-                )
-                .comment(
-                        saved.getComment()
-                )
-                .createdAt(
-                        saved.getCreatedAt()
-                )
+                .reviewerId(saved.getReviewerId())
+                .reviewedUserId(saved.getReviewedUserId())
+                .targetId(saved.getTargetId())
+                .rating(saved.getRating())
+                .comment(saved.getComment())
+                .createdAt(saved.getCreatedAt())
                 .build();
     }
 }

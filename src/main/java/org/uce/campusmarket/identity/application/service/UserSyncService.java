@@ -5,6 +5,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.uce.campusmarket.identity.domain.model.User;
 import org.uce.campusmarket.identity.domain.repository.UserRepository;
+import org.uce.campusmarket.identity.domain.model.User;
+import org.uce.campusmarket.identity.domain.repository.UserRepository;
+
 
 import java.time.LocalDateTime;
 
@@ -37,13 +40,12 @@ public class UserSyncService {
             String email
     ) {
 
-        User user = User.builder()
-                .clerkId(clerkUserId)
-                .fullName(fullName)
-                .email(email)
-                .trustScore(100.0)
-                .createdAt(LocalDateTime.now())
-                .build();
+        User user = User.create(
+                clerkUserId,
+                fullName,
+                email,
+                100.0
+        );
 
         return userRepository.save(user);
     }

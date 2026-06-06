@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.uce.campusmarket.shared.exception.DomainException;
 import org.uce.campusmarket.tutoring.domain.model.TutoringEnrollment;
 import org.uce.campusmarket.tutoring.domain.model.TutoringOffer;
+import org.uce.campusmarket.tutoring.domain.model.TutoringStatus;
 import org.uce.campusmarket.tutoring.domain.repository.TutoringEnrollmentRepository;
 import org.uce.campusmarket.tutoring.domain.repository.TutoringOfferRepository;
 
@@ -36,6 +37,18 @@ public class EnrollInTutoringUseCase {
                                 )
                         );
 
+        if (tutoring.getTutorId().equals(studentId)) {
+            throw new DomainException(
+                    "No puedes inscribirte en tu propia tutoría"
+            );
+        }
+
+        if (tutoring.getStatus() == TutoringStatus.CLOSED) {
+            throw new DomainException(
+                    "No puedes inscribirte en una tutoría cerrada"
+            );
+        }
+
         boolean alreadyEnrolled =
                 tutoringEnrollmentRepository
                         .findByTutoringOfferIdAndStudentId(
@@ -52,8 +65,7 @@ public class EnrollInTutoringUseCase {
         }
 
         TutoringEnrollment enrollment =
-                new TutoringEnrollment(
-                        null,
+                TutoringEnrollment.create(
                         tutoringId,
                         studentId
                 );

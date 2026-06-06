@@ -11,9 +11,10 @@ public class HourlyRate {
     private final BigDecimal value;
 
     public HourlyRate(Double value) {
-        if (value == null || value < 0) {
-            throw new DomainException("La tarifa por hora no puede ser negativa o nula");
+        if (value == null || value <= 0) {
+            throw new DomainException("La tarifa por hora debe ser mayor a 0");
         }
+
         this.value = BigDecimal.valueOf(value);
     }
 }

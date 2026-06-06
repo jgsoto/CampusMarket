@@ -1,8 +1,8 @@
 package org.uce.campusmarket.marketplace.domain.model;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.uce.campusmarket.marketplace.domain.valueobject.ListingDescription;
 import org.uce.campusmarket.marketplace.domain.valueobject.ListingTitle;
 import org.uce.campusmarket.marketplace.domain.valueobject.Price;
@@ -10,13 +10,14 @@ import org.uce.campusmarket.shared.exception.DomainException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 @Getter
-@Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Listing {
+
     private UUID id;
     private ListingTitle title;
     private ListingDescription description;
@@ -26,12 +27,17 @@ public class Listing {
     private ListingStatus status;
     private LocalDateTime createdAt;
     private Long version;
-    private List<ListingImage> images = new ArrayList<>();
+    private final List<ListingImage> images = new ArrayList<>();
 
-    public Listing(UUID id, ListingTitle title, ListingDescription description, Price price,
-            Category category, UUID ownerId) {
-
-        validateRequiredFields(ownerId, category);
+    public Listing(
+            UUID id,
+            ListingTitle title,
+            ListingDescription description,
+            Price price,
+            Category category,
+            UUID ownerId
+    ) {
+        validateRequiredFields(title, description, price, category, ownerId);
 
         this.id = id != null ? id : UUID.randomUUID();
         this.title = title;
@@ -43,35 +49,137 @@ public class Listing {
         this.createdAt = LocalDateTime.now();
     }
 
-    private void validateRequiredFields(UUID ownerId, Category category) {
-        if (ownerId == null) {
-            throw new DomainException("La publicación debe tener un propietario");
+    public static Listing create(
+            ListingTitle title,
+            ListingDescription description,
+            Price price,
+            Category category,
+            UUID ownerId
+    ) {
+        return new Listing(
+                UUID.randomUUID(),
+                title,
+                description,
+                price,
+                category,
+                ownerId
+        );
+    }
+
+    private void validateRequiredFields(
+            ListingTitle title,
+            ListingDescription description,
+            Price price,
+            Category category,
+            UUID ownerId
+    ) {
+        if (title == null) {
+            throw new DomainException("La publicación debe tener un título");
         }
+
+        if (description == null) {
+            throw new DomainException("La publicación debe tener una descripción");
+        }
+
+        if (price == null) {
+            throw new DomainException("La publicación debe tener un precio");
+        }
+
         if (category == null) {
             throw new DomainException("La publicación debe tener una categoría");
         }
+
+        if (ownerId == null) {
+            throw new DomainException("La publicación debe tener un propietario");
+        }
     }
 
+    public List<ListingImage> getImages() {
+        return Collections.unmodifiableList(images);
+    }
     public void publish() {
-        this.status = ListingStatus.PUBLICADA;
-    }
+        if (this.status != ListingStatus.BORRADOR) {
+            throw new DomainException("Solo se pueden publicar productos en borrador");
+        }
 
-    public void addImage(ListingImage image) {
-        if (image == null)
-            return;
-        this.images.add(image);
+        this.status = ListingStatus.PUBLICADA;
     }
 
     public void markAsSold() {
         if (this.status != ListingStatus.PUBLICADA) {
-            throw new DomainException("Solo se pueden marcar como vendidos los productos que estén publicados");
+            throw new DomainException("Solo se pueden marcar como vendidos los productos publicados");
         }
+
         this.status = ListingStatus.VENDIDO;
     }
 
-    public void updateDetails(ListingTitle title, ListingDescription description, Price price) {
+    public void markAsDeleted() {
+        if (this.status == ListingStatus.VENDIDO) {
+            throw new DomainException("No se puede eliminar un producto vendido");
+        }
+
+        if (this.status == ListingStatus.ELIMINADO) {
+            throw new DomainException("La publicación ya está eliminada");
+        }
+
+        this.status = ListingStatus.ELIMINADO;
+    }
+
+    public void updateDetails(
+            ListingTitle title,
+            ListingDescription description,
+            Price price
+    ) {
+        if (this.status == ListingStatus.VENDIDO || this.status == ListingStatus.ELIMINADO) {
+            throw new DomainException("No se puede editar una publicación vendida o eliminada");
+        }
+
+        if (title == null || description == null || price == null) {
+            throw new DomainException("Título, descripción y precio son obligatorios");
+        }
         this.title = title;
         this.description = description;
         this.price = price;
+    }
+
+    public void addImage(ListingImage image) {
+        if (image == null) {
+            return;
+        }
+
+        if (this.status == ListingStatus.ELIMINADO) {
+            throw new DomainException("No se pueden agregar imágenes a una publicación eliminada");
+        }
+
+        this.images.add(image);
+    }
+
+    public void replaceImages(List<ListingImage> newImages) {
+        if (this.status == ListingStatus.VENDIDO || this.status == ListingStatus.ELIMINADO) {
+            throw new DomainException("No se pueden reemplazar imágenes de una publicación vendida o eliminada");
+        }
+
+        this.images.clear();
+
+        if (newImages != null) {
+            newImages.forEach(this::addImage);
+        }
+    }
+
+    public void restoreFromPersistence(
+            ListingStatus status,
+            LocalDateTime createdAt,
+            Long version,
+            List<ListingImage> images
+    ) {
+        this.status = status;
+        this.createdAt = createdAt;
+        this.version = version;
+
+        this.images.clear();
+
+        if (images != null) {
+            this.images.addAll(images);
+        }
     }
 }

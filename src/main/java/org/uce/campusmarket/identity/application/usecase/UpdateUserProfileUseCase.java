@@ -18,13 +18,9 @@ public class UpdateUserProfileUseCase {
     private final UserRepository userRepository;
 
     public void execute(UUID userId, UserProfileRequest request) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado con ID: " + userId));
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("Usuario no encontrado con ID: " + userId));
 
-        user.setPhone(request.phone());
-        user.setAddress(request.address());
-        user.setDescription(request.description());
-        user.setSocialMedia(request.socialMedia());
+        user.updateProfile(request.phone(), request.address(), request.description(), request.socialMedia());
 
         userRepository.save(user);
     }

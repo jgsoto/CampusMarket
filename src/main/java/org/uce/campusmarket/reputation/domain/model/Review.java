@@ -1,14 +1,16 @@
 package org.uce.campusmarket.reputation.domain.model;
 
+import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
+import org.uce.campusmarket.reputation.domain.valueobject.Rating;
 import org.uce.campusmarket.shared.exception.DomainException;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
-@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Review {
 
     private UUID id;
@@ -19,9 +21,7 @@ public class Review {
 
     private UUID targetId;
 
-    private ReviewTargetType targetType;
-
-    private int rating;
+    private Rating rating;
 
     private String comment;
 
@@ -32,11 +32,29 @@ public class Review {
             UUID reviewerId,
             UUID reviewedUserId,
             UUID targetId,
-            ReviewTargetType targetType,
-            int rating,
+            Rating rating,
             String comment
     ) {
+        this(
+                id,
+                reviewerId,
+                reviewedUserId,
+                targetId,
+                rating,
+                comment,
+                LocalDateTime.now()
+        );
+    }
 
+    public Review(
+            UUID id,
+            UUID reviewerId,
+            UUID reviewedUserId,
+            UUID targetId,
+            Rating rating,
+            String comment,
+            LocalDateTime createdAt
+    ) {
         validate(
                 reviewerId,
                 reviewedUserId,
@@ -45,57 +63,93 @@ public class Review {
         );
 
         this.id = id != null ? id : UUID.randomUUID();
-
         this.reviewerId = reviewerId;
-
         this.reviewedUserId = reviewedUserId;
-
         this.targetId = targetId;
+        this.rating = rating;
+        this.comment = normalizeComment(comment);
+        this.createdAt = createdAt != null ? createdAt : LocalDateTime.now();
+    }
 
-        this.targetType = targetType;
+    public static Review create(
+            UUID reviewerId,
+            UUID reviewedUserId,
+            UUID targetId,
+            Rating rating,
+            String comment
+    ) {
+
+        if (reviewerId.equals(reviewedUserId)) {
+
+            throw new DomainException(
+                    "No puedes calificarte a ti mismo"
+            );
+        }
+
+
+        return new Review(
+                UUID.randomUUID(),
+                reviewerId,
+                reviewedUserId,
+                targetId,
+                rating,
+                comment
+        );
+    }
+
+    public void update(
+            Rating rating,
+            String comment
+    ) {
+        validate(
+                this.reviewerId,
+                this.reviewedUserId,
+                this.targetId,
+                rating
+        );
 
         this.rating = rating;
-
-        this.comment = comment;
-
-        this.createdAt = LocalDateTime.now();
+        this.comment = normalizeComment(comment);
     }
 
     private void validate(
             UUID reviewerId,
             UUID reviewedUserId,
             UUID targetId,
-            int rating
+            Rating rating
     ) {
-
         if (reviewerId == null) {
-            throw new DomainException(
-                    "El reviewer es obligatorio"
-            );
+            throw new DomainException("El reviewer es obligatorio");
         }
 
         if (reviewedUserId == null) {
-            throw new DomainException(
-                    "El usuario evaluado es obligatorio"
-            );
+            throw new DomainException("El usuario evaluado es obligatorio");
         }
 
         if (targetId == null) {
-            throw new DomainException(
-                    "El target es obligatorio"
-            );
+            throw new DomainException("El target es obligatorio");
         }
 
         if (reviewerId.equals(reviewedUserId)) {
-            throw new DomainException(
-                    "No puedes evaluarte a ti mismo"
-            );
+            throw new DomainException("No puedes evaluarte a ti mismo");
+        }
+    }
+
+    private String normalizeComment(String comment) {
+        if (comment == null || comment.isBlank()) {
+            throw new DomainException("El comentario es obligatorio");
         }
 
-        if (rating < 1 || rating > 5) {
-            throw new DomainException(
-                    "La calificación debe estar entre 1 y 5"
-            );
+        String normalizedComment = comment.trim();
+
+        if (normalizedComment.length() > 500) {
+            throw new DomainException("El comentario no puede superar los 500 caracteres");
         }
+
+        return normalizedComment;
+    }
+
+    public int getRating() {
+        return rating.getValue();
     }
 }

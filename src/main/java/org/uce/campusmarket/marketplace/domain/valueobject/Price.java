@@ -15,9 +15,11 @@ public final class Price {
         if (value == null) {
             throw new DomainException("El precio no puede ser nulo");
         }
-        if (value.compareTo(BigDecimal.ZERO) < 0) {
-            throw new DomainException("El precio debe ser positivo");
+
+        if (value.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new DomainException("El precio debe ser mayor a 0");
         }
+
         this.value = value;
     }
 

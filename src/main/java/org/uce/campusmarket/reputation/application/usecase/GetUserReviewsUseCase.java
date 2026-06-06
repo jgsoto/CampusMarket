@@ -78,10 +78,6 @@ public class GetUserReviewsUseCase {
                                     review.getTargetId()
                             )
 
-                            .targetType(
-                                    review.getTargetType().name()
-                            )
-
                             .rating(
                                     review.getRating()
                             )

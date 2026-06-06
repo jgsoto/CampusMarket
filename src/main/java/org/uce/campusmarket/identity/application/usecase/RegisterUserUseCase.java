@@ -8,8 +8,6 @@ import org.uce.campusmarket.identity.domain.service.EmailValidationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-
 @Service
 @RequiredArgsConstructor
 public class RegisterUserUseCase {
@@ -36,9 +34,20 @@ public class RegisterUserUseCase {
 
     private User createUser(User user) {
 
-        user.setTrustScore(trustVerificationService.initialTrustScore());
-        user.setCreatedAt(LocalDateTime.now());
+        User newUser = User.create(
+                user.getClerkId(),
+                user.getFullName(),
+                user.getEmail(),
+                trustVerificationService.initialTrustScore()
+        );
 
-        return userRepository.save(user);
+        newUser.updateProfile(
+                user.getPhone(),
+                user.getAddress(),
+                user.getDescription(),
+                user.getSocialMedia()
+        );
+
+        return userRepository.save(newUser);
     }
 }

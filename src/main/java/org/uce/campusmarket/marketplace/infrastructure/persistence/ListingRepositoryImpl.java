@@ -20,31 +20,25 @@ public class ListingRepositoryImpl implements ListingRepository {
 
     @Override
     public Listing save(Listing listing) {
-        // Si el registro ya existe, actualizamos sus campos en la entidad
-        // gestionada por JPA para no perder el tracking de imágenes (orphanRemoval)
+
         Optional<ListingJpaEntity> existing = jpaListingRepository.findById(listing.getId());
 
         if (existing.isPresent()) {
             ListingJpaEntity managed = existing.get();
             ListingJpaEntity updated = listingMapper.toEntity(listing);
 
-            // Actualizar solo los campos editables
             managed.setTitle(updated.getTitle());
             managed.setDescription(updated.getDescription());
             managed.setPrice(updated.getPrice());
             managed.setStatus(updated.getStatus());
 
-            // FIX: Evitar NullPointerException en Hibernate al actualizar registros antiguos
-            // que tienen la columna "version" en NULL en la base de datos.
             if (updated.getVersion() != null) {
                 managed.setVersion(updated.getVersion());
             } else if (managed.getVersion() == null) {
                 managed.setVersion(0L);
             }
 
-            // Solo reemplazar imágenes si la nueva lista no está vacía
             if (updated.getImages() != null) {
-                // Mapear imágenes existentes por su ID para reutilizar las entidades gestionadas por JPA
                 java.util.Map<UUID, ListingImageJpaEntity> existingImages = managed.getImages().stream()
                         .filter(img -> img.getId() != null)
                         .collect(Collectors.toMap(ListingImageJpaEntity::getId, img -> img));
@@ -56,12 +50,10 @@ public class ListingRepositoryImpl implements ListingRepository {
                         existingImg = existingImages.get(updatedImg.getId());
                     }
                     if (existingImg != null) {
-                        // Reutilizar la misma instancia de entidad gestionada por JPA para evitar duplicados en la sesión de Hibernate
                         existingImg.setUrl(updatedImg.getUrl());
                         existingImg.setThumbnail(updatedImg.isThumbnail());
                         finalImages.add(existingImg);
                     } else {
-                        // Si es nueva, la asociamos y agregamos
                         if (updatedImg.getId() == null) {
                             updatedImg.setId(UUID.randomUUID());
                         }
@@ -76,18 +68,14 @@ public class ListingRepositoryImpl implements ListingRepository {
             ListingJpaEntity saved = jpaListingRepository.save(managed);
             return listingMapper.toDomain(saved);
         }
-
-        // Si es nuevo, lo creamos normalmente
         ListingJpaEntity entity = listingMapper.toEntity(listing);
-        
-        // Es necesario establecer la relación inversa para cada imagen
-        // para que Hibernate asigne correctamente el foreign key 'listing_id'
+
         if (entity.getImages() != null) {
             for (ListingImageJpaEntity img : entity.getImages()) {
                 img.setListing(entity);
             }
         }
-        
+
         ListingJpaEntity saved = jpaListingRepository.save(entity);
         return listingMapper.toDomain(saved);
     }
