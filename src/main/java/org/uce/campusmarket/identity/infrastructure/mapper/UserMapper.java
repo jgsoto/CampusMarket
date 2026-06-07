@@ -18,7 +18,7 @@ public class UserMapper {
                 .fullName(user.getFullName())
                 .email(user.getEmail())
                 .trustScore(user.getTrustScore())
-                .phone(user.getPhone().toString())
+                .phone(user.getPhone())
                 .address(user.getAddress())
                 .description(user.getDescription())
                 .socialMedia(user.getSocialMedia())
