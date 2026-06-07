@@ -50,10 +50,6 @@ C:.
 ¦       ¦           +---campusmarket
 ¦       ¦               ¦   CampusMarketApplication.java
 ¦       ¦               ¦   
-¦       ¦               +---config
-¦       ¦               ¦   +---security
-¦       ¦               ¦           SecurityConfiguration.java
-¦       ¦               ¦           
 ¦       ¦               +---identity
 ¦       ¦               ¦   +---application
 ¦       ¦               ¦   ¦   +---dto
@@ -105,14 +101,6 @@ C:.
 ¦       ¦               ¦               UserProfileController.java
 ¦       ¦               ¦               UserSyncController.java
 ¦       ¦               ¦               
-¦       ¦               +---infrastructure
-¦       ¦               ¦   +---security
-¦       ¦               ¦           ClerkAuthenticationFilter.java
-¦       ¦               ¦           ClerkTokenService.java
-¦       ¦               ¦           
-¦       ¦               +---interfaces
-¦       ¦               ¦       ViewController.java
-¦       ¦               ¦       
 ¦       ¦               +---marketplace
 ¦       ¦               ¦   +---application
 ¦       ¦               ¦   ¦   +---dto
@@ -211,8 +199,17 @@ C:.
 ¦       ¦               ¦               ReviewController.java
 ¦       ¦               ¦               
 ¦       ¦               +---shared
+¦       ¦               ¦   +---config
+¦       ¦               ¦   ¦       SecurityConfiguration.java
+¦       ¦               ¦   ¦       
 ¦       ¦               ¦   +---exception
-¦       ¦               ¦           DomainException.java
+¦       ¦               ¦   ¦       DomainException.java
+¦       ¦               ¦   ¦       
+¦       ¦               ¦   +---security
+¦       ¦               ¦           ClerkAuthenticationFilter.java
+¦       ¦               ¦           ClerkJwtService.java
+¦       ¦               ¦           ClerkTokenService.java
+¦       ¦               ¦           ViewController.java
 ¦       ¦               ¦           
 ¦       ¦               +---tutoring
 ¦       ¦                   +---application
@@ -337,10 +334,6 @@ C:.
     ¦   ¦       +---campusmarket
     ¦   ¦           ¦   CampusMarketApplication.class
     ¦   ¦           ¦   
-    ¦   ¦           +---config
-    ¦   ¦           ¦   +---security
-    ¦   ¦           ¦           SecurityConfiguration.class
-    ¦   ¦           ¦           
     ¦   ¦           +---identity
     ¦   ¦           ¦   +---application
     ¦   ¦           ¦   ¦   +---dto
@@ -394,14 +387,6 @@ C:.
     ¦   ¦           ¦               UserProfileController.class
     ¦   ¦           ¦               UserSyncController.class
     ¦   ¦           ¦               
-    ¦   ¦           +---infrastructure
-    ¦   ¦           ¦   +---security
-    ¦   ¦           ¦           ClerkAuthenticationFilter.class
-    ¦   ¦           ¦           ClerkTokenService.class
-    ¦   ¦           ¦           
-    ¦   ¦           +---interfaces
-    ¦   ¦           ¦       ViewController.class
-    ¦   ¦           ¦       
     ¦   ¦           +---marketplace
     ¦   ¦           ¦   +---application
     ¦   ¦           ¦   ¦   +---dto
@@ -503,8 +488,17 @@ C:.
     ¦   ¦           ¦               ReviewController.class
     ¦   ¦           ¦               
     ¦   ¦           +---shared
+    ¦   ¦           ¦   +---config
+    ¦   ¦           ¦   ¦       SecurityConfiguration.class
+    ¦   ¦           ¦   ¦       
     ¦   ¦           ¦   +---exception
-    ¦   ¦           ¦           DomainException.class
+    ¦   ¦           ¦   ¦       DomainException.class
+    ¦   ¦           ¦   ¦       
+    ¦   ¦           ¦   +---security
+    ¦   ¦           ¦           ClerkAuthenticationFilter.class
+    ¦   ¦           ¦           ClerkJwtService.class
+    ¦   ¦           ¦           ClerkTokenService.class
+    ¦   ¦           ¦           ViewController.class
     ¦   ¦           ¦           
     ¦   ¦           +---tutoring
     ¦   ¦               +---application
