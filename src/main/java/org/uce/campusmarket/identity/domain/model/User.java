@@ -1,48 +1,94 @@
 package org.uce.campusmarket.identity.domain.model;
 
-import jakarta.persistence.*;
 import lombok.*;
+import org.uce.campusmarket.identity.domain.valueobject.Email;
+import org.uce.campusmarket.identity.domain.valueobject.FullName;
+import org.uce.campusmarket.identity.domain.valueobject.TrustScore;
+import org.uce.campusmarket.shared.exception.DomainException;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Entity
-@Table(name = "users")
 @Getter
-@Setter
 @Builder
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class User {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "clerk_id", nullable = false, unique = true)
     private String clerkId;
 
-    @Column(name = "full_name", nullable = false)
     private String fullName;
 
-    @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(name = "trust_score", nullable = false)
     private Double trustScore;
 
-    @Column(length = 20)
     private String phone;
 
-    @Column(length = 255)
     private String address;
 
-    @Column(length = 1000)
     private String description;
 
-    @Column(name = "social_media", length = 255)
     private String socialMedia;
 
-    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+
+    public static User create(
+            String clerkId,
+            String fullName,
+            String email,
+            Double trustScore
+    ) {
+        if (clerkId == null || clerkId.isBlank()) {
+            throw new DomainException("El identificador de Clerk es obligatorio");
+        }
+
+        FullName validFullName = new FullName(fullName);
+        Email validEmail = new Email(email);
+        TrustScore validTrustScore = new TrustScore(trustScore);
+
+        return User.builder()
+                .clerkId(clerkId.trim())
+                .fullName(validFullName.value())
+                .email(validEmail.value())
+                .trustScore(validTrustScore.value())
+                .createdAt(LocalDateTime.now())
+                .build();
+    }
+
+    public void updateProfile(
+            String phone,
+            String address,
+            String description,
+            String socialMedia
+    ) {
+        this.phone = normalizeOptional(phone);
+        this.address = normalizeOptional(address);
+        this.description = normalizeOptional(description);
+        this.socialMedia = normalizeOptional(socialMedia);
+    }
+
+    public void updateIdentity(
+            String fullName,
+            String email
+    ) {
+        FullName validFullName = new FullName(fullName);
+        Email validEmail = new Email(email);
+
+        this.fullName = validFullName.value();
+        this.email = validEmail.value();
+    }
+
+    public void updateTrustScore(Double trustScore) {
+        TrustScore validTrustScore = new TrustScore(trustScore);
+        this.trustScore = validTrustScore.value();
+    }
+
+    private String normalizeOptional(String value) {
+        return value == null || value.isBlank()
+                ? null
+                : value.trim();
+    }
 }

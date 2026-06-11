@@ -13,9 +13,13 @@ public final class ListingTitle {
         if (value == null || value.trim().isEmpty()) {
             throw new DomainException("El título de la publicación no puede estar vacío");
         }
-        if (value.length() < 5 || value.length() > 100) {
+
+        String normalizedValue = value.trim();
+
+        if (normalizedValue.length() < 5 || normalizedValue.length() > 100) {
             throw new DomainException("El título debe tener entre 5 y 100 caracteres");
         }
-        this.value = value;
+
+        this.value = normalizedValue;
     }
 }

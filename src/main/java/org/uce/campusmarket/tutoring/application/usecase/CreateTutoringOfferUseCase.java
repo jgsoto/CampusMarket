@@ -16,55 +16,43 @@ import org.uce.campusmarket.identity.domain.model.User;
 
 import org.uce.campusmarket.shared.exception.DomainException;
 
-import java.util.UUID;
-
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class CreateTutoringOfferUseCase {
 
-    private final TutoringOfferRepository repository;
-    private final UserRepository userRepository;
+        private final TutoringOfferRepository repository;
+        private final UserRepository userRepository;
 
-    public TutoringOfferResponse execute(CreateTutoringOfferRequest request) {
+        public TutoringOfferResponse execute(CreateTutoringOfferRequest request) {
 
-        User tutor = userRepository.findById(request.getTutorId())
-                .orElseThrow(() -> new DomainException("El tutor no existe"));
+                User tutor = userRepository.findById(request.getTutorId())
+                                .orElseThrow(() -> new DomainException("El tutor no existe"));
 
-        if (tutor == null) {
-            throw new DomainException("Tutor inválido");
+                TutoringOffer offer = TutoringOffer.create(
+                                request.getTutorId(),
+                                request.getSubject(),
+                                request.getDescription(),
+                                new HourlyRate(request.getHourlyRate()));
+
+                TutoringOffer savedOffer = repository.save(offer);
+
+                return new TutoringOfferResponse(
+                                savedOffer.getId(),
+                                savedOffer.getTutorId(),
+                                savedOffer.getSubject(),
+                                savedOffer.getDescription(),
+                                savedOffer.getHourlyRate().getValue().doubleValue(),
+                                savedOffer.getStatus().name(),
+                                savedOffer.getCreatedAt(),
+
+                                tutor.getFullName(),
+                                tutor.getEmail(),
+                                tutor.getPhone(),
+                                tutor.getAddress(),
+                                tutor.getSocialMedia(),
+
+                                null,
+                                null);
         }
-
-        if (request.getHourlyRate() == null || request.getHourlyRate() <= 0) {
-            throw new DomainException("La tarifa por hora debe ser mayor a 0");
-        }
-
-        TutoringOffer offer = TutoringOffer.builder()
-                .id(UUID.randomUUID())
-                .tutorId(request.getTutorId())
-                .subject(request.getSubject())
-                .description(request.getDescription())
-                .hourlyRate(new HourlyRate(request.getHourlyRate()))
-                .build();
-
-        TutoringOffer savedOffer = repository.save(offer);
-
-        return new TutoringOfferResponse(
-                savedOffer.getId(),
-                savedOffer.getTutorId(),
-                savedOffer.getSubject(),
-                savedOffer.getDescription(),
-                savedOffer.getHourlyRate().getValue().doubleValue(),
-                savedOffer.getStatus().name(),
-                savedOffer.getCreatedAt(),
-
-                tutor.getFullName(),
-                tutor.getEmail(),
-                tutor.getPhone(),
-                tutor.getAddress(),
-                tutor.getSocialMedia(),
-
-                null,
-                null);
-    }
 }

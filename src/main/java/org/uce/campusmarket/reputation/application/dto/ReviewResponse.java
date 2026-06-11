@@ -20,8 +20,6 @@ public class ReviewResponse {
 
     private UUID targetId;
 
-    private String targetType;
-
     private int rating;
 
     private String comment;

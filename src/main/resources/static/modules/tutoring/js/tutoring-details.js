@@ -101,13 +101,13 @@ function renderOfferInfo(offer) {
     badge.textContent = isOpen ? 'Disponible' : 'Cerrada';
     badge.className = `px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
       isOpen ? 'bg-emerald-100 text-emerald-700 border border-emerald-200'
-              : 'bg-gray-100 text-gray-500 border border-gray-200'
+             : 'bg-gray-100 text-gray-500 border border-gray-200'
     }`;
   }
 }
 
 function renderTutorPanel(offer, reputation) {
-  const score = (reputation?.reputation ?? 0);
+  const score = reputation?.reputation ?? 0;
   if (DetailsDOM.reputationScore()) DetailsDOM.reputationScore().textContent = score.toFixed(1);
   if (DetailsDOM.reputationStars()) DetailsDOM.reputationStars().textContent = buildStarString(score);
 
@@ -124,30 +124,16 @@ function initRevealContact(offer) {
     const social = offer.tutorSocialMedia;
 
     if (phone) {
-      const wa = DetailsDOM.contactWhatsapp();
-      const ph = DetailsDOM.contactPhoneText();
-      if (wa && ph) {
-        wa.href = `https://wa.me/${phone.replace(/\D/g, '')}`;
-        ph.textContent = phone;
-        wa.classList.remove('hidden');
-      }
+      const wa = DetailsDOM.contactWhatsapp(), ph = DetailsDOM.contactPhoneText();
+      if (wa && ph) { wa.href = `https://wa.me/${phone.replace(/\D/g, '')}`; ph.textContent = phone; wa.classList.remove('hidden'); }
     }
     if (email) {
-      const el = DetailsDOM.contactEmailLink();
-      const et = DetailsDOM.contactEmailText();
-      if (el && et) {
-        el.href = `mailto:${email}`;
-        et.textContent = email;
-        el.classList.remove('hidden');
-      }
+      const el = DetailsDOM.contactEmailLink(), et = DetailsDOM.contactEmailText();
+      if (el && et) { el.href = `mailto:${email}`; et.textContent = email; el.classList.remove('hidden'); }
     }
     if (social) {
-      const sw = DetailsDOM.contactSocialWrap();
-      const st = DetailsDOM.contactSocialText();
-      if (sw && st) {
-        st.textContent = social;
-        sw.classList.remove('hidden');
-      }
+      const sw = DetailsDOM.contactSocialWrap(), st = DetailsDOM.contactSocialText();
+      if (sw && st) { st.textContent = social; sw.classList.remove('hidden'); }
     }
     DetailsDOM.contactHidden()?.classList.add('hidden');
     DetailsDOM.contactRevealed()?.classList.remove('hidden');
@@ -258,7 +244,8 @@ async function initReviewForm(offer, currentUserId) {
   const form    = DetailsDOM.reviewForm();
   if (!section || !form) return;
 
-  if (offer.tutorId === currentUserId || offer.status !== 'CLOSED') return;
+  // No mostrar formulario si el usuario es el tutor o si la tutoría no está cerrada
+  if (String(offer.tutorId) === String(currentUserId) || offer.status !== 'CLOSED') return;
 
   try {
     const enrollRes = await DetailsAPI.fetchEnrolled(offer.id, currentUserId);
@@ -289,7 +276,7 @@ async function initReviewForm(offer, currentUserId) {
     const rating  = parseInt(DetailsDOM.reviewRating()?.value ?? '0');
     const comment = DetailsDOM.reviewComment()?.value?.trim() ?? '';
 
-    if (!rating) { showToast('Selecciona una calificación.', 'warning'); return; }
+    if (!rating)  { showToast('Selecciona una calificación.', 'warning'); return; }
     if (!comment) { showToast('Escribe un comentario.', 'warning'); return; }
 
     const payload = {
@@ -367,8 +354,7 @@ async function initEnrollmentButton(offer, offerId, currentUserId) {
   container.innerHTML = `
     <button id="enroll-btn" class="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold text-sm uppercase tracking-wider rounded-xl hover:from-emerald-600 hover:to-teal-700 transition-all shadow-md mb-4 transform hover:-translate-y-0.5">
       🎓 Inscribirme a esta Tutoría
-    </button>
-  `;
+    </button>`;
 
   document.getElementById('enroll-btn').addEventListener('click', async () => {
     const confirmed = await Swal.fire({
@@ -383,10 +369,8 @@ async function initEnrollmentButton(offer, offerId, currentUserId) {
     if (!confirmed.isConfirmed) return;
 
     const res = await fetch(`${API_BASE}/api/tutoring/${offerId}/enroll`, {
-      method: 'POST',
-      headers: { 'X-User-Id': currentUserId }
+      method: 'POST', headers: { 'X-User-Id': currentUserId },
     });
-
     if (res.ok) {
       await Swal.fire('¡Inscripción Exitosa!', 'Has quedado registrado. Ya puedes ver los datos del tutor.', 'success');
       location.reload();
@@ -402,14 +386,15 @@ async function initEnrollmentButton(offer, offerId, currentUserId) {
 }
 
 function initOwnerActions(offer, offerId, currentUserId) {
-  if (offer.tutorId !== currentUserId) return;
+  // FIX: String() para comparación segura UUID vs string
+  if (String(offer.tutorId) !== String(currentUserId)) return;
 
   DetailsDOM.contactPanel()?.classList.add('hidden');
   DetailsDOM.ownerNote()?.classList.remove('hidden');
 
-  const ownerDiv = DetailsDOM.ownerActions();
-  const closeBtn = DetailsDOM.closeOfferBtn();
-  const editBtn  = DetailsDOM.editOfferBtn();
+  const ownerDiv  = DetailsDOM.ownerActions();
+  const closeBtn  = DetailsDOM.closeOfferBtn();
+  const editBtn   = DetailsDOM.editOfferBtn();
   const deleteBtn = DetailsDOM.deleteOfferBtn();
 
   if (ownerDiv) ownerDiv.classList.remove('hidden');
@@ -426,11 +411,9 @@ function initOwnerActions(offer, offerId, currentUserId) {
         title: '¿Cerrar esta tutoría?',
         text: 'El anuncio dejará de aparecer disponible en el catálogo de alumnos.',
         icon: 'warning', showCancelButton: true,
-        confirmButtonText: 'Sí, cerrar', cancelButtonText: 'No',
-        confirmButtonColor: '#ef4444',
+        confirmButtonText: 'Sí, cerrar', cancelButtonText: 'No', confirmButtonColor: '#ef4444',
       });
       if (!confirmed.isConfirmed) return;
-
       closeBtn.disabled = true;
       const res = await DetailsAPI.closeOffer(offerId, currentUserId);
       if (res.ok) { showToast('Tutoría marcada como cerrada.'); location.reload(); }
@@ -447,18 +430,16 @@ function initOwnerActions(offer, offerId, currentUserId) {
         <input id="swal-rate" type="number" class="swal2-input" placeholder="Tarifa por hora ($)" value="${offer.hourlyRate}">`,
       showCancelButton: true, confirmButtonText: 'Guardar cambios', confirmButtonColor: '#0A1628',
       preConfirm: () => ({
-        subject: document.getElementById('swal-subject').value.trim(),
+        subject:     document.getElementById('swal-subject').value.trim(),
         description: document.getElementById('swal-description').value.trim(),
-        hourlyRate: parseFloat(document.getElementById('swal-rate').value)
-      })
+        hourlyRate:  parseFloat(document.getElementById('swal-rate').value),
+      }),
     });
-
     if (!formValues || !formValues.subject || isNaN(formValues.hourlyRate)) return;
-
     const res = await fetch(`${API_BASE}/api/tutoring/${offerId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', 'X-User-Id': currentUserId },
-      body: JSON.stringify(formValues)
+      body: JSON.stringify(formValues),
     });
 
     if (res.ok) { location.reload(); } 
@@ -518,8 +499,20 @@ window.addEventListener('load', async () => {
   await Clerk.load();
   if (!Clerk.user) { window.location.href = '/modules/identity/signin.html'; return; }
 
-  const userId  = localStorage.getItem('campusMarketUserId');
-  const offerId = new URLSearchParams(window.location.search).get('id');
+  // FIX: siempre hacer sync con el backend para obtener el UUID interno correcto
+  // (no leer solo del localStorage, que puede estar vacío o desactualizado)
+  const syncRes = await fetch(`${API_BASE}/api/v1/users/sync`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      clerkUserId: Clerk.user.id,
+      fullName:    Clerk.user.fullName,
+      email:       Clerk.user.primaryEmailAddress?.emailAddress ?? '',
+    }),
+  });
+  const syncData = await syncRes.json();
+  const userId   = String(syncData.id);
+  localStorage.setItem('campusMarketUserId', userId);
 
   if (!offerId) {
     window.location.href = '/modules/tutoring/tutoring-catalog.html';

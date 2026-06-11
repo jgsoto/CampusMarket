@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.uce.campusmarket.reputation.domain.model.Review;
 import org.uce.campusmarket.reputation.domain.repository.ReviewRepository;
 
+import org.uce.campusmarket.reputation.domain.valueobject.Rating;
 import org.uce.campusmarket.shared.exception.DomainException;
 
 import java.util.UUID;
@@ -17,45 +18,22 @@ import java.util.UUID;
 @Transactional
 public class UpdateReviewUseCase {
 
-    private final ReviewRepository
-            reviewRepository;
+    private final ReviewRepository reviewRepository;
 
-    public void execute(
-            UUID reviewId,
-            UUID requesterId,
-            int rating,
-            String comment
-    ){
+    public void execute(UUID reviewId, UUID requesterId, int rating, String comment) {
 
-        Review review =
-                reviewRepository
-                        .findById(reviewId)
-                        .orElseThrow(() ->
-                                new DomainException(
-                                        "Reseña no encontrada"
-                                )
-                        );
+        Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new DomainException("Reseña no encontrada"));
 
-        if(
-                !review.getReviewerId()
-                        .equals(requesterId)
-        ){
+        if (!review.getReviewerId().equals(requesterId)) {
 
-            throw new DomainException(
-                    "No puedes editar esta reseña"
-            );
+            throw new DomainException("No puedes editar esta reseña");
         }
 
-        review.setRating(
-                rating
-        );
-
-        review.setComment(
+        review.update(
+                new Rating(rating),
                 comment
         );
 
-        reviewRepository.save(
-                review
-        );
+        reviewRepository.save(review);
     }
 }
