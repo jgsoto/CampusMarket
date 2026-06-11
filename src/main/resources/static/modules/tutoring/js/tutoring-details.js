@@ -40,25 +40,27 @@ const DetailsDOM = Object.freeze({
 });
 
 const DetailsAPI = Object.freeze({
-  fetchOffer:      (id)      => fetch(`${API_BASE}/api/tutoring/${id}`),
-  fetchReputation: (uid)     => fetch(`${API_BASE}/api/reviews/users/${uid}/reputation`),
-  fetchReviews:    (uid)     => fetch(`${API_BASE}/api/reviews/users/${uid}/reviews`),
-  fetchEnrolled:   (id, uid) => fetch(`${API_BASE}/api/tutoring/${id}/enrolled`, { headers: { 'X-User-Id': uid } }),
-  closeOffer:      (id, uid) => fetch(`${API_BASE}/api/tutoring/${id}/close`, { method: 'POST', headers: { 'X-User-Id': uid } }),
-  createReview: (payload, uid) => fetch(`${API_BASE}/api/reviews`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-User-Id': uid },
-    body: JSON.stringify(payload),
-  }),
-  deleteReview: (reviewId, uid) => fetch(`${API_BASE}/api/reviews/${reviewId}`, {
-    method: 'DELETE',
-    headers: { 'X-User-Id': uid },
-  }),
-  updateReview: (reviewId, payload, uid) => fetch(`${API_BASE}/api/reviews/${reviewId}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json', 'X-User-Id': uid },
-    body: JSON.stringify(payload),
-  }),
+  fetchOffer:      (id)     => fetch(`${API_BASE}/api/tutoring/${id}`),
+  fetchReputation: (uid)    => fetch(`${API_BASE}/api/reviews/users/${uid}/reputation`),
+  fetchReviews:    (uid)    => fetch(`${API_BASE}/api/reviews/users/${uid}/reviews`),
+  fetchEnrolled:   (id, uid) => 
+    fetch(`${API_BASE}/api/tutoring/${id}/enrolled`, { headers: { 'X-User-Id': uid } }),
+  closeOffer:      (id, uid) => 
+    fetch(`${API_BASE}/api/tutoring/${id}/close`, { method: 'POST', headers: { 'X-User-Id': uid } }),
+  createReview:    (payload, uid) => 
+    fetch(`${API_BASE}/api/reviews`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-User-Id': uid },
+      body: JSON.stringify(payload),
+    }),
+  deleteReview: (reviewId, uid) => 
+    fetch(`${API_BASE}/api/reviews/${reviewId}`, { method: 'DELETE', headers: { 'X-User-Id': uid } }),
+  updateReview: (reviewId, payload, uid) => 
+    fetch(`${API_BASE}/api/reviews/${reviewId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-User-Id': uid },
+      body: JSON.stringify(payload),
+    }),
 });
 
 function buildInitials(name) {
@@ -90,14 +92,14 @@ function showToast(message, type = 'success') {
 function renderOfferInfo(offer) {
   const isOpen = offer.status !== 'CLOSED';
   if (DetailsDOM.breadcrumbSubject()) DetailsDOM.breadcrumbSubject().textContent = offer.subject;
-  if (DetailsDOM.subject())           DetailsDOM.subject().textContent = offer.subject;
-  if (DetailsDOM.price())             DetailsDOM.price().textContent = `$${offer.hourlyRate} / hora`;
-  if (DetailsDOM.description())       DetailsDOM.description().textContent = offer.description ?? '—';
+  if (DetailsDOM.subject()) DetailsDOM.subject().textContent = offer.subject;
+  if (DetailsDOM.price()) DetailsDOM.price().textContent = `$${offer.hourlyRate} / hora`;
+  if (DetailsDOM.description()) DetailsDOM.description().textContent = offer.description ?? '—';
 
   const badge = DetailsDOM.statusBadge();
   if (badge) {
     badge.textContent = isOpen ? 'Disponible' : 'Cerrada';
-    badge.className   = `px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
+    badge.className = `px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
       isOpen ? 'bg-emerald-100 text-emerald-700 border border-emerald-200'
              : 'bg-gray-100 text-gray-500 border border-gray-200'
     }`;
@@ -111,13 +113,16 @@ function renderTutorPanel(offer, reputation) {
 
   const name = offer.tutorName ?? 'Tutor UCE';
   if (DetailsDOM.tutorInitials()) DetailsDOM.tutorInitials().textContent = buildInitials(name);
-  if (DetailsDOM.tutorName())     DetailsDOM.tutorName().textContent = name;
-  if (DetailsDOM.tutorEmail())    DetailsDOM.tutorEmail().textContent = offer.tutorEmail ?? '—';
+  if (DetailsDOM.tutorName()) DetailsDOM.tutorName().textContent = name;
+  if (DetailsDOM.tutorEmail()) DetailsDOM.tutorEmail().textContent = offer.tutorEmail ?? '—';
 }
 
 function initRevealContact(offer) {
   DetailsDOM.revealBtn()?.addEventListener('click', () => {
-    const { tutorPhone: phone, tutorEmail: email, tutorSocialMedia: social } = offer;
+    const phone = offer.tutorPhone;
+    const email = offer.tutorEmail;
+    const social = offer.tutorSocialMedia;
+
     if (phone) {
       const wa = DetailsDOM.contactWhatsapp(), ph = DetailsDOM.contactPhoneText();
       if (wa && ph) { wa.href = `https://wa.me/${phone.replace(/\D/g, '')}`; ph.textContent = phone; wa.classList.remove('hidden'); }
@@ -137,7 +142,7 @@ function initRevealContact(offer) {
 
 function renderReviews(reviews, currentUserId) {
   const container = DetailsDOM.reviewsContainer();
-  const title     = DetailsDOM.reviewsTitle();
+  const title = DetailsDOM.reviewsTitle();
   if (!container) return;
 
   if (title) title.textContent = `Opiniones (${reviews.length})`;
@@ -148,18 +153,14 @@ function renderReviews(reviews, currentUserId) {
   }
 
   container.innerHTML = reviews.map(review => {
-    // FIX: String() en ambos lados — UUID del backend vs string del localStorage
-    const isOwner  = String(review.reviewerId) === String(currentUserId);
+    const isOwner = review.reviewerId === currentUserId;
     const initials = buildInitials(review.reviewerName ?? 'U');
-    const stars    = buildStarString(review.rating ?? 0);
-    const ownerBtns = isOwner ? `
-      <div class="flex gap-2 mt-2">
-        <button class="edit-review-btn text-[10px] font-semibold text-blue-500 hover:underline"
-          data-id="${review.id}" data-rating="${review.rating}"
-          data-comment="${encodeURIComponent(review.comment ?? '')}">Editar</button>
-        <button class="delete-review-btn text-[10px] font-semibold text-red-400 hover:underline"
-          data-id="${review.id}">Eliminar</button>
-      </div>` : '';
+    const stars = buildStarString(review.rating ?? 0);
+    const ownerBtns = isOwner
+      ? `<div class="flex gap-2 mt-2">
+           <button class="edit-review-btn text-[10px] font-semibold text-blue-500 hover:underline" data-id="${review.id}" data-rating="${review.rating}" data-comment="${encodeURIComponent(review.comment ?? '')}">Editar</button>
+           <button class="delete-review-btn text-[10px] font-semibold text-red-400 hover:underline" data-id="${review.id}">Eliminar</button>
+         </div>` : '';
 
     return `
       <article class="review-card flex gap-3 items-start p-4 rounded-xl border border-gray-100 bg-white">
@@ -253,16 +254,17 @@ async function initReviewForm(offer, currentUserId) {
 
     const reviewsRes = await DetailsAPI.fetchReviews(offer.tutorId);
     const allReviews = reviewsRes.ok ? await reviewsRes.json() : [];
-
-    // FIX: usar offer.id (no offerId, que no existe en este scope)
-    // FIX: String() en ambos lados para comparación segura UUID vs string
+    
     const alreadyReviewed = allReviews.some(
-      r => String(r.reviewerId) === String(currentUserId) && String(r.targetId) === String(offer.id)
+      review => review.reviewerId === currentUserId && review.targetId === offer.id
     );
 
-    if (alreadyReviewed) { section.classList.add('hidden'); return; }
+    if (alreadyReviewed) {
+      section.classList.add('hidden');
+      return;
+    }
   } catch (err) {
-    console.error('[TutoringDetails] initReviewForm error:', err);
+    console.error('[TutoringDetails] Error:', err);
     return;
   }
 
@@ -292,7 +294,7 @@ async function initReviewForm(offer, currentUserId) {
 }
 
 async function initEnrollmentButton(offer, offerId, currentUserId) {
-  if (String(offer.tutorId) === String(currentUserId)) return;
+  if (offer.tutorId === currentUserId) return;
 
   const container = DetailsDOM.enrollContainer();
   if (!container) return;
@@ -300,9 +302,11 @@ async function initEnrollmentButton(offer, offerId, currentUserId) {
   let isAlreadyEnrolled = false;
   try {
     const checkRes = await DetailsAPI.fetchEnrolled(offerId, currentUserId);
-    if (checkRes.ok) isAlreadyEnrolled = await checkRes.json();
+    if (checkRes.ok) {
+      isAlreadyEnrolled = await checkRes.json();
+    }
   } catch (err) {
-    console.warn('[TutoringDetails] fetchEnrolled error:', err);
+    console.warn('[TutoringDetails] Error:', err);
   }
 
   if (isAlreadyEnrolled) {
@@ -310,26 +314,24 @@ async function initEnrollmentButton(offer, offerId, currentUserId) {
     try {
       const reviewsRes = await DetailsAPI.fetchReviews(offer.tutorId);
       const allReviews = reviewsRes.ok ? await reviewsRes.json() : [];
-      // FIX: String() en ambos lados para comparación segura
       alreadyReviewed = allReviews.some(
-        r => String(r.reviewerId) === String(currentUserId) && String(r.targetId) === String(offerId)
+        review => review.reviewerId === currentUserId && review.targetId === offerId
       );
     } catch (e) {
-      console.warn('[TutoringDetails] fetchReviews error:', e);
+      console.warn('[TutoringDetails] Error:', e);
     }
 
     if (offer.status === 'CLOSED' && alreadyReviewed) {
-       container.innerHTML = `
-    <div class="w-full bg-green-50 border border-green-200 rounded-xl p-4 text-center text-green-800 font-semibold text-sm mb-4">
-      ✓ Ya dejaste tu reseña para esta tutoría
-    </div>`;
-  return;
-}
+      container.innerHTML = ''; 
+      return;
+    }
+
     if (offer.status === 'CLOSED' && !alreadyReviewed) {
       container.innerHTML = `
         <div class="w-full bg-blue-50 border border-blue-200 rounded-xl p-4 text-center text-blue-800 font-semibold text-sm mb-4">
           🎓 La tutoría ha terminado. Deja tu reseña abajo
-        </div>`;
+        </div>
+      `;
       DetailsDOM.contactHidden()?.classList.add('hidden');
       DetailsDOM.contactRevealed()?.classList.remove('hidden');
       DetailsDOM.revealBtn()?.click();
@@ -339,7 +341,8 @@ async function initEnrollmentButton(offer, offerId, currentUserId) {
     container.innerHTML = `
       <div class="w-full bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-center text-emerald-800 font-semibold text-sm mb-4">
         ✓ Ya estás inscrito a esta tutoría
-      </div>`;
+      </div>
+    `;
     DetailsDOM.contactHidden()?.classList.add('hidden');
     DetailsDOM.contactRevealed()?.classList.remove('hidden');
     DetailsDOM.revealBtn()?.click();
@@ -357,9 +360,11 @@ async function initEnrollmentButton(offer, offerId, currentUserId) {
     const confirmed = await Swal.fire({
       title: '¿Inscribirte en la tutoría?',
       text: 'Te registrarás como alumno oficial para esta asignatura.',
-      icon: 'question', showCancelButton: true,
-      confirmButtonText: 'Sí, inscribirme', cancelButtonText: 'Cancelar',
-      confirmButtonColor: '#10b981',
+      icon: 'question', 
+      showCancelButton: true,
+      confirmButtonText: 'Sí, inscribirme', 
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#10b981'
     });
     if (!confirmed.isConfirmed) return;
 
@@ -370,7 +375,12 @@ async function initEnrollmentButton(offer, offerId, currentUserId) {
       await Swal.fire('¡Inscripción Exitosa!', 'Has quedado registrado. Ya puedes ver los datos del tutor.', 'success');
       location.reload();
     } else {
-      Swal.fire({ title: 'Registro existente', text: 'Ya te encuentras registrado en esta tutoría.', icon: 'info', confirmButtonColor: '#0A1628' });
+      Swal.fire({
+        title: 'Registro existente',
+        text: 'Ya te encuentras registrado en esta tutoría.',
+        icon: 'info',
+        confirmButtonColor: '#0A1628'
+      });
     }
   });
 }
@@ -391,8 +401,8 @@ function initOwnerActions(offer, offerId, currentUserId) {
 
   if (offer.status === 'CLOSED') {
     if (closeBtn) {
-      closeBtn.disabled   = true;
-      closeBtn.className  = 'px-5 py-2.5 bg-gray-300 text-gray-500 font-bold text-xs uppercase tracking-wider rounded-xl cursor-not-allowed';
+      closeBtn.disabled = true;
+      closeBtn.className = "px-5 py-2.5 bg-gray-300 text-gray-500 font-bold text-xs uppercase tracking-wider rounded-xl cursor-not-allowed";
       closeBtn.textContent = 'Tutoría ya cerrada';
     }
   } else if (closeBtn) {
@@ -431,19 +441,22 @@ function initOwnerActions(offer, offerId, currentUserId) {
       headers: { 'Content-Type': 'application/json', 'X-User-Id': currentUserId },
       body: JSON.stringify(formValues),
     });
-    if (res.ok) { location.reload(); }
+
+    if (res.ok) { location.reload(); } 
     else { showToast('Error al actualizar la tutoría.', 'error'); }
   });
 
   deleteBtn?.addEventListener('click', async () => {
     const confirmed = await Swal.fire({
-      title: '¿Eliminar tutoría?', text: 'Esta acción borrará la publicación de forma permanente.',
+      title: '¿Eliminar tutoría?',
+      text: 'Esta acción borrará la publicación de forma permanente.',
       icon: 'warning', showCancelButton: true,
-      confirmButtonText: 'Sí, eliminar', confirmButtonColor: '#ef4444', cancelButtonText: 'Cancelar',
+      confirmButtonText: 'Sí, eliminar', confirmButtonColor: '#ef4444', cancelButtonText: 'Cancelar'
     });
     if (!confirmed.isConfirmed) return;
+
     const res = await fetch(`${API_BASE}/api/tutoring/${offerId}`, { method: 'DELETE', headers: { 'X-User-Id': currentUserId } });
-    if (res.ok) { window.location.href = '/modules/tutoring/tutoring-catalog.html'; }
+    if (res.ok) { window.location.href = "/modules/tutoring/tutoring-catalog.html"; } 
     else { showToast('Error al eliminar la tutoría.', 'error'); }
   });
 }
@@ -454,23 +467,23 @@ async function loadDetails(offerId, currentUserId) {
     if (!offerRes.ok) throw new Error(`HTTP ${offerRes.status}`);
     const offer = await offerRes.json();
 
-    const revRes     = await DetailsAPI.fetchReviews(offer.tutorId);
+    const revRes = await DetailsAPI.fetchReviews(offer.tutorId);
     const allReviews = revRes.ok ? await revRes.json() : [];
 
-    // FIX: String() para comparación segura UUID (JSON) vs string (URL param)
-    const filteredReviews = allReviews.filter(r => String(r.targetId) === String(offerId));
-
-    // FIX: declarar localScore antes del if para evitar ReferenceError
+    const filteredReviews = allReviews.filter(review => review.targetId === offerId);
     let localScore = 0;
     if (filteredReviews.length > 0) {
-      localScore = filteredReviews.reduce((acc, r) => acc + r.rating, 0) / filteredReviews.length;
+      const sum = filteredReviews.reduce((acc, r) => acc + r.rating, 0);
+      localScore = sum / filteredReviews.length;
     }
 
+    const localReputation = { reputation: localScore };
+
     renderOfferInfo(offer);
-    renderTutorPanel(offer, { reputation: localScore });
+    renderTutorPanel(offer, localReputation);
     renderReviews(filteredReviews, currentUserId);
     initRevealContact(offer);
-
+    
     await initEnrollmentButton(offer, offerId, currentUserId);
     initOwnerActions(offer, offerId, currentUserId);
     await initReviewForm(offer, currentUserId);
@@ -478,7 +491,7 @@ async function loadDetails(offerId, currentUserId) {
     DetailsDOM.pageLoading()?.classList.add('hidden');
     DetailsDOM.pageContent()?.classList.remove('hidden');
   } catch (err) {
-    console.error('[TutoringDetails] loadDetails error:', err);
+    console.error('[TutoringDetails] Error:', err);
   }
 }
 
@@ -501,8 +514,10 @@ window.addEventListener('load', async () => {
   const userId   = String(syncData.id);
   localStorage.setItem('campusMarketUserId', userId);
 
-  const offerId = new URLSearchParams(window.location.search).get('id');
-  if (!offerId) { window.location.href = '/modules/tutoring/tutoring-catalog.html'; return; }
+  if (!offerId) {
+    window.location.href = '/modules/tutoring/tutoring-catalog.html';
+    return;
+  }
 
   MarketplaceLayout.mountNavbar('tutorias', Clerk.user);
   await loadDetails(offerId, userId);

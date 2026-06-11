@@ -1,26 +1,26 @@
 'use strict';
 
 const RepDOM = Object.freeze({
-  loading:         () => document.getElementById('page-loading'),
-  content:         () => document.getElementById('page-content'),
-  barsContainer:   () => document.getElementById('rating-bars-container'),
-  globalScore:     () => document.getElementById('global-score'),
-  globalStars:     () => document.getElementById('global-stars'),
-  globalCount:     () => document.getElementById('global-count'),
-  reviewsContainer:() => document.getElementById('reviews-container'),
-  reviewsTitle:    () => document.getElementById('reviews-title'),
-  filterBtns:      () => document.querySelectorAll('.rev-filter-btn'),
+  loading: () => document.getElementById('page-loading'),
+  content: () => document.getElementById('page-content'),
+  barsContainer: () => document.getElementById('rating-bars-container'),
+  globalScore: () => document.getElementById('global-score'),
+  globalStars: () => document.getElementById('global-stars'),
+  globalCount: () => document.getElementById('global-count'),
+  reviewsContainer: () => document.getElementById('reviews-container'),
+  reviewsTitle: () => document.getElementById('reviews-title'),
+  filterBtns: () => document.querySelectorAll('.rev-filter-btn'),
   statMarketplace: () => document.getElementById('stat-marketplace'),
-  statTutoring:    () => document.getElementById('stat-tutoring'),
-  statTotal:       () => document.getElementById('stat-total'),
+  statTutoring: () => document.getElementById('stat-tutoring'),
+  statTotal: () => document.getElementById('stat-total')
 });
 
-let _allReviews  = [];
+let _allReviews = [];
 let _activeFilter = 'ALL';
 
 const Utils = {
   buildStars: (score) => '★'.repeat(Math.round(score)).padEnd(5, '☆'),
-
+  
   initBarContainer: () => {
     const container = RepDOM.barsContainer();
     if (!container) return;
@@ -36,10 +36,12 @@ const Utils = {
     });
   },
 
-  buildReviewCard: (r) => `
+  // Tarjeta limpia sin badges de categorías
+  buildReviewCard: (r) => {
+    return `
     <article class="flex gap-3 items-start p-4 rounded-xl border border-gray-100 bg-white">
       <div class="w-9 h-9 rounded-full bg-uce-navy/10 flex items-center justify-center font-bold text-xs text-uce-navy">
-        ${r.reviewerName?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'U'}
+        ${r.reviewerName?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2) || 'U'}
       </div>
       <div class="flex flex-col w-full">
         <div class="flex justify-between text-sm">
@@ -51,22 +53,17 @@ const Utils = {
         </div>
         <p class="text-gray-600 text-sm mt-1 italic">"${r.comment || ''}"</p>
       </div>
-    </article>`,
+    </article>`;
+  }
 };
 
 function applyReviewFilter() {
   const container = RepDOM.reviewsContainer();
-  const title     = RepDOM.reviewsTitle();
+  const title = RepDOM.reviewsTitle();
+  const visible = _activeFilter === 'ALL' ? _allReviews : _allReviews.filter(r => r.targetType === _activeFilter);
 
-  if (_activeFilter === 'ALL') {
-    visible = _allReviews;
-  } else {
-   
-    visible = _allReviews;
-  }
-
-  if (title) title.textContent = `Opiniones recibidas (${_allReviews.length})`;
-
+  if (title) title.textContent = `Opiniones recibidas (${visible.length})`;
+  
   if (visible.length === 0) {
     container.innerHTML = '<p class="text-sm text-gray-400 text-center py-10">No hay reseñas disponibles.</p>';
     return;
@@ -75,36 +72,29 @@ function applyReviewFilter() {
 }
 
 function updateStats(reviews) {
+  const marketplace = reviews.filter(r => r.targetType === 'MARKETPLACE').length;
+  const tutoring = reviews.filter(r => r.targetType === 'TUTORING').length;
   
-  const total = reviews.length;
-
-  const cardMarketplace = RepDOM.statMarketplace()?.closest('.bg-white');
-  const cardTutoring    = RepDOM.statTutoring()?.closest('.bg-white');
-  if (cardMarketplace) cardMarketplace.classList.add('hidden');
-  if (cardTutoring)    cardTutoring.classList.add('hidden');
-
-  if (RepDOM.statTotal()) RepDOM.statTotal().textContent = total;
-
-  RepDOM.filterBtns().forEach(btn => {
-    if (btn.dataset.type !== 'ALL') btn.classList.add('hidden');
-  });
+  if (RepDOM.statMarketplace()) RepDOM.statMarketplace().textContent = marketplace;
+  if (RepDOM.statTutoring()) RepDOM.statTutoring().textContent = tutoring;
+  if (RepDOM.statTotal()) RepDOM.statTotal().textContent = reviews.length;
 }
 
 async function loadReputation(userId) {
   try {
     const [repRes, revRes] = await Promise.all([
       fetch(`${API_BASE}/api/reviews/users/${userId}/reputation`).then(r => r.json()),
-      fetch(`${API_BASE}/api/reviews/users/${userId}/reviews`).then(r => r.json()),
+      fetch(`${API_BASE}/api/reviews/users/${userId}/reviews`).then(r => r.json())
     ]);
 
     const reputation = repRes.reputation || 0;
-
+    
     RepDOM.globalScore().textContent = reputation.toFixed(1);
     RepDOM.globalStars().textContent = Utils.buildStars(reputation);
     RepDOM.globalCount().textContent = `(${revRes.length} reseña${revRes.length !== 1 ? 's' : ''})`;
-
+    
     updateStats(revRes);
-
+    
     const dist = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
     revRes.forEach(r => dist[Math.max(1, Math.min(5, Math.round(r.rating)))]++);
     Object.entries(dist).forEach(([s, count]) => {
@@ -117,11 +107,11 @@ async function loadReputation(userId) {
 
     _allReviews = revRes;
     applyReviewFilter();
-
+    
     RepDOM.loading().classList.add('hidden');
     RepDOM.content().classList.remove('hidden');
   } catch (err) {
-    console.error('Error cargando reputación:', err);
+    console.error("Error:", err);
   }
 }
 
@@ -132,17 +122,13 @@ window.addEventListener('load', async () => {
     const res = await fetch(`${API_BASE}/api/v1/users/sync`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        clerkUserId: Clerk.user.id,
-        fullName:    Clerk.user.fullName,
-        email:       Clerk.user.primaryEmailAddress?.emailAddress ?? '',
-      }),
+      body: JSON.stringify({ clerkUserId: Clerk.user.id, fullName: Clerk.user.fullName, email: Clerk.user.primaryEmailAddress?.emailAddress ?? '' }),
     });
-    const data   = await res.json();
+    const data = await res.json();
     const userId = data.id;
 
     MarketplaceLayout.mountNavbar('reputation', Clerk.user);
-
+    
     RepDOM.filterBtns().forEach(btn => btn.addEventListener('click', () => {
       _activeFilter = btn.dataset.type;
       applyReviewFilter();
