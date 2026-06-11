@@ -321,6 +321,9 @@ async function initEnrollmentButton(offer, offerId, currentUserId) {
       console.warn('[TutoringDetails] Error:', e);
     }
 
+    const params = new URLSearchParams(window.location.search);
+    const offerId = params.get('id');
+
     if (offer.status === 'CLOSED' && alreadyReviewed) {
       container.innerHTML = ''; 
       return;
@@ -513,6 +516,9 @@ window.addEventListener('load', async () => {
   const syncData = await syncRes.json();
   const userId   = String(syncData.id);
   localStorage.setItem('campusMarketUserId', userId);
+
+  const params = new URLSearchParams(window.location.search);
+  const offerId = params.get('id');
 
   if (!offerId) {
     window.location.href = '/modules/tutoring/tutoring-catalog.html';

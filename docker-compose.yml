@@ -13,9 +13,6 @@ services:
     env_file:
       - .env
 
-    env_file:
-      - .env
-
   nginx:
 
     image: nginx:latest
