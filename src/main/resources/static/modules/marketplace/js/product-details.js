@@ -86,7 +86,60 @@ function renderAction(product) {
           </svg>
           Contactar por WhatsApp
         </a>` : ''}
+      <button id="chat-btn"
+        class="w-full bg-uce-navy hover:bg-uce-navy-light text-white font-bold
+               text-sm py-3 rounded-xl transition-colors">Enviar mensaje</button>
     </div>`;
+}
+
+async function initChatButton(product) {
+
+  const btn = document.getElementById('chat-btn');
+
+  if (!btn) return;
+
+  btn.addEventListener('click', async () => {
+
+    const buyerId = localStorage.getItem('campusMarketUserId');
+
+    if (!buyerId) {
+      alert('Debes iniciar sesión.');
+      return;
+    }
+
+    try {
+
+      const response = await fetch(
+          `${API_BASE}/api/chat/conversations`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-User-Id': buyerId
+            },
+            body: JSON.stringify({
+              listingId: product.id,
+              sellerId: product.ownerId
+            })
+          }
+      );
+
+      if (!response.ok) {
+        throw new Error();
+      }
+
+      const conversation = await response.json();
+
+      window.location.href =
+          `/modules/chat/chat.html?id=${conversation.id}`;
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert('No se pudo iniciar la conversación.');
+    }
+  });
 }
 
 function renderProduct(product) {
@@ -115,6 +168,7 @@ function renderProduct(product) {
   }`;
 
   renderAction(product);
+  initChatButton(product);
 
   document.getElementById('product-skeleton').remove();
   document.getElementById('product-content').hidden = false;
