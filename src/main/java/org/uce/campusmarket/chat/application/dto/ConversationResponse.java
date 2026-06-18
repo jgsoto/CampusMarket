@@ -1,0 +1,19 @@
+package org.uce.campusmarket.chat.application.dto;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+public record ConversationResponse(
+
+        UUID id,
+
+        UUID listingId,
+
+        UUID buyerId,
+
+        UUID sellerId,
+
+        LocalDateTime createdAt
+
+) {
+}
