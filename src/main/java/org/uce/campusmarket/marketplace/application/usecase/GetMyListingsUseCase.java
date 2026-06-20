@@ -11,7 +11,6 @@ import org.uce.campusmarket.marketplace.application.dto.ListingImageResponse;
 import org.uce.campusmarket.marketplace.application.dto.ListingResponse;
 
 import org.uce.campusmarket.marketplace.domain.model.Listing;
-import org.uce.campusmarket.marketplace.domain.model.ListingStatus;
 import org.uce.campusmarket.marketplace.domain.repository.ListingRepository;
 
 import org.uce.campusmarket.reputation.domain.repository.ReviewRepository;
@@ -34,33 +33,24 @@ public class GetMyListingsUseCase {
         List<Listing> listings = listingRepository.findAll();
 
         return listings.stream()
-                .filter(listing ->
-                        listing.getOwnerId().equals(ownerId)
-                                && listing.getStatus() != ListingStatus.ELIMINADO
-                )
+                .filter(listing -> listing.getOwnerId().equals(ownerId))
                 .map(listing -> {
 
                     User seller = userRepository.findById(
-                            listing.getOwnerId()
-                    ).orElse(null);
+                            listing.getOwnerId()).orElse(null);
 
                     List<ListingImageResponse> images = listing.getImages()
                             .stream()
                             .map(img -> new ListingImageResponse(
                                     img.getUrl(),
-                                    img.isThumbnail()
-                            ))
+                                    img.isThumbnail()))
                             .toList();
 
-                    Double averageRating =
-                            reviewRepository.getAverageRatingByReviewedUserId(
-                                    listing.getOwnerId()
-                            );
+                    Double averageRating = reviewRepository.getAverageRatingByReviewedUserId(
+                            listing.getOwnerId());
 
-                    Integer totalReviews =
-                            reviewRepository.countByReviewedUserId(
-                                    listing.getOwnerId()
-                            );
+                    Integer totalReviews = reviewRepository.countByReviewedUserId(
+                            listing.getOwnerId());
 
                     return new ListingResponse(
                             listing.getId(),
@@ -78,8 +68,7 @@ public class GetMyListingsUseCase {
                             seller != null ? seller.getAddress() : "No disponible",
                             seller != null ? seller.getSocialMedia() : "No disponible",
                             averageRating,
-                            totalReviews
-                    );
+                            totalReviews);
                 })
                 .collect(Collectors.toList());
     }
