@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
+    <meta charset="UTF-8">
     <title>Conversación</title>
 </head>
 <body>
@@ -26,7 +27,7 @@
     const API = "http://localhost:8080";
 
     const USER_ID =
-        "11111111-1111-1111-1111-111111111111";
+        localStorage.getItem("campusMarketUserId");
 
     const params =
         new URLSearchParams(window.location.search);
@@ -36,51 +37,90 @@
 
     async function loadMessages() {
 
-        const response = await fetch(
-            `${API}/api/chat/conversations/${conversationId}/messages`
-        );
+        try {
 
-        const messages =
-            await response.json();
+            const response = await fetch(
+                `${API}/api/chat/conversations/${conversationId}/messages`
+            );
 
-        const div =
-            document.getElementById("messages");
+            if (!response.ok) {
+                throw new Error("Error al cargar mensajes");
+            }
 
-        div.innerHTML = "";
+            const messages =
+                await response.json();
 
-        messages.forEach(m => {
+            const div =
+                document.getElementById("messages");
 
-            div.innerHTML += `
-            <p>
-                <b>${m.senderId}</b>:
-                ${m.content}
-            </p>
-        `;
-        });
+            div.innerHTML = "";
+
+            messages.forEach(m => {
+
+                const sender =
+                    m.senderId === USER_ID
+                        ? "Yo"
+                        : "Otro usuario";
+
+                div.innerHTML += `
+                    <p>
+                        <b>${sender}</b>:
+                        ${m.content}
+                    </p>
+                `;
+            });
+
+        } catch (error) {
+
+            console.error(error);
+
+            document.getElementById("messages").innerHTML =
+                "<p>Error al cargar mensajes.</p>";
+        }
     }
 
     async function sendMessage() {
 
+        const input =
+            document.getElementById("content");
+
         const content =
-            document.getElementById("content").value;
+            input.value.trim();
 
-        await fetch(
-            `${API}/api/chat/conversations/${conversationId}/messages`,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type":"application/json",
-                    "X-User-Id": USER_ID
-                },
-                body: JSON.stringify({
-                    content
-                })
+        if (!content) {
+            return;
+        }
+
+        try {
+
+            const response = await fetch(
+                `${API}/api/chat/conversations/${conversationId}/messages`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-User-Id": USER_ID
+                    },
+                    body: JSON.stringify({
+                        content: content
+                    })
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("Error al enviar mensaje");
             }
-        );
 
-        document.getElementById("content").value = "";
+            input.value = "";
 
-        loadMessages();
+            await loadMessages();
+
+        } catch (error) {
+
+            console.error(error);
+
+            alert("No se pudo enviar el mensaje.");
+        }
     }
 
     loadMessages();

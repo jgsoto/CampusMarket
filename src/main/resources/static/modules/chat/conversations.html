@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CampusMarket | Mensajes</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/js/tailwind-config.js"></script>
+    <link rel="stylesheet" href="/css/styles.css">
+
+    <script async crossorigin="anonymous"
+            src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@4/dist/clerk.browser.js">
+    </script>
+</head>
+
+<body class="bg-gray-50">
+
+<div id="navbar-placeholder"></div>
+
+<main class="max-w-5xl mx-auto p-6">
+
+    <h1 class="text-3xl font-bold mb-6">
+        Mis Conversaciones
+    </h1>
+
+    <div id="conversation-list"
+         class="bg-white rounded-2xl shadow-sm">
+    </div>
+
+</main>
+
+<script src="/modules/shared/components/js/marketplace-layout.js"></script>
+<script src="/modules/chat/js/conversations.js"></script>
+
+</body>
+</html>

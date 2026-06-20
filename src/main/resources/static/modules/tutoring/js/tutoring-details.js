@@ -37,6 +37,7 @@ const DetailsDOM = Object.freeze({
   closeOfferBtn:      () => document.getElementById('close-offer-btn'),
   enrollContainer:    () => document.getElementById('enroll-container'),
   toast:              () => document.getElementById('toast-container'),
+  enrolledStudents:   () => document.getElementById('enrolled-students'),
 });
 
 const DetailsAPI = Object.freeze({
@@ -61,6 +62,17 @@ const DetailsAPI = Object.freeze({
       headers: { 'Content-Type': 'application/json', 'X-User-Id': uid },
       body: JSON.stringify(payload),
     }),
+  fetchStudents: (offerId) =>
+      fetch(`${API_BASE}/api/tutoring/${offerId}/students`),
+
+  fetchUsersBulk: (ids) =>
+      fetch(`${API_BASE}/api/users/profile/bulk`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(ids)
+      }),
 });
 
 function buildInitials(name) {
@@ -115,6 +127,39 @@ function renderTutorPanel(offer, reputation) {
   if (DetailsDOM.tutorInitials()) DetailsDOM.tutorInitials().textContent = buildInitials(name);
   if (DetailsDOM.tutorName()) DetailsDOM.tutorName().textContent = name;
   if (DetailsDOM.tutorEmail()) DetailsDOM.tutorEmail().textContent = offer.tutorEmail ?? '—';
+}
+
+function renderStudents(students) {
+  const container = DetailsDOM.enrolledStudents();
+
+  if (!container) return;
+
+  if (!students.length) {
+    container.innerHTML = `
+      <p class="text-sm text-gray-500">
+        No hay estudiantes inscritos.
+      </p>
+    `;
+    return;
+  }
+
+  container.innerHTML = students.map(student => `
+    <div class="flex items-center gap-3 p-3 border rounded-lg">
+      <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-xs font-bold">
+        ${buildInitials(student.fullName)}
+      </div>
+
+      <div>
+        <p class="font-medium text-sm">
+          ${student.fullName}
+        </p>
+
+        <p class="text-xs text-gray-500">
+          ${student.email}
+        </p>
+      </div>
+    </div>
+  `).join('');
 }
 
 function initRevealContact(offer) {
@@ -388,7 +433,10 @@ async function initEnrollmentButton(offer, offerId, currentUserId) {
   });
 }
 
-function initOwnerActions(offer, offerId, currentUserId) {
+async function initOwnerActions(offer, offerId, currentUserId) {
+  if (String(offer.tutorId) === String(currentUserId)) {
+    await loadStudents(offerId);
+  }
   // FIX: String() para comparación segura UUID vs string
   if (String(offer.tutorId) !== String(currentUserId)) return;
 
@@ -528,3 +576,35 @@ window.addEventListener('load', async () => {
   MarketplaceLayout.mountNavbar('tutorias', Clerk.user);
   await loadDetails(offerId, userId);
 });
+async function loadStudents(offerId) {
+
+  try {
+
+    const idsRes = await DetailsAPI.fetchStudents(offerId);
+
+    if (!idsRes.ok) return;
+
+    const ids = await idsRes.json();
+
+    if (!ids.length) {
+      renderStudents([]);
+      return;
+    }
+
+    const usersRes = await DetailsAPI.fetchUsersBulk(ids);
+
+    if (!usersRes.ok) return;
+
+    const users = await usersRes.json();
+
+    renderStudents(users);
+
+  } catch (err) {
+
+    console.error(
+        '[TutoringDetails] Error loading students:',
+        err
+    );
+
+  }
+}
