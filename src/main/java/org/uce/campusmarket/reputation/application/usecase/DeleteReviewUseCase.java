@@ -27,27 +27,12 @@ public class DeleteReviewUseCase {
             UUID requesterId
     ){
 
-        Review review =
-                reviewRepository
-                        .findById(reviewId)
-                        .orElseThrow(()->
-                                new DomainException(
-                                        "Reseña no encontrada"
-                                )
-                        );
+        Review review = reviewRepository.findById(reviewId).orElseThrow(()-> new DomainException("Reseña no encontrada"));
 
-        if(
-                !review.getReviewerId()
-                        .equals(requesterId)
-        ){
-
-            throw new DomainException(
-                    "No puedes eliminar esta reseña"
-            );
+        if(!review.getReviewerId().equals(requesterId)){
+            throw new DomainException("No puedes eliminar esta reseña");
         }
 
-        reviewRepository.deleteById(
-                reviewId
-        );
+        reviewRepository.deleteById(reviewId);
     }
 }

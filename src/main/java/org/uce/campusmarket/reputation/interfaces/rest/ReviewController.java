@@ -53,19 +53,13 @@ public class ReviewController {
     public ResponseEntity<Void> updateReview(
 
             @PathVariable UUID reviewId,
-
             @RequestHeader("X-User-Id") UUID userId,
-
             @RequestBody Map<String, Object> body) {
 
         updateReviewUseCase.execute(
-
                 reviewId,
-
                 userId,
-
                 (Integer) body.get("rating"),
-
                 body.get("comment").toString());
 
         return ResponseEntity.ok().build();
@@ -75,7 +69,6 @@ public class ReviewController {
     public ResponseEntity<Void> deleteReview(
 
             @PathVariable UUID reviewId,
-
             @RequestHeader("X-User-Id") UUID userId) {
 
         deleteReviewUseCase.execute(reviewId, userId);
