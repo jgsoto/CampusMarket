@@ -113,25 +113,15 @@ public class Listing {
         this.status = ListingStatus.VENDIDO;
     }
 
-    public void markAsDeleted() {
-        if (this.status == ListingStatus.VENDIDO) {
-            throw new DomainException("No se puede eliminar un producto vendido");
-        }
 
-        if (this.status == ListingStatus.ELIMINADO) {
-            throw new DomainException("La publicación ya está eliminada");
-        }
-
-        this.status = ListingStatus.ELIMINADO;
-    }
 
     public void updateDetails(
             ListingTitle title,
             ListingDescription description,
             Price price
     ) {
-        if (this.status == ListingStatus.VENDIDO || this.status == ListingStatus.ELIMINADO) {
-            throw new DomainException("No se puede editar una publicación vendida o eliminada");
+        if (this.status == ListingStatus.VENDIDO) {
+            throw new DomainException("No se puede editar una publicación vendida");
         }
 
         if (title == null || description == null || price == null) {
@@ -147,16 +137,12 @@ public class Listing {
             return;
         }
 
-        if (this.status == ListingStatus.ELIMINADO) {
-            throw new DomainException("No se pueden agregar imágenes a una publicación eliminada");
-        }
-
         this.images.add(image);
     }
 
     public void replaceImages(List<ListingImage> newImages) {
-        if (this.status == ListingStatus.VENDIDO || this.status == ListingStatus.ELIMINADO) {
-            throw new DomainException("No se pueden reemplazar imágenes de una publicación vendida o eliminada");
+        if (this.status == ListingStatus.VENDIDO) {
+            throw new DomainException("No se pueden reemplazar imágenes de una publicación vendida");
         }
 
         this.images.clear();
