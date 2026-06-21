@@ -1,6 +1,7 @@
 'use strict';
 
 let _activeStatus = 'TODOS';
+let _activeCategory = 'TODAS';
 
 async function syncUser(clerkUser) {
   const res = await fetch(`${API_BASE}/api/v1/users/sync`, {
@@ -44,14 +45,14 @@ function initFilters() {
   filterBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       _activeStatus = btn.dataset.filter;
-      
+
       filterBtns.forEach(b => {
         const isActive = b.dataset.filter === _activeStatus;
-        b.className = isActive 
+        b.className = isActive
           ? "filter-btn px-4 py-2 text-xs font-semibold rounded-xl border-2 transition-all bg-uce-navy text-uce-gold border-uce-navy"
           : "filter-btn px-4 py-2 text-xs font-semibold rounded-xl border-2 transition-all bg-white text-gray-500 border-gray-200 hover:bg-gray-50";
       });
-      
+
       applyFilters(searchInput.value);
     });
   });
@@ -62,10 +63,13 @@ function applyFilters(query = '') {
 
   const filtered = _catalogCache.filter(item => {
     const matchesStatus = _activeStatus === 'TODOS' || item.status === _activeStatus;
-    const matchesSearch = !q || 
-                          item.title.toLowerCase().includes(q) || 
-                          (item.description ?? '').toLowerCase().includes(q);
-    return matchesStatus && matchesSearch;
+    const matchesSearch = !q ||
+      item.title.toLowerCase().includes(q) ||
+      (item.description ?? '').toLowerCase().includes(q);
+
+    const matchesCategory = _activeCategory === 'TODAS' || item.categoryName === _activeCategory;
+    return matchesStatus && matchesSearch && matchesCategory;
+
   });
 
   if (filtered.length > 0) {
@@ -74,6 +78,36 @@ function applyFilters(query = '') {
     renderEmpty(q ? `No se encontraron productos para "${q}".` : 'No hay productos en este estado.');
   }
 }
+
+async function initCategories() {
+  try {
+    const res = await fetch(`${API_BASE}/api/listings/categories`);
+    if (!res.ok) throw new Error('Error al cargar categorías');
+    const categories = await res.json();
+
+    const select = document.getElementById('category-select');
+    if (!select) return;
+
+
+    categories.forEach(cat => {
+      const option = document.createElement('option');
+      option.value = cat.name;
+      option.textContent = cat.name;
+      select.appendChild(option);
+    });
+
+
+    select.addEventListener('change', (e) => {
+      _activeCategory = e.target.value;
+      applyFilters(document.getElementById('search-input').value);
+    });
+
+  } catch (err) {
+    console.error('[Dashboard] Error cargando categorías:', err);
+  }
+}
+
+
 
 window.addEventListener('load', async () => {
   await Clerk.load();
@@ -94,11 +128,12 @@ window.addEventListener('load', async () => {
   }
 
   populateUserSection(Clerk.user);
-  
+
   // IMPORTANTE: En tu marketplace.js (donde está loadCatalog), 
   // asegúrate de que al terminar el fetch hagas: _catalogCache = data; renderCatalog(data);
-  await loadCatalog(); 
+  await loadCatalog();
   initFilters();
+  initCategories();
 
   document.getElementById('logout-btn')?.addEventListener('click', async () => {
     await Clerk.signOut();

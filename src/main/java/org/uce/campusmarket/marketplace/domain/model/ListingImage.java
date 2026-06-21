@@ -18,8 +18,7 @@ public class ListingImage {
     public ListingImage(
             UUID id,
             String url,
-            boolean thumbnail
-    ) {
+            boolean thumbnail) {
         if (url == null || url.isBlank()) {
             throw new DomainException("La URL de la imagen es obligatoria");
         }
@@ -29,7 +28,4 @@ public class ListingImage {
         this.thumbnail = thumbnail;
     }
 
-    public static ListingImage create(String url, boolean thumbnail) {
-        return new ListingImage(UUID.randomUUID(), url, thumbnail);
-    }
 }

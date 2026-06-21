@@ -29,6 +29,8 @@ public class DeleteListingUseCase {
             throw new DomainException("No tienes permiso para eliminar esta publicación");
         }
 
+
+
         if (listing.getImages() != null && !listing.getImages().isEmpty()) {
             listing.getImages().forEach(image -> storageService.delete(image.getUrl()));
         }

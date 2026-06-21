@@ -35,8 +35,7 @@ public class Listing {
             ListingDescription description,
             Price price,
             Category category,
-            UUID ownerId
-    ) {
+            UUID ownerId) {
         validateRequiredFields(title, description, price, category, ownerId);
 
         this.id = id != null ? id : UUID.randomUUID();
@@ -49,41 +48,12 @@ public class Listing {
         this.createdAt = LocalDateTime.now();
     }
 
-    public static Listing create(
-            ListingTitle title,
-            ListingDescription description,
-            Price price,
-            Category category,
-            UUID ownerId
-    ) {
-        return new Listing(
-                UUID.randomUUID(),
-                title,
-                description,
-                price,
-                category,
-                ownerId
-        );
-    }
-
     private void validateRequiredFields(
             ListingTitle title,
             ListingDescription description,
             Price price,
             Category category,
-            UUID ownerId
-    ) {
-        if (title == null) {
-            throw new DomainException("La publicación debe tener un título");
-        }
-
-        if (description == null) {
-            throw new DomainException("La publicación debe tener una descripción");
-        }
-
-        if (price == null) {
-            throw new DomainException("La publicación debe tener un precio");
-        }
+            UUID ownerId) {
 
         if (category == null) {
             throw new DomainException("La publicación debe tener una categoría");
@@ -97,6 +67,7 @@ public class Listing {
     public List<ListingImage> getImages() {
         return Collections.unmodifiableList(images);
     }
+
     public void publish() {
         if (this.status != ListingStatus.BORRADOR) {
             throw new DomainException("Solo se pueden publicar productos en borrador");
@@ -113,30 +84,14 @@ public class Listing {
         this.status = ListingStatus.VENDIDO;
     }
 
-    public void markAsDeleted() {
-        if (this.status == ListingStatus.VENDIDO) {
-            throw new DomainException("No se puede eliminar un producto vendido");
-        }
-
-        if (this.status == ListingStatus.ELIMINADO) {
-            throw new DomainException("La publicación ya está eliminada");
-        }
-
-        this.status = ListingStatus.ELIMINADO;
-    }
-
     public void updateDetails(
             ListingTitle title,
             ListingDescription description,
-            Price price
-    ) {
-        if (this.status == ListingStatus.VENDIDO || this.status == ListingStatus.ELIMINADO) {
-            throw new DomainException("No se puede editar una publicación vendida o eliminada");
+            Price price) {
+        if (this.status == ListingStatus.VENDIDO) {
+            throw new DomainException("No se puede editar una publicación vendida");
         }
 
-        if (title == null || description == null || price == null) {
-            throw new DomainException("Título, descripción y precio son obligatorios");
-        }
         this.title = title;
         this.description = description;
         this.price = price;
@@ -147,16 +102,12 @@ public class Listing {
             return;
         }
 
-        if (this.status == ListingStatus.ELIMINADO) {
-            throw new DomainException("No se pueden agregar imágenes a una publicación eliminada");
-        }
-
         this.images.add(image);
     }
 
     public void replaceImages(List<ListingImage> newImages) {
-        if (this.status == ListingStatus.VENDIDO || this.status == ListingStatus.ELIMINADO) {
-            throw new DomainException("No se pueden reemplazar imágenes de una publicación vendida o eliminada");
+        if (this.status == ListingStatus.VENDIDO) {
+            throw new DomainException("No se pueden reemplazar imágenes de una publicación vendida");
         }
 
         this.images.clear();
@@ -170,8 +121,7 @@ public class Listing {
             ListingStatus status,
             LocalDateTime createdAt,
             Long version,
-            List<ListingImage> images
-    ) {
+            List<ListingImage> images) {
         this.status = status;
         this.createdAt = createdAt;
         this.version = version;
