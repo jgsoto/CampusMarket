@@ -18,8 +18,7 @@ public class Category {
     public Category(
             UUID id,
             String name,
-            String description
-    ) {
+            String description) {
         if (name == null || name.isBlank()) {
             throw new DomainException("El nombre de la categoría es obligatorio");
         }
@@ -33,7 +32,4 @@ public class Category {
         this.description = description.trim();
     }
 
-    public static Category create(String name, String description) {
-        return new Category(UUID.randomUUID(), name, description);
-    }
 }
