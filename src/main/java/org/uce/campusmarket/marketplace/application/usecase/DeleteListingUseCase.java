@@ -1,6 +1,6 @@
 package org.uce.campusmarket.marketplace.application.usecase;
 
-import org.uce.campusmarket.marketplace.infrastructure.storage.SupabaseStorageService;
+import org.uce.campusmarket.marketplace.application.port.ImageStoragePort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.uce.campusmarket.marketplace.domain.model.Listing;
@@ -14,9 +14,9 @@ import java.util.UUID;
 public class DeleteListingUseCase {
 
     private final ListingRepository listingRepository;
-    private final SupabaseStorageService storageService;
+    private final ImageStoragePort storageService;
 
-    public DeleteListingUseCase(ListingRepository listingRepository, SupabaseStorageService storageService) {
+    public DeleteListingUseCase(ListingRepository listingRepository, ImageStoragePort storageService) {
         this.listingRepository = listingRepository;
         this.storageService = storageService;
     }
@@ -28,8 +28,6 @@ public class DeleteListingUseCase {
         if (!listing.getOwnerId().equals(requesterId)) {
             throw new DomainException("No tienes permiso para eliminar esta publicación");
         }
-
-
 
         if (listing.getImages() != null && !listing.getImages().isEmpty()) {
             listing.getImages().forEach(image -> storageService.delete(image.getUrl()));

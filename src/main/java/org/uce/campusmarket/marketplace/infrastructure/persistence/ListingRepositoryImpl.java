@@ -32,12 +32,6 @@ public class ListingRepositoryImpl implements ListingRepository {
             managed.setPrice(updated.getPrice());
             managed.setStatus(updated.getStatus());
 
-            if (updated.getVersion() != null) {
-                managed.setVersion(updated.getVersion());
-            } else if (managed.getVersion() == null) {
-                managed.setVersion(0L);
-            }
-
             if (updated.getImages() != null) {
                 java.util.Map<UUID, ListingImageJpaEntity> existingImages = managed.getImages().stream()
                         .filter(img -> img.getId() != null)

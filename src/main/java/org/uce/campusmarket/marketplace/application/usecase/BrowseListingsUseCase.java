@@ -7,6 +7,7 @@ import org.uce.campusmarket.marketplace.application.dto.ListingResponse;
 import org.uce.campusmarket.marketplace.domain.model.Listing;
 import org.uce.campusmarket.marketplace.domain.repository.ListingRepository;
 import org.uce.campusmarket.reputation.domain.repository.ReviewRepository;
+import org.uce.campusmarket.marketplace.domain.model.ListingStatus;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,8 +21,7 @@ public class BrowseListingsUseCase {
 
     public BrowseListingsUseCase(
             ListingRepository listingRepository,
-            ReviewRepository reviewRepository
-    ) {
+            ReviewRepository reviewRepository) {
         this.listingRepository = listingRepository;
         this.reviewRepository = reviewRepository;
     }
@@ -31,29 +31,24 @@ public class BrowseListingsUseCase {
         List<Listing> listings = listingRepository.findAll();
 
         return listings.stream()
-                .filter(listing ->
-                        listing.getStatus() == org.uce.campusmarket.marketplace.domain.model.ListingStatus.PUBLICADA ||
-                                listing.getStatus() == org.uce.campusmarket.marketplace.domain.model.ListingStatus.VENDIDO
-                )
+                .filter(listing -> listing
+                        .getStatus() == ListingStatus.PUBLICADA
+                        ||
+                        listing.getStatus() == ListingStatus.VENDIDO)
                 .map(listing -> {
 
                     List<ListingImageResponse> images = listing.getImages()
                             .stream()
                             .map(img -> new ListingImageResponse(
                                     img.getUrl(),
-                                    img.isThumbnail()
-                            ))
+                                    img.isThumbnail()))
                             .toList();
 
-                    Double averageRating =
-                            reviewRepository.getAverageRatingByReviewedUserId(
-                                    listing.getOwnerId()
-                            );
+                    Double averageRating = reviewRepository.getAverageRatingByReviewedUserId(
+                            listing.getOwnerId());
 
-                    Integer totalReviews =
-                            reviewRepository.countByReviewedUserId(
-                                    listing.getOwnerId()
-                            );
+                    Integer totalReviews = reviewRepository.countByReviewedUserId(
+                            listing.getOwnerId());
 
                     return new ListingResponse(
                             listing.getId(),
@@ -71,8 +66,7 @@ public class BrowseListingsUseCase {
                             null,
                             null,
                             averageRating,
-                            totalReviews
-                    );
+                            totalReviews);
                 })
                 .collect(Collectors.toList());
     }
