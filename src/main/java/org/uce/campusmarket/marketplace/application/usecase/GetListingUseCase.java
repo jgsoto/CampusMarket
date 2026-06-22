@@ -25,9 +25,7 @@ public class GetListingUseCase {
     public ListingResponse execute(UUID listingId) {
 
         Listing listing = listingRepository.findById(listingId)
-                .orElseThrow(() ->
-                        new DomainException("La publicación no existe")
-                );
+                .orElseThrow(() -> new DomainException("La publicación no existe"));
 
         User seller = userRepository.findById(listing.getOwnerId())
                 .orElse(null);
@@ -36,8 +34,7 @@ public class GetListingUseCase {
                 .stream()
                 .map(img -> new ListingImageResponse(
                         img.getUrl(),
-                        img.isThumbnail()
-                ))
+                        img.isThumbnail()))
                 .toList();
 
         return ListingResponse.builder()

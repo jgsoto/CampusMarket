@@ -48,6 +48,21 @@ public class Listing {
         this.createdAt = LocalDateTime.now();
     }
 
+    public static Listing create(
+            ListingTitle title,
+            ListingDescription description,
+            Price price,
+            Category category,
+            UUID ownerId) {
+        return new Listing(
+                UUID.randomUUID(),
+                title,
+                description,
+                price,
+                category,
+                ownerId);
+    }
+
     private void validateRequiredFields(
             ListingTitle title,
             ListingDescription description,

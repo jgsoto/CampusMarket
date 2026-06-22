@@ -40,46 +40,35 @@ public class UpdateListingUseCase {
     public ListingResponse execute(
             UUID listingId,
             UUID requesterId,
-            UpdateListingRequest request
-    ) {
+            UpdateListingRequest request) {
 
         Listing listing = listingRepository.findById(listingId)
-                .orElseThrow(() ->
-                        new DomainException("La publicación no existe")
-                );
+                .orElseThrow(() -> new DomainException("La publicación no existe"));
 
         if (!listing.getOwnerId().equals(requesterId)) {
             throw new DomainException(
-                    "No tienes permiso para editar esta publicación"
-            );
+                    "No tienes permiso para editar esta publicación");
         }
 
-        ListingTitle newTitle =
-                new ListingTitle(request.getTitle());
+        ListingTitle newTitle = new ListingTitle(request.getTitle());
 
-        ListingDescription newDescription =
-                new ListingDescription(request.getDescription());
+        ListingDescription newDescription = new ListingDescription(request.getDescription());
 
-        Price newPrice =
-                Price.of(request.getPrice());
+        Price newPrice = Price.of(request.getPrice());
 
         listing.updateDetails(
                 newTitle,
                 newDescription,
-                newPrice
-        );
+                newPrice);
 
         List<MultipartFile> newImages = request.getImages();
 
-        boolean hasRealFiles =
-                newImages != null &&
-                        newImages.stream().anyMatch(file -> !file.isEmpty());
+        boolean hasRealFiles = newImages != null &&
+                newImages.stream().anyMatch(file -> !file.isEmpty());
 
         if (hasRealFiles) {
 
-            listing.getImages().forEach(image ->
-                    imageStoragePort.delete(image.getUrl())
-            );
+            listing.getImages().forEach(image -> imageStoragePort.delete(image.getUrl()));
 
             List<ListingImage> uploadedImages = new java.util.ArrayList<>();
 
@@ -89,15 +78,12 @@ public class UpdateListingUseCase {
 
                 if (!file.isEmpty()) {
 
-                    String imageUrl =
-                            imageStoragePort.upload(file);
+                    String imageUrl = imageStoragePort.upload(file);
 
-                    ListingImage listingImage =
-                            new ListingImage(
-                                    UUID.randomUUID(),
-                                    imageUrl,
-                                    i == 0
-                            );
+                    ListingImage listingImage = new ListingImage(
+                            UUID.randomUUID(),
+                            imageUrl,
+                            i == 0);
 
                     uploadedImages.add(listingImage);
                 }
@@ -106,8 +92,7 @@ public class UpdateListingUseCase {
             listing.replaceImages(uploadedImages);
         }
 
-        Listing updatedListing =
-                listingRepository.save(listing);
+        Listing updatedListing = listingRepository.save(listing);
 
         User seller = userRepository
                 .findById(updatedListing.getOwnerId())

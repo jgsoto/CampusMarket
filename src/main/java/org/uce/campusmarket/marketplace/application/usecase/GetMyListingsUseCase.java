@@ -26,23 +26,24 @@ public class GetMyListingsUseCase {
     private final ListingRepository listingRepository;
     private final UserRepository userRepository;
 
-        public List<ListingResponse> execute(UUID ownerId) {
 
-                List<Listing> listings = listingRepository.findAll();
+    public List<ListingResponse> execute(UUID ownerId) {
 
-                return listings.stream()
-                                .filter(listing -> listing.getOwnerId().equals(ownerId))
-                                .map(listing -> {
+        List<Listing> listings = listingRepository.findAll();
 
-                                        User seller = userRepository.findById(
-                                                        listing.getOwnerId()).orElse(null);
+        return listings.stream()
+                .filter(listing -> listing.getOwnerId().equals(ownerId))
+                .map(listing -> {
 
-                                        List<ListingImageResponse> images = listing.getImages()
-                                                        .stream()
-                                                        .map(img -> new ListingImageResponse(
-                                                                        img.getUrl(),
-                                                                        img.isThumbnail()))
-                                                        .toList();
+                    User seller = userRepository.findById(
+                            listing.getOwnerId()).orElse(null);
+
+                    List<ListingImageResponse> images = listing.getImages()
+                            .stream()
+                            .map(img -> new ListingImageResponse(
+                                    img.getUrl(),
+                                    img.isThumbnail()))
+                            .toList();
 
                     return ListingResponse.builder()
                             .id(listing.getId())

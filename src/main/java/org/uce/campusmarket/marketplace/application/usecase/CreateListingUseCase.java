@@ -39,21 +39,14 @@ public class CreateListingUseCase {
     public ListingResponse execute(CreateListingRequest request) {
 
         Category category = categoryRepository.findById(
-                request.getCategoryId()
-        ).orElseThrow(() ->
-                new DomainException(
-                        "La categoría especificada no existe"
-                )
-        );
+                request.getCategoryId()).orElseThrow(() -> new DomainException("La categoría especificada no existe"));
 
-        Listing newListing = new Listing(
-                UUID.randomUUID(),
+        Listing newListing = Listing.create(
                 new ListingTitle(request.getTitle()),
                 new ListingDescription(request.getDescription()),
                 Price.of(request.getPrice()),
                 category,
-                request.getOwnerId()
-        );
+                request.getOwnerId());
 
         List<MultipartFile> images = request.getImages();
 
@@ -68,8 +61,7 @@ public class CreateListingUseCase {
                 ListingImage listingImage = new ListingImage(
                         UUID.randomUUID(),
                         imageUrl,
-                        i == 0
-                );
+                        i == 0);
 
                 newListing.addImage(listingImage);
             }
@@ -85,8 +77,7 @@ public class CreateListingUseCase {
                 .stream()
                 .map(img -> new ListingImageResponse(
                         img.getUrl(),
-                        img.isThumbnail()
-                ))
+                        img.isThumbnail()))
                 .toList();
 
         return ListingResponse.builder()

@@ -27,18 +27,17 @@ public class BrowseListingsUseCase {
         List<Listing> listings = listingRepository.findAll();
 
         return listings.stream()
-                .filter(listing ->
-                        listing.getStatus() == org.uce.campusmarket.marketplace.domain.model.ListingStatus.PUBLICADA ||
-                                listing.getStatus() == org.uce.campusmarket.marketplace.domain.model.ListingStatus.VENDIDO
-                )
+                .filter(listing -> listing
+                        .getStatus() == ListingStatus.PUBLICADA
+                        ||
+                        listing.getStatus() == ListingStatus.VENDIDO)
                 .map(listing -> {
 
                     List<ListingImageResponse> images = listing.getImages()
                             .stream()
                             .map(img -> new ListingImageResponse(
                                     img.getUrl(),
-                                    img.isThumbnail()
-                            ))
+                                    img.isThumbnail()))
                             .toList();
 
                     return ListingResponse.builder()

@@ -100,8 +100,6 @@ public class SupabaseStorageService implements ImageStoragePort {
                                 entity,
                                 String.class);
 
-                        System.out.println("Imagen eliminada de Supabase: " + fileName);
-
                 } catch (Exception e) {
                         System.err.println("Advertencia: no se pudo eliminar la imagen de Supabase: " + e.getMessage());
                 }
