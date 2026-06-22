@@ -70,21 +70,6 @@ public class User {
         this.socialMedia = normalizeOptional(socialMedia);
     }
 
-    public void updateIdentity(
-            String fullName,
-            String email
-    ) {
-        FullName validFullName = new FullName(fullName);
-        Email validEmail = new Email(email);
-
-        this.fullName = validFullName.value();
-        this.email = validEmail.value();
-    }
-
-    public void updateTrustScore(Double trustScore) {
-        TrustScore validTrustScore = new TrustScore(trustScore);
-        this.trustScore = validTrustScore.value();
-    }
 
     private String normalizeOptional(String value) {
         return value == null || value.isBlank()
