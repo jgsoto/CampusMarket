@@ -21,7 +21,6 @@ import org.uce.campusmarket.marketplace.domain.valueobject.ListingDescription;
 import org.uce.campusmarket.marketplace.domain.valueobject.ListingTitle;
 import org.uce.campusmarket.marketplace.domain.valueobject.Price;
 
-import org.uce.campusmarket.reputation.domain.repository.ReviewRepository;
 
 import org.uce.campusmarket.shared.exception.DomainException;
 
@@ -36,7 +35,6 @@ public class CreateListingUseCase {
     private final ListingRepository listingRepository;
     private final CategoryRepository categoryRepository;
     private final ImageStoragePort imageStoragePort;
-    private final ReviewRepository reviewRepository;
 
     public ListingResponse execute(CreateListingRequest request) {
 
@@ -82,28 +80,16 @@ public class CreateListingUseCase {
                         img.isThumbnail()))
                 .toList();
 
-        Double averageRating = reviewRepository.getAverageRatingByReviewedUserId(
-                savedListing.getOwnerId());
-
-        Integer totalReviews = reviewRepository.countByReviewedUserId(
-                savedListing.getOwnerId());
-
-        return new ListingResponse(
-                savedListing.getId(),
-                savedListing.getTitle().getValue(),
-                savedListing.getDescription().getValue(),
-                savedListing.getPrice().getValue().doubleValue(),
-                savedListing.getCategory().getName(),
-                savedListing.getOwnerId(),
-                savedListing.getStatus().name(),
-                savedListing.getCreatedAt(),
-                imageResponses,
-                null,
-                null,
-                null,
-                null,
-                null,
-                averageRating,
-                totalReviews);
+        return ListingResponse.builder()
+                .id(savedListing.getId())
+                .title(savedListing.getTitle().getValue())
+                .description(savedListing.getDescription().getValue())
+                .price(savedListing.getPrice().getValue().doubleValue())
+                .categoryName(savedListing.getCategory().getName())
+                .ownerId(savedListing.getOwnerId())
+                .status(savedListing.getStatus().name())
+                .createdAt(savedListing.getCreatedAt())
+                .images(imageResponses)
+                .build();
     }
 }

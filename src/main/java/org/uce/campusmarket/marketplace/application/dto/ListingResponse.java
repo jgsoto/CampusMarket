@@ -1,6 +1,7 @@
 package org.uce.campusmarket.marketplace.application.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ListingResponse {
@@ -30,6 +32,4 @@ public class ListingResponse {
     private String sellerAddress;
     private String sellerSocialMedia;
 
-    private Double averageRating;
-    private Integer totalReviews;
 }
