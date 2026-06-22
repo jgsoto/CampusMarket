@@ -13,7 +13,6 @@ import org.uce.campusmarket.marketplace.application.dto.ListingResponse;
 import org.uce.campusmarket.marketplace.domain.model.Listing;
 import org.uce.campusmarket.marketplace.domain.repository.ListingRepository;
 
-import org.uce.campusmarket.reputation.domain.repository.ReviewRepository;
 
 import java.util.List;
 import java.util.UUID;
@@ -24,9 +23,8 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class GetMyListingsUseCase {
 
-        private final ListingRepository listingRepository;
-        private final UserRepository userRepository;
-        private final ReviewRepository reviewRepository;
+    private final ListingRepository listingRepository;
+    private final UserRepository userRepository;
 
         public List<ListingResponse> execute(UUID ownerId) {
 
@@ -46,30 +44,23 @@ public class GetMyListingsUseCase {
                                                                         img.isThumbnail()))
                                                         .toList();
 
-                                        Double averageRating = reviewRepository.getAverageRatingByReviewedUserId(
-                                                        listing.getOwnerId());
-
-                                        Integer totalReviews = reviewRepository.countByReviewedUserId(
-                                                        listing.getOwnerId());
-
-                                        return new ListingResponse(
-                                                        listing.getId(),
-                                                        listing.getTitle().getValue(),
-                                                        listing.getDescription().getValue(),
-                                                        listing.getPrice().getValue().doubleValue(),
-                                                        listing.getCategory().getName(),
-                                                        listing.getOwnerId(),
-                                                        listing.getStatus().name(),
-                                                        listing.getCreatedAt(),
-                                                        images,
-                                                        seller != null ? seller.getFullName() : "Desconocido",
-                                                        seller != null ? seller.getEmail() : "No disponible",
-                                                        seller != null ? seller.getPhone() : "No disponible",
-                                                        seller != null ? seller.getAddress() : "No disponible",
-                                                        seller != null ? seller.getSocialMedia() : "No disponible",
-                                                        averageRating,
-                                                        totalReviews);
-                                })
-                                .collect(Collectors.toList());
-        }
+                    return ListingResponse.builder()
+                            .id(listing.getId())
+                            .title(listing.getTitle().getValue())
+                            .description(listing.getDescription().getValue())
+                            .price(listing.getPrice().getValue().doubleValue())
+                            .categoryName(listing.getCategory().getName())
+                            .ownerId(listing.getOwnerId())
+                            .status(listing.getStatus().name())
+                            .createdAt(listing.getCreatedAt())
+                            .images(images)
+                            .sellerName(seller != null ? seller.getFullName() : "Desconocido")
+                            .sellerEmail(seller != null ? seller.getEmail() : "No disponible")
+                            .sellerPhone(seller != null ? seller.getPhone() : "No disponible")
+                            .sellerAddress(seller != null ? seller.getAddress() : "No disponible")
+                            .sellerSocialMedia(seller != null ? seller.getSocialMedia() : "No disponible")
+                            .build();
+                })
+                .collect(Collectors.toList());
+    }
 }

@@ -22,7 +22,6 @@ import org.uce.campusmarket.marketplace.domain.valueobject.ListingDescription;
 import org.uce.campusmarket.marketplace.domain.valueobject.ListingTitle;
 import org.uce.campusmarket.marketplace.domain.valueobject.Price;
 
-import org.uce.campusmarket.reputation.domain.repository.ReviewRepository;
 
 import org.uce.campusmarket.shared.exception.DomainException;
 
@@ -37,7 +36,6 @@ public class UpdateListingUseCase {
     private final ListingRepository listingRepository;
     private final ImageStoragePort imageStoragePort;
     private final UserRepository userRepository;
-    private final ReviewRepository reviewRepository;
 
     public ListingResponse execute(
             UUID listingId,
@@ -115,42 +113,28 @@ public class UpdateListingUseCase {
                 .findById(updatedListing.getOwnerId())
                 .orElse(null);
 
-        Double averageRating =
-                reviewRepository.getAverageRatingByReviewedUserId(
-                        updatedListing.getOwnerId()
-                );
+        List<ListingImageResponse> images = updatedListing.getImages()
+                .stream()
+                .map(img -> new ListingImageResponse(
+                        img.getUrl(),
+                        img.isThumbnail()))
+                .toList();
 
-        Integer totalReviews =
-                reviewRepository.countByReviewedUserId(
-                        updatedListing.getOwnerId()
-                );
-
-        List<ListingImageResponse> images =
-                updatedListing.getImages()
-                        .stream()
-                        .map(img -> new ListingImageResponse(
-                                img.getUrl(),
-                                img.isThumbnail()
-                        ))
-                        .toList();
-
-        return new ListingResponse(
-                updatedListing.getId(),
-                updatedListing.getTitle().getValue(),
-                updatedListing.getDescription().getValue(),
-                updatedListing.getPrice().getValue().doubleValue(),
-                updatedListing.getCategory().getName(),
-                updatedListing.getOwnerId(),
-                updatedListing.getStatus().name(),
-                updatedListing.getCreatedAt(),
-                images,
-                seller != null ? seller.getFullName() : "Desconocido",
-                seller != null ? seller.getEmail() : "No disponible",
-                seller != null ? seller.getPhone() : "No disponible",
-                seller != null ? seller.getAddress() : "No disponible",
-                seller != null ? seller.getSocialMedia() : "No disponible",
-                averageRating,
-                totalReviews
-        );
+        return ListingResponse.builder()
+                .id(updatedListing.getId())
+                .title(updatedListing.getTitle().getValue())
+                .description(updatedListing.getDescription().getValue())
+                .price(updatedListing.getPrice().getValue().doubleValue())
+                .categoryName(updatedListing.getCategory().getName())
+                .ownerId(updatedListing.getOwnerId())
+                .status(updatedListing.getStatus().name())
+                .createdAt(updatedListing.getCreatedAt())
+                .images(images)
+                .sellerName(seller != null ? seller.getFullName() : "Desconocido")
+                .sellerEmail(seller != null ? seller.getEmail() : "No disponible")
+                .sellerPhone(seller != null ? seller.getPhone() : "No disponible")
+                .sellerAddress(seller != null ? seller.getAddress() : "No disponible")
+                .sellerSocialMedia(seller != null ? seller.getSocialMedia() : "No disponible")
+                .build();
     }
 }

@@ -9,7 +9,6 @@ import org.uce.campusmarket.marketplace.application.dto.ListingImageResponse;
 import org.uce.campusmarket.marketplace.application.dto.ListingResponse;
 import org.uce.campusmarket.marketplace.domain.model.Listing;
 import org.uce.campusmarket.marketplace.domain.repository.ListingRepository;
-import org.uce.campusmarket.reputation.domain.repository.ReviewRepository;
 import org.uce.campusmarket.shared.exception.DomainException;
 
 import java.util.List;
@@ -22,7 +21,6 @@ public class GetListingUseCase {
 
     private final ListingRepository listingRepository;
     private final UserRepository userRepository;
-    private final ReviewRepository reviewRepository;
 
     public ListingResponse execute(UUID listingId) {
 
@@ -42,49 +40,21 @@ public class GetListingUseCase {
                 ))
                 .toList();
 
-        Double averageRating =
-                reviewRepository.getAverageRatingByReviewedUserId(
-                        listing.getOwnerId()
-                );
-
-        Integer totalReviews =
-                reviewRepository.countByReviewedUserId(
-                        listing.getOwnerId()
-                );
-
-        return new ListingResponse(
-                listing.getId(),
-                listing.getTitle().getValue(),
-                listing.getDescription().getValue(),
-                listing.getPrice().getValue().doubleValue(),
-                listing.getCategory().getName(),
-                listing.getOwnerId(),
-                listing.getStatus().name(),
-                listing.getCreatedAt(),
-                images,
-
-                seller != null
-                        ? seller.getFullName()
-                        : "Desconocido",
-
-                seller != null
-                        ? seller.getEmail()
-                        : "No disponible",
-
-                seller != null
-                        ? seller.getPhone()
-                        : "No disponible",
-
-                seller != null
-                        ? seller.getAddress()
-                        : "No disponible",
-
-                seller != null
-                        ? seller.getSocialMedia()
-                        : "No disponible",
-
-                averageRating,
-                totalReviews
-        );
+        return ListingResponse.builder()
+                .id(listing.getId())
+                .title(listing.getTitle().getValue())
+                .description(listing.getDescription().getValue())
+                .price(listing.getPrice().getValue().doubleValue())
+                .categoryName(listing.getCategory().getName())
+                .ownerId(listing.getOwnerId())
+                .status(listing.getStatus().name())
+                .createdAt(listing.getCreatedAt())
+                .images(images)
+                .sellerName(seller != null ? seller.getFullName() : "Desconocido")
+                .sellerEmail(seller != null ? seller.getEmail() : "No disponible")
+                .sellerPhone(seller != null ? seller.getPhone() : "No disponible")
+                .sellerAddress(seller != null ? seller.getAddress() : "No disponible")
+                .sellerSocialMedia(seller != null ? seller.getSocialMedia() : "No disponible")
+                .build();
     }
 }
