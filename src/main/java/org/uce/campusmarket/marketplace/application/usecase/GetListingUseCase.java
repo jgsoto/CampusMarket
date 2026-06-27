@@ -10,6 +10,7 @@ import org.uce.campusmarket.marketplace.application.dto.ListingResponse;
 import org.uce.campusmarket.marketplace.domain.model.Listing;
 import org.uce.campusmarket.marketplace.domain.repository.ListingRepository;
 import org.uce.campusmarket.shared.exception.DomainException;
+import org.uce.campusmarket.reputation.domain.repository.ReviewRepository;
 
 import java.util.List;
 import java.util.UUID;
@@ -21,6 +22,7 @@ public class GetListingUseCase {
 
     private final ListingRepository listingRepository;
     private final UserRepository userRepository;
+    private final ReviewRepository reviewRepository;
 
     public ListingResponse execute(UUID listingId) {
 
@@ -29,6 +31,12 @@ public class GetListingUseCase {
 
         User seller = userRepository.findById(listing.getOwnerId())
                 .orElse(null);
+
+        double reputation = reviewRepository
+                .getAverageRatingByReviewedUserId(listing.getOwnerId());
+
+        int totalReviews = reviewRepository
+                .countByReviewedUserId(listing.getOwnerId());
 
         List<ListingImageResponse> images = listing.getImages()
                 .stream()
@@ -52,6 +60,8 @@ public class GetListingUseCase {
                 .sellerPhone(seller != null ? seller.getPhone() : "No disponible")
                 .sellerAddress(seller != null ? seller.getAddress() : "No disponible")
                 .sellerSocialMedia(seller != null ? seller.getSocialMedia() : "No disponible")
+                .sellerReputation(reputation)
+                .sellerReviewCount(totalReviews)
                 .build();
     }
 }

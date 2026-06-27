@@ -7,20 +7,22 @@ import org.uce.campusmarket.marketplace.application.dto.ListingResponse;
 import org.uce.campusmarket.marketplace.domain.model.Listing;
 import org.uce.campusmarket.marketplace.domain.repository.ListingRepository;
 import org.uce.campusmarket.marketplace.domain.model.ListingStatus;
+import lombok.RequiredArgsConstructor;
+import org.uce.campusmarket.identity.domain.model.User;
+import org.uce.campusmarket.identity.domain.repository.UserRepository;
+import org.uce.campusmarket.reputation.domain.repository.ReviewRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class BrowseListingsUseCase {
 
     private final ListingRepository listingRepository;
-
-    public BrowseListingsUseCase(
-            ListingRepository listingRepository) {
-        this.listingRepository = listingRepository;
-    }
+    private final UserRepository userRepository;
+    private final ReviewRepository reviewRepository;
 
     public List<ListingResponse> execute() {
 
@@ -40,6 +42,16 @@ public class BrowseListingsUseCase {
                                     img.isThumbnail()))
                             .toList();
 
+                    User seller = userRepository
+                            .findById(listing.getOwnerId())
+                            .orElse(null);
+
+                    double reputation = reviewRepository
+                            .getAverageRatingByReviewedUserId(listing.getOwnerId());
+
+                    int reviewCount = reviewRepository
+                            .countByReviewedUserId(listing.getOwnerId());
+
                     return ListingResponse.builder()
                             .id(listing.getId())
                             .title(listing.getTitle().getValue())
@@ -50,6 +62,14 @@ public class BrowseListingsUseCase {
                             .status(listing.getStatus().name())
                             .createdAt(listing.getCreatedAt())
                             .images(images)
+                            .sellerName(seller != null ? seller.getFullName() : "Desconocido")
+                            .sellerEmail(seller != null ? seller.getEmail() : "")
+                            .sellerPhone(seller != null ? seller.getPhone() : "")
+                            .sellerAddress(seller != null ? seller.getAddress() : "")
+                            .sellerSocialMedia(seller != null ? seller.getSocialMedia() : "")
+
+                            .sellerReputation(reputation)
+                            .sellerReviewCount(reviewCount)
                             .build();
                 })
                 .collect(Collectors.toList());
