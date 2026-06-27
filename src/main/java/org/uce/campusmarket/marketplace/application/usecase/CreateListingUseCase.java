@@ -21,7 +21,6 @@ import org.uce.campusmarket.marketplace.domain.valueobject.ListingDescription;
 import org.uce.campusmarket.marketplace.domain.valueobject.ListingTitle;
 import org.uce.campusmarket.marketplace.domain.valueobject.Price;
 
-import org.uce.campusmarket.reputation.domain.repository.ReviewRepository;
 
 import org.uce.campusmarket.shared.exception.DomainException;
 
@@ -36,26 +35,18 @@ public class CreateListingUseCase {
     private final ListingRepository listingRepository;
     private final CategoryRepository categoryRepository;
     private final ImageStoragePort imageStoragePort;
-    private final ReviewRepository reviewRepository;
 
     public ListingResponse execute(CreateListingRequest request) {
 
         Category category = categoryRepository.findById(
-                request.getCategoryId()
-        ).orElseThrow(() ->
-                new DomainException(
-                        "La categoría especificada no existe"
-                )
-        );
+                request.getCategoryId()).orElseThrow(() -> new DomainException("La categoría especificada no existe"));
 
-        Listing newListing = new Listing(
-                UUID.randomUUID(),
+        Listing newListing = Listing.create(
                 new ListingTitle(request.getTitle()),
                 new ListingDescription(request.getDescription()),
                 Price.of(request.getPrice()),
                 category,
-                request.getOwnerId()
-        );
+                request.getOwnerId());
 
         List<MultipartFile> images = request.getImages();
 
@@ -70,8 +61,7 @@ public class CreateListingUseCase {
                 ListingImage listingImage = new ListingImage(
                         UUID.randomUUID(),
                         imageUrl,
-                        i == 0
-                );
+                        i == 0);
 
                 newListing.addImage(listingImage);
             }
@@ -87,37 +77,19 @@ public class CreateListingUseCase {
                 .stream()
                 .map(img -> new ListingImageResponse(
                         img.getUrl(),
-                        img.isThumbnail()
-                ))
+                        img.isThumbnail()))
                 .toList();
 
-        Double averageRating =
-                reviewRepository.getAverageRatingByReviewedUserId(
-                        savedListing.getOwnerId()
-                );
-
-        Integer totalReviews =
-                reviewRepository.countByReviewedUserId(
-                        savedListing.getOwnerId()
-                );
-
-        return new ListingResponse(
-                savedListing.getId(),
-                savedListing.getTitle().getValue(),
-                savedListing.getDescription().getValue(),
-                savedListing.getPrice().getValue().doubleValue(),
-                savedListing.getCategory().getName(),
-                savedListing.getOwnerId(),
-                savedListing.getStatus().name(),
-                savedListing.getCreatedAt(),
-                imageResponses,
-                null,
-                null,
-                null,
-                null,
-                null,
-                averageRating,
-                totalReviews
-        );
+        return ListingResponse.builder()
+                .id(savedListing.getId())
+                .title(savedListing.getTitle().getValue())
+                .description(savedListing.getDescription().getValue())
+                .price(savedListing.getPrice().getValue().doubleValue())
+                .categoryName(savedListing.getCategory().getName())
+                .ownerId(savedListing.getOwnerId())
+                .status(savedListing.getStatus().name())
+                .createdAt(savedListing.getCreatedAt())
+                .images(imageResponses)
+                .build();
     }
 }

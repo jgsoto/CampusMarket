@@ -25,60 +25,27 @@ public class GetUserReviewsUseCase {
         public List<ReviewResponse> execute(
                         UUID userId) {
 
-                return reviewRepository
-                                .findByReviewedUserId(userId)
-                                .stream()
-                                .map(review -> {
+                return reviewRepository.findByReviewedUserId(userId).stream().map(review -> {
 
-                                        String reviewerName = userRepository
-                                                        .findById(
-                                                                        review.getReviewerId())
-                                                        .map(
-                                                                        user -> user.getFullName())
-                                                        .orElse(
-                                                                        "Usuario");
+                                        String reviewerName = userRepository.findById(review.getReviewerId())
+                                                        .map(user -> user.getFullName())
+                                                        .orElse("Usuario");
 
-                                        String targetTitle = tutoringOfferRepository
-                                                        .findById(
-                                                                        review.getTargetId())
-                                                        .map(
-                                                                        tutoring -> tutoring.getSubject())
-                                                        .orElse(
-                                                                        "Tutoría");
+                                        String targetTitle = tutoringOfferRepository.findById(review.getTargetId())
+                                                        .map(tutoring -> tutoring.getSubject())
+                                                        .orElse("Tutoría");
 
                                         return ReviewResponse
                                                         .builder()
-
-                                                        .id(
-                                                                        review.getId())
-
-                                                        .reviewerId(
-                                                                        review.getReviewerId())
-
-                                                        .reviewedUserId(
-                                                                        review.getReviewedUserId())
-
-                                                        .targetId(
-                                                                        review.getTargetId())
-
-                                                        .rating(
-                                                                        review.getRating())
-
-                                                        .comment(
-                                                                        review.getComment())
-
-                                                        .createdAt(
-                                                                        review.getCreatedAt())
-
-                                                        .reviewerName(
-                                                                        reviewerName)
-
-                                                        .targetTitle(
-                                                                        targetTitle)
-
-                                                        .build();
-
-                                })
-                                .toList();
+                                                        .id(review.getId())
+                                                        .reviewerId(review.getReviewerId())
+                                                        .reviewedUserId(review.getReviewedUserId())
+                                                        .targetId(review.getTargetId())
+                                                        .rating(review.getRating())
+                                                        .comment(review.getComment())
+                                                        .createdAt(review.getCreatedAt())
+                                                        .reviewerName(reviewerName)
+                                                        .targetTitle(targetTitle)
+                                                        .build();}).toList();
         }
 }

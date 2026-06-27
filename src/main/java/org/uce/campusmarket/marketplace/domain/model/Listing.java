@@ -118,9 +118,6 @@ public class Listing {
             throw new DomainException("No se puede editar una publicación vendida");
         }
 
-        if (title == null || description == null || price == null) {
-            throw new DomainException("Título, descripción y precio son obligatorios");
-        }
         this.title = title;
         this.description = description;
         this.price = price;

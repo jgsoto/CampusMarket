@@ -22,7 +22,6 @@ import org.uce.campusmarket.marketplace.domain.valueobject.ListingDescription;
 import org.uce.campusmarket.marketplace.domain.valueobject.ListingTitle;
 import org.uce.campusmarket.marketplace.domain.valueobject.Price;
 
-import org.uce.campusmarket.reputation.domain.repository.ReviewRepository;
 
 import org.uce.campusmarket.shared.exception.DomainException;
 
@@ -37,51 +36,39 @@ public class UpdateListingUseCase {
     private final ListingRepository listingRepository;
     private final ImageStoragePort imageStoragePort;
     private final UserRepository userRepository;
-    private final ReviewRepository reviewRepository;
 
     public ListingResponse execute(
             UUID listingId,
             UUID requesterId,
-            UpdateListingRequest request
-    ) {
+            UpdateListingRequest request) {
 
         Listing listing = listingRepository.findById(listingId)
-                .orElseThrow(() ->
-                        new DomainException("La publicación no existe")
-                );
+                .orElseThrow(() -> new DomainException("La publicación no existe"));
 
         if (!listing.getOwnerId().equals(requesterId)) {
             throw new DomainException(
-                    "No tienes permiso para editar esta publicación"
-            );
+                    "No tienes permiso para editar esta publicación");
         }
 
-        ListingTitle newTitle =
-                new ListingTitle(request.getTitle());
+        ListingTitle newTitle = new ListingTitle(request.getTitle());
 
-        ListingDescription newDescription =
-                new ListingDescription(request.getDescription());
+        ListingDescription newDescription = new ListingDescription(request.getDescription());
 
-        Price newPrice =
-                Price.of(request.getPrice());
+        Price newPrice = Price.of(request.getPrice());
 
         listing.updateDetails(
                 newTitle,
                 newDescription,
-                newPrice
-        );
+                newPrice);
 
         List<MultipartFile> newImages = request.getImages();
 
-        boolean hasRealFiles =
-                newImages != null &&
-                        newImages.stream().anyMatch(file -> !file.isEmpty());
+        boolean hasRealFiles = newImages != null &&
+                newImages.stream().anyMatch(file -> !file.isEmpty());
 
         if (hasRealFiles) {
 
-            listing.getImages().forEach(image ->
-                    imageStoragePort.delete(image.getUrl())
-            );
+            listing.getImages().forEach(image -> imageStoragePort.delete(image.getUrl()));
 
             List<ListingImage> uploadedImages = new java.util.ArrayList<>();
 
@@ -91,15 +78,12 @@ public class UpdateListingUseCase {
 
                 if (!file.isEmpty()) {
 
-                    String imageUrl =
-                            imageStoragePort.upload(file);
+                    String imageUrl = imageStoragePort.upload(file);
 
-                    ListingImage listingImage =
-                            new ListingImage(
-                                    UUID.randomUUID(),
-                                    imageUrl,
-                                    i == 0
-                            );
+                    ListingImage listingImage = new ListingImage(
+                            UUID.randomUUID(),
+                            imageUrl,
+                            i == 0);
 
                     uploadedImages.add(listingImage);
                 }
@@ -108,49 +92,34 @@ public class UpdateListingUseCase {
             listing.replaceImages(uploadedImages);
         }
 
-        Listing updatedListing =
-                listingRepository.save(listing);
+        Listing updatedListing = listingRepository.save(listing);
 
         User seller = userRepository
                 .findById(updatedListing.getOwnerId())
                 .orElse(null);
 
-        Double averageRating =
-                reviewRepository.getAverageRatingByReviewedUserId(
-                        updatedListing.getOwnerId()
-                );
+        List<ListingImageResponse> images = updatedListing.getImages()
+                .stream()
+                .map(img -> new ListingImageResponse(
+                        img.getUrl(),
+                        img.isThumbnail()))
+                .toList();
 
-        Integer totalReviews =
-                reviewRepository.countByReviewedUserId(
-                        updatedListing.getOwnerId()
-                );
-
-        List<ListingImageResponse> images =
-                updatedListing.getImages()
-                        .stream()
-                        .map(img -> new ListingImageResponse(
-                                img.getUrl(),
-                                img.isThumbnail()
-                        ))
-                        .toList();
-
-        return new ListingResponse(
-                updatedListing.getId(),
-                updatedListing.getTitle().getValue(),
-                updatedListing.getDescription().getValue(),
-                updatedListing.getPrice().getValue().doubleValue(),
-                updatedListing.getCategory().getName(),
-                updatedListing.getOwnerId(),
-                updatedListing.getStatus().name(),
-                updatedListing.getCreatedAt(),
-                images,
-                seller != null ? seller.getFullName() : "Desconocido",
-                seller != null ? seller.getEmail() : "No disponible",
-                seller != null ? seller.getPhone() : "No disponible",
-                seller != null ? seller.getAddress() : "No disponible",
-                seller != null ? seller.getSocialMedia() : "No disponible",
-                averageRating,
-                totalReviews
-        );
+        return ListingResponse.builder()
+                .id(updatedListing.getId())
+                .title(updatedListing.getTitle().getValue())
+                .description(updatedListing.getDescription().getValue())
+                .price(updatedListing.getPrice().getValue().doubleValue())
+                .categoryName(updatedListing.getCategory().getName())
+                .ownerId(updatedListing.getOwnerId())
+                .status(updatedListing.getStatus().name())
+                .createdAt(updatedListing.getCreatedAt())
+                .images(images)
+                .sellerName(seller != null ? seller.getFullName() : "Desconocido")
+                .sellerEmail(seller != null ? seller.getEmail() : "No disponible")
+                .sellerPhone(seller != null ? seller.getPhone() : "No disponible")
+                .sellerAddress(seller != null ? seller.getAddress() : "No disponible")
+                .sellerSocialMedia(seller != null ? seller.getSocialMedia() : "No disponible")
+                .build();
     }
 }

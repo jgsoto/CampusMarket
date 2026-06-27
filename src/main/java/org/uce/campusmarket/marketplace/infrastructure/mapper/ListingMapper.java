@@ -36,7 +36,6 @@ public class ListingMapper {
         entity.setOwnerId(domain.getOwnerId());
         entity.setStatus(domain.getStatus().name());
         entity.setCreatedAt(domain.getCreatedAt());
-        entity.setVersion(domain.getVersion());
 
         List<ListingImageJpaEntity> imageEntities = domain.getImages()
                 .stream()
