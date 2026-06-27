@@ -118,15 +118,45 @@ function renderOfferInfo(offer) {
   }
 }
 
-function renderTutorPanel(offer, reputation) {
-  const score = reputation?.reputation ?? 0;
-  if (DetailsDOM.reputationScore()) DetailsDOM.reputationScore().textContent = score.toFixed(1);
-  if (DetailsDOM.reputationStars()) DetailsDOM.reputationStars().textContent = buildStarString(score);
+function renderTutorPanel(offer) {
+
+  const score = Number(offer.averageRating ?? 0);
+  const total = Number(offer.totalReviews ?? 0);
+
+  const reputationStars = DetailsDOM.reputationStars();
+  const reputationScore = DetailsDOM.reputationScore();
+  const reviewCount = document.getElementById('tutor-review-count');
+
+  if (reputationStars) {
+    reputationStars.textContent = buildStarString(score);
+  }
+
+  if (reputationScore) {
+    reputationScore.textContent = score.toFixed(1);
+  }
+
+  if (reviewCount) {
+    reviewCount.textContent =
+        total > 0
+            ? `(${total})`
+            : 'Sin reseñas';
+  }
 
   const name = offer.tutorName ?? 'Tutor UCE';
-  if (DetailsDOM.tutorInitials()) DetailsDOM.tutorInitials().textContent = buildInitials(name);
-  if (DetailsDOM.tutorName()) DetailsDOM.tutorName().textContent = name;
-  if (DetailsDOM.tutorEmail()) DetailsDOM.tutorEmail().textContent = offer.tutorEmail ?? '—';
+
+  if (DetailsDOM.tutorInitials()) {
+    DetailsDOM.tutorInitials().textContent = buildInitials(name);
+  }
+
+  if (DetailsDOM.tutorName()) {
+    DetailsDOM.tutorName().textContent = name;
+  }
+
+  if (DetailsDOM.tutorEmail()) {
+    DetailsDOM.tutorEmail().textContent =
+        offer.tutorEmail ?? '—';
+  }
+
 }
 
 function renderStudents(students) {
