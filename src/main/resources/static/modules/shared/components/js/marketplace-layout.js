@@ -16,7 +16,6 @@ const MarketplaceLayout = (() => {
       { id: 'dashboard',   href: '/modules/marketplace/dashboard.html',    label: 'Marketplace' },
       { id: 'tutorias',    href: '/modules/tutoring/tutoring-catalog.html', label: 'Tutorías' },
       { id: 'reputation',  href: '/modules/reputation/reputation.html', label: 'Reputación' },
-      { id: 'chat',        href: '/modules/chat/conversations.html', label: 'Mensajes'}
     ];
 
     const navLinks = links.map(({ id, href, label }) => {

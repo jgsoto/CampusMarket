@@ -86,9 +86,6 @@ function renderAction(product) {
           </svg>
           Contactar por WhatsApp
         </a>` : ''}
-      <button id="chat-btn"
-        class="w-full bg-uce-navy hover:bg-uce-navy-light text-white font-bold
-               text-sm py-3 rounded-xl transition-colors">Enviar mensaje</button>
     </div>`;
 }
 
