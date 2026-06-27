@@ -89,6 +89,56 @@ function renderAction(product) {
     </div>`;
 }
 
+async function initChatButton(product) {
+
+  const btn = document.getElementById('chat-btn');
+
+  if (!btn) return;
+
+  btn.addEventListener('click', async () => {
+
+    const buyerId = localStorage.getItem('campusMarketUserId');
+
+    if (!buyerId) {
+      alert('Debes iniciar sesión.');
+      return;
+    }
+
+    try {
+
+      const response = await fetch(
+          `${API_BASE}/api/chat/conversations`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-User-Id': buyerId
+            },
+            body: JSON.stringify({
+              listingId: product.id,
+              sellerId: product.ownerId
+            })
+          }
+      );
+
+      if (!response.ok) {
+        throw new Error();
+      }
+
+      const conversation = await response.json();
+
+      window.location.href =
+          `/modules/chat/chat.html?id=${conversation.id}`;
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert('No se pudo iniciar la conversación.');
+    }
+  });
+}
+
 function renderProduct(product) {
   document.getElementById('breadcrumb-title').textContent     = product.title;
   document.title                                              = `CampusMarket | ${product.title}`;
@@ -115,6 +165,7 @@ function renderProduct(product) {
   }`;
 
   renderAction(product);
+  initChatButton(product);
 
   document.getElementById('product-skeleton').remove();
   document.getElementById('product-content').hidden = false;

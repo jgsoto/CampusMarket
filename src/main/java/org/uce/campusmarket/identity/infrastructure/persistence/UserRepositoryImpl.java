@@ -6,6 +6,7 @@ import org.uce.campusmarket.identity.domain.model.User;
 import org.uce.campusmarket.identity.domain.repository.UserRepository;
 import org.uce.campusmarket.identity.infrastructure.mapper.UserMapper;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -34,5 +35,13 @@ public class UserRepositoryImpl implements UserRepository {
     public Optional<User> findByClerkId(String clerkId) {
         return jpaUserRepository.findByClerkId(clerkId)
                 .map(userMapper::toDomain);
+    }
+
+    @Override
+    public List<User> findAllById(List<UUID> ids) {
+        return jpaUserRepository.findAllById(ids)
+                .stream()
+                .map(userMapper::toDomain)
+                .toList();
     }
 }
