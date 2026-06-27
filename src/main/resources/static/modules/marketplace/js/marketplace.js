@@ -22,6 +22,24 @@ function createCard(listing) {
 
     <div class="p-5 flex flex-col gap-3 flex-1">
       <h3 class="font-display text-base font-bold text-uce-navy leading-snug line-clamp-2 ${isSold ? 'opacity-50' : ''}">${listing.title}</h3>
+      <div class="flex items-center justify-between text-xs">
+    <span class="font-medium text-gray-700">
+        ${listing.sellerName ?? 'Vendedor'}
+    </span>
+
+    ${
+      listing.sellerReviewCount > 0
+          ? `
+        <span class="text-amber-500 font-semibold">
+            ★ ${listing.sellerReputation.toFixed(1)}
+            <span class="text-gray-500">(${listing.sellerReviewCount})</span>
+        </span>`
+          : `
+        <span class="text-gray-400">
+            Sin reseñas
+        </span>`
+  }
+</div>
       <p class="text-xs text-gray-500 line-clamp-2 flex-1 ${isSold ? 'opacity-50' : ''}">${listing.description}</p>
       
       <div class="flex items-center justify-between mt-auto pt-3 border-t border-gray-100">
