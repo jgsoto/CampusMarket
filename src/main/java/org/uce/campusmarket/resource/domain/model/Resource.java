@@ -6,6 +6,9 @@ import lombok.NoArgsConstructor;
 import org.uce.campusmarket.shared.exception.DomainException;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -18,6 +21,7 @@ public class Resource {
     private String description;
     private String category;
     private LocalDateTime createdAt;
+    private final List<ResourceFile> files = new ArrayList<>();
 
     public Resource(UUID id, UUID ownerId, String title, String description, String category) {
         validateRequiredFields(ownerId, title, description, category);
@@ -71,7 +75,26 @@ public class Resource {
         }
     }
 
-    public void restoreFromPersistence(LocalDateTime createdAt) {
+    public void restoreFromPersistence(LocalDateTime createdAt, List<ResourceFile> files) {
         this.createdAt = createdAt;
+
+        this.files.clear();
+        if (files != null) {
+            this.files.addAll(files);
+        }
+    }
+
+    public List<ResourceFile> getFiles() {
+        return Collections.unmodifiableList(files);
+    }
+
+    public void addFile(ResourceFile file) {
+        if (file != null) {
+            this.files.add(file);
+        }
+    }
+
+    public void removeFile(UUID fileId) {
+        this.files.removeIf(file -> file.getId().equals(fileId));
     }
 }
