@@ -25,10 +25,14 @@ public class UpdateResourceUseCase {
     private final ResourceRepository resourceRepository;
     private final FileStoragePort fileStoragePort;
 
-    public ResourceResponse execute(UpdateResourceRequest request) {
+    public ResourceResponse execute(UpdateResourceRequest request, UUID requesterId) {
         
         Resource resource = resourceRepository.findById(request.getResourceId())
                 .orElseThrow(() -> new DomainException("El recurso especificado no existe"));
+
+        if (!resource.getOwnerId().equals(requesterId)) {
+            throw new DomainException("No tienes permiso para actualizar este recurso");
+        }
 
         resource.updateDetails(
                 request.getTitle(),

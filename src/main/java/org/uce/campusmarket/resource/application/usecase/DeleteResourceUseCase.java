@@ -18,10 +18,14 @@ public class DeleteResourceUseCase {
     private final ResourceRepository resourceRepository;
     private final FileStoragePort fileStoragePort;
 
-    public void execute(UUID resourceId) {
+    public void execute(UUID resourceId, UUID requesterId) {
         
         Resource resource = resourceRepository.findById(resourceId)
                 .orElseThrow(() -> new DomainException("El recurso especificado no existe"));
+
+        if (!resource.getOwnerId().equals(requesterId)) {
+            throw new DomainException("No tienes permiso para eliminar este recurso");
+        }
 
         if (resource.getFiles() != null && !resource.getFiles().isEmpty()) {
             resource.getFiles().forEach(file -> fileStoragePort.delete(file.getUrl()));
