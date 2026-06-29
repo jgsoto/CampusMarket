@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CampusMarket | Detalle de Recurso</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/js/tailwind-config.js"></script>
+  <link rel="stylesheet" href="/css/styles.css" />
+  <script async crossorigin="anonymous"
+    data-clerk-publishable-key="pk_test_ZnVubnktbXVza294LTU5LmNsZXJrLmFjY291bnRzLmRldiQ"
+    src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@4/dist/clerk.browser.js">
+  </script>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+
+  <div id="navbar-placeholder"></div>
+
+  <main class="max-w-4xl mx-auto px-6 py-10">
+
+    <nav class="flex items-center gap-2 text-sm text-gray-400 mb-8">
+      <a href="/modules/resources/dashboard.html" class="hover:text-uce-navy transition-colors">Recursos Académicos</a>
+      <span class="text-gray-300">›</span>
+      <span class="text-gray-700 font-medium" id="breadcrumb-title">Cargando...</span>
+    </nav>
+
+    <div id="loader" class="text-center py-20 text-gray-400">Cargando detalles...</div>
+
+    <div id="content-container" class="hidden">
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-6">
+        <div class="px-8 py-6 border-b border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <span id="res-category" class="px-2.5 py-1 bg-gray-100 text-gray-600 rounded-md text-xs font-medium mb-3 inline-block"></span>
+            <h1 id="res-title" class="font-display text-2xl font-bold text-uce-navy"></h1>
+            <p id="res-owner" class="text-sm text-gray-500 mt-2"></p>
+          </div>
+          <div id="owner-actions" class="hidden flex gap-2">
+            <button id="btn-edit" class="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-200 transition-colors">Editar</button>
+            <button id="btn-delete" class="px-4 py-2 bg-red-50 text-red-600 text-sm font-medium rounded-xl hover:bg-red-100 transition-colors">Eliminar</button>
+          </div>
+        </div>
+        <div class="px-8 py-6">
+          <h3 class="text-sm font-bold text-gray-900 mb-2">Descripción</h3>
+          <p id="res-desc" class="text-gray-600 text-sm whitespace-pre-wrap leading-relaxed"></p>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+        <h3 class="text-lg font-bold text-gray-900 mb-4">Archivos adjuntos</h3>
+        <div id="files-list" class="flex flex-col gap-3"></div>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="/modules/shared/components/js/marketplace-layout.js"></script>
+  <script src="/modules/resources/js/resource-details.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CampusMarket | Editar Recurso</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/js/tailwind-config.js"></script>
+  <link rel="stylesheet" href="/css/styles.css" />
+  <script async crossorigin="anonymous"
+    data-clerk-publishable-key="pk_test_ZnVubnktbXVza294LTU5LmNsZXJrLmFjY291bnRzLmRldiQ"
+    src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@4/dist/clerk.browser.js">
+  </script>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+
+  <div id="navbar-placeholder"></div>
+
+  <main class="max-w-2xl mx-auto px-6 py-10 pb-20">
+
+    <nav class="flex items-center gap-2 text-sm text-gray-400 mb-8">
+      <a href="/modules/resources/dashboard.html" class="hover:text-uce-navy transition-colors">Recursos Académicos</a>
+      <span class="text-gray-300">›</span>
+      <span class="text-gray-700 font-medium">Editar Recurso</span>
+    </nav>
+
+    <div class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+
+      <div class="px-8 py-6 border-b border-gray-100">
+        <h1 class="font-display text-2xl font-bold text-uce-navy">Editar recurso</h1>
+        <p class="text-sm text-gray-400 mt-1">Actualiza la información y/o sube nuevos archivos (los nuevos archivos reemplazarán a los anteriores en esta versión simplificada).</p>
+      </div>
+      
+      <div id="loader" class="text-center py-10 text-gray-400">Cargando datos...</div>
+
+      <form id="edit-resource-form" class="hidden px-8 py-6 flex flex-col gap-6" novalidate>
+
+        <div class="flex flex-col gap-1.5">
+          <label class="text-sm font-medium text-gray-700" for="resource-title">
+            Título <span class="text-red-400">*</span>
+          </label>
+          <input id="resource-title" type="text"
+                 required maxlength="100"
+                 class="px-4 py-3 border-2 border-gray-200 rounded-xl text-sm
+                        focus:border-uce-navy focus:outline-none focus:ring-2
+                        focus:ring-uce-navy/10 transition-colors" />
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label class="text-sm font-medium text-gray-700" for="resource-desc">
+            Descripción <span class="text-red-400">*</span>
+          </label>
+          <textarea id="resource-desc" rows="4" required maxlength="500"
+                    class="px-4 py-3 border-2 border-gray-200 rounded-xl text-sm
+                           focus:border-uce-navy focus:outline-none focus:ring-2
+                           focus:ring-uce-navy/10 transition-colors resize-none"></textarea>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label class="text-sm font-medium text-gray-700" for="resource-category">
+            Categoría <span class="text-red-400">*</span>
+          </label>
+          <select id="resource-category" required
+                  class="px-4 py-3 border-2 border-gray-200 rounded-xl text-sm
+                         focus:border-uce-navy focus:outline-none focus:ring-2
+                         focus:ring-uce-navy/10 transition-colors bg-white">
+            <option value="Apuntes">Apuntes de clase</option>
+            <option value="Examenes">Exámenes pasados</option>
+            <option value="Libros">Libros / PDFs</option>
+            <option value="Proyectos">Proyectos / Código</option>
+          </select>
+        </div>
+
+        <div class="flex flex-col gap-4">
+          <div class="flex items-center justify-between">
+            <label class="text-sm font-medium text-gray-700">
+              Nuevos Archivos (Opcional)
+            </label>
+          </div>
+
+          <label for="resource-files" id="upload-zone"
+                 class="flex flex-col items-center justify-center gap-3 p-8
+                        border-2 border-dashed border-gray-200 rounded-xl cursor-pointer
+                        hover:border-uce-navy hover:bg-uce-navy/2 transition-colors group">
+            <div class="text-center">
+              <p class="text-sm font-medium text-gray-600">Haz clic si deseas subir archivos nuevos</p>
+              <p class="text-xs text-gray-400 mt-0.5">Si subes archivos aquí, los anteriores serán borrados y reemplazados.</p>
+            </div>
+            <input id="resource-files" type="file" multiple class="sr-only" />
+          </label>
+          <div id="file-list" class="text-sm text-gray-600 flex flex-col gap-1"></div>
+        </div>
+
+        <div class="flex gap-4 pt-4 border-t border-gray-100">
+          <a href="#" id="btn-cancel"
+             class="flex-1 py-3 text-center rounded-xl text-sm font-semibold
+                    bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
+            Cancelar
+          </a>
+          <button type="submit" id="btn-submit"
+                  class="flex-1 py-3 rounded-xl text-sm font-bold
+                         bg-uce-navy text-uce-gold hover:bg-uce-navy-light
+                         transition-colors shadow-sm disabled:opacity-50">
+            Guardar Cambios
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+  </main>
+
+  <script src="/modules/shared/components/js/marketplace-layout.js"></script>
+  <script src="/modules/resources/js/edit-resource.js"></script>
+
+</body>
+</html>

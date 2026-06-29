@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CampusMarket | Recursos Académicos</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/js/tailwind-config.js"></script>
+  <link rel="stylesheet" href="/css/styles.css" />
+  <script async crossorigin="anonymous"
+    data-clerk-publishable-key="pk_test_ZnVubnktbXVza294LTU5LmNsZXJrLmFjY291bnRzLmRldiQ"
+    src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@4/dist/clerk.browser.js">
+  </script>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+
+  <div id="navbar-placeholder"></div>
+
+  <main class="max-w-7xl mx-auto px-6 py-10">
+
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+      <div>
+        <h1 class="font-display text-3xl font-bold text-uce-navy">Recursos Académicos</h1>
+        <p class="text-gray-500 mt-1">Encuentra apuntes, exámenes y libros compartidos por la comunidad.</p>
+      </div>
+      <a href="/modules/resources/create-resource.html"
+         class="px-5 py-2.5 bg-uce-navy text-uce-gold font-semibold rounded-xl hover:bg-uce-navy-light transition-colors shadow-sm">
+        Compartir Recurso
+      </a>
+    </div>
+
+    <!-- Buscador -->
+    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col sm:flex-row gap-3 mb-10">
+      <div class="flex-1 relative">
+        <input type="text" id="search-keyword" placeholder="Buscar por palabra clave..."
+               class="w-full pl-10 pr-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-uce-navy/20" />
+        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+      </div>
+      <select id="search-category" class="px-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-uce-navy/20 min-w-[200px]">
+        <option value="">Todas las categorías</option>
+        <option value="Apuntes">Apuntes de clase</option>
+        <option value="Examenes">Exámenes pasados</option>
+        <option value="Libros">Libros / PDFs</option>
+        <option value="Proyectos">Proyectos / Código</option>
+      </select>
+      <button id="btn-search" class="px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition-colors">
+        Buscar
+      </button>
+    </div>
+
+    <!-- Grid de Resultados -->
+    <div id="resources-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <!-- Los recursos se cargarán aquí por JS -->
+    </div>
+
+    <!-- Loader -->
+    <div id="loader" class="hidden text-center py-20 text-gray-400">
+      Cargando recursos...
+    </div>
+    
+    <!-- Empty State -->
+    <div id="empty-state" class="hidden text-center py-20">
+      <p class="text-gray-500 text-lg">No se encontraron recursos.</p>
+    </div>
+
+  </main>
+
+  <script src="/modules/shared/components/js/marketplace-layout.js"></script>
+  <script src="/modules/resources/js/dashboard.js"></script>
+
+</body>
+</html>
