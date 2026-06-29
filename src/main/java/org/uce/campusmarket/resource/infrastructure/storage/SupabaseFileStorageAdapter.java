@@ -31,7 +31,14 @@ public class SupabaseFileStorageAdapter implements FileStoragePort {
     public String upload(MultipartFile file) {
         try {
             // Aseguramos nombres de archivo únicos para evitar colisiones
-            String fileName = UUID.randomUUID() + "-" + file.getOriginalFilename();
+            String originalName = file.getOriginalFilename();
+            if (originalName != null) {
+                // Supabase no acepta caracteres especiales ni espacios en el object key, así que los limpiamos
+                originalName = originalName.replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
+            } else {
+                originalName = "file";
+            }
+            String fileName = UUID.randomUUID() + "-" + originalName;
 
             String uploadUrl = supabaseUrl +
                     "/storage/v1/object/" +
