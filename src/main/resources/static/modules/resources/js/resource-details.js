@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (!resourceId) {
         alert("Recurso no encontrado");
-        window.location.href = '/modules/resources/dashboard.html';
+        window.location.href = '/modules/resources/resources-catalog.html';
         return;
     }
 
@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (!response.ok) throw new Error('Error al eliminar');
                 
                 alert('Recurso eliminado correctamente');
-                window.location.href = '/modules/resources/dashboard.html';
+                window.location.href = '/modules/resources/resources-catalog.html';
 
             } catch (err) {
                 alert(err.message);

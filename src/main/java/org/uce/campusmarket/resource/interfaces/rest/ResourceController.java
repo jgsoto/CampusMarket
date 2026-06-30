@@ -22,6 +22,7 @@ public class ResourceController {
     private final DeleteResourceUseCase deleteResourceUseCase;
     private final GetResourceUseCase getResourceUseCase;
     private final SearchResourcesUseCase searchResourcesUseCase;
+    private final GetResourcesByOwnerUseCase getResourcesByOwnerUseCase;
 
     @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<ResourceResponse> createResource(
@@ -52,6 +53,12 @@ public class ResourceController {
     @GetMapping("/{id}")
     public ResponseEntity<ResourceResponse> getResource(@PathVariable UUID id) {
         ResourceResponse response = getResourceUseCase.execute(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/owner")
+    public ResponseEntity<List<ResourceResponse>> getResourcesByOwner(@RequestHeader("X-User-Id") UUID ownerId) {
+        List<ResourceResponse> response = getResourcesByOwnerUseCase.execute(ownerId);
         return ResponseEntity.ok(response);
     }
 

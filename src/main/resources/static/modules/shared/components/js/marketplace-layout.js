@@ -15,7 +15,7 @@ const MarketplaceLayout = (() => {
         const links = [
             { id: 'dashboard', href: '/modules/marketplace/dashboard.html', label: 'Marketplace' },
             { id: 'tutorias', href: '/modules/tutoring/tutoring-catalog.html', label: 'Tutorías' },
-            { id: 'recursos', href: '/modules/resources/dashboard.html', label: 'Recursos' },
+            { id: 'recursos', href: '/modules/resources/resources-catalog.html', label: 'Recursos' },
             { id: 'reputation', href: '/modules/reputation/reputation.html', label: 'Reputación' },
         ];
 
