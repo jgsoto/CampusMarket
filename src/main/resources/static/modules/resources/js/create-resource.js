@@ -4,6 +4,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const fileListContainer = document.getElementById('file-list');
     const submitBtn = document.getElementById('btn-submit');
     const uploadZone = document.getElementById('upload-zone');
+    const categorySelect = document.getElementById('resource-category');
+
+    // Cargar las categorías dinámicamente
+    fetchCategories(categorySelect);
 
     // Manejar selección de archivos para mostrarlos en la UI
     fileInput.addEventListener('change', (e) => {
@@ -83,8 +87,13 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(errorText || 'Error al subir el recurso');
+                const errorData = await response.json();
+                if (errorData.message === "No se proporcionaron archivos.") {
+                    alert('Ocurrió un error al subir los archivos al servidor.');
+                } else {
+                    alert(`Error al crear: ${errorData.message}`);
+                }
+                throw new Error(errorData.message || 'Error al subir el recurso');
             }
 
             const data = await response.json();
@@ -106,3 +115,25 @@ window.addEventListener('load', async () => {
         MarketplaceLayout.mountNavbar('recursos', window.Clerk.user);
     }
 });
+
+async function fetchCategories(selectElement) {
+    try {
+        const response = await fetch('/api/resources/categories');
+        if (response.ok) {
+            const categories = await response.json();
+            selectElement.innerHTML = '<option value="" disabled selected>Selecciona...</option>';
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category.name;
+                option.textContent = category.name;
+                selectElement.appendChild(option);
+            });
+        } else {
+            console.error('Error fetching resource categories');
+            selectElement.innerHTML = '<option value="" disabled selected>Error al cargar categorías</option>';
+        }
+    } catch (error) {
+        console.error('Network error fetching resource categories:', error);
+        selectElement.innerHTML = '<option value="" disabled selected>Error de red</option>';
+    }
+}

@@ -9,25 +9,32 @@ const STATUS_STYLES = {
 const ListingsDOM = Object.freeze({
   tabProducts:   () => document.getElementById('tab-products'),
   tabTutoring:   () => document.getElementById('tab-tutoring'),
+  tabResources:  () => document.getElementById('tab-resources'),
   secProducts:   () => document.getElementById('section-products'),
   secTutoring:   () => document.getElementById('section-tutoring'),
+  secResources:  () => document.getElementById('section-resources'),
   productsGrid:  () => document.getElementById('my-listings-container'),
   tutoringGrid:  () => document.getElementById('my-tutoring-container'),
+  resourcesGrid: () => document.getElementById('my-resources-container'),
   btnNewPub:     () => document.getElementById('btn-new-publication'),
 });
 
 function initTabs() {
   const btnProd = ListingsDOM.tabProducts();
   const btnTut = ListingsDOM.tabTutoring();
+  const btnRes = ListingsDOM.tabResources();
   const secProd = ListingsDOM.secProducts();
   const secTut = ListingsDOM.secTutoring();
+  const secRes = ListingsDOM.secResources();
   const btnNew = ListingsDOM.btnNewPub();
 
   btnProd?.addEventListener('click', () => {
     secProd.classList.replace('hidden', 'block');
     secTut.classList.replace('block', 'hidden');
+    secRes.classList.replace('block', 'hidden');
     btnProd.className = "px-6 py-3 text-sm font-bold border-b-2 border-uce-navy text-uce-navy transition-all";
     btnTut.className = "px-6 py-3 text-sm font-medium border-b-2 border-transparent text-gray-400 hover:text-uce-navy transition-all";
+    btnRes.className = "px-6 py-3 text-sm font-medium border-b-2 border-transparent text-gray-400 hover:text-uce-navy transition-all";
     
     if (btnNew) btnNew.href = "/modules/marketplace/create-listing.html";
   });
@@ -35,10 +42,23 @@ function initTabs() {
   btnTut?.addEventListener('click', () => {
     secTut.classList.replace('hidden', 'block');
     secProd.classList.replace('block', 'hidden');
+    secRes.classList.replace('block', 'hidden');
     btnTut.className = "px-6 py-3 text-sm font-bold border-b-2 border-uce-navy text-uce-navy transition-all";
     btnProd.className = "px-6 py-3 text-sm font-medium border-b-2 border-transparent text-gray-400 hover:text-uce-navy transition-all";
+    btnRes.className = "px-6 py-3 text-sm font-medium border-b-2 border-transparent text-gray-400 hover:text-uce-navy transition-all";
     
     if (btnNew) btnNew.href = "/modules/tutoring/create-tutoring.html";
+  });
+
+  btnRes?.addEventListener('click', () => {
+    secRes.classList.replace('hidden', 'block');
+    secProd.classList.replace('block', 'hidden');
+    secTut.classList.replace('block', 'hidden');
+    btnRes.className = "px-6 py-3 text-sm font-bold border-b-2 border-uce-navy text-uce-navy transition-all";
+    btnProd.className = "px-6 py-3 text-sm font-medium border-b-2 border-transparent text-gray-400 hover:text-uce-navy transition-all";
+    btnTut.className = "px-6 py-3 text-sm font-medium border-b-2 border-transparent text-gray-400 hover:text-uce-navy transition-all";
+    
+    if (btnNew) btnNew.href = "/modules/resources/create-resource.html";
   });
 }
 
@@ -260,10 +280,80 @@ window.addEventListener('load', async () => {
   MarketplaceLayout.mountNavbar('my-listings', Clerk.user);
   initTabs();
   
-  await Promise.all([loadMyListings(), loadMyTutoring()]);
+  await Promise.all([loadMyListings(), loadMyTutoring(), loadMyResources()]);
 
   document.getElementById('edit-listing-form').addEventListener('submit', handleEditSubmit);
   document.getElementById('edit-modal').addEventListener('click', e => {
     if (e.target === e.currentTarget) closeEditModal();
   });
 });
+
+function createMyResourceCard(resource) {
+  const card = document.createElement('article');
+  card.className = `bg-white border border-gray-100 rounded-2xl p-5 hover:shadow-md transition-shadow flex flex-col h-full`;
+  
+  const fileCount = resource.files ? resource.files.length : 0;
+  
+  card.innerHTML = `
+    <div class="flex justify-between items-start mb-4">
+      <span class="inline-block px-3 py-1 bg-uce-navy/5 text-uce-navy text-xs font-bold rounded-lg">${resource.category || 'Recurso'}</span>
+      <span class="text-gray-400 text-xs flex items-center gap-1">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
+        ${fileCount} arch.
+      </span>
+    </div>
+    <h3 class="font-display font-bold text-gray-800 text-lg mb-2 line-clamp-2">${resource.title}</h3>
+    <p class="text-gray-500 text-sm mb-4 line-clamp-3 flex-grow">${resource.description}</p>
+    <div class="flex items-center justify-between pt-4 border-t border-gray-100 mt-auto gap-2">
+      <button onclick="window.location.href='/modules/resources/edit-resource.html?id=${resource.id}'" class="flex-1 py-1.5 bg-yellow-50 text-yellow-700 text-xs font-bold rounded-xl hover:bg-yellow-100 transition-all">
+        Editar
+      </button>
+      <button onclick="deleteMyResource('${resource.id}')" class="py-1.5 px-3 rounded-xl text-xs font-bold bg-red-50 text-red-600 hover:bg-red-100 transition-colors">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="inline"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+      </button>
+    </div>
+  `;
+  return card;
+}
+
+async function deleteMyResource(id) {
+  const ok = await showConfirm('¿Estás seguro de que quieres eliminar este recurso? Todos sus archivos serán borrados de forma permanente.', 'Eliminar recurso');
+  if (!ok) return;
+
+  try {
+    const res = await fetch(`${API_BASE}/api/resources/${id}`, {
+      method: 'DELETE',
+      headers: { 'X-User-Id': getOwnerId() }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    showToast('Recurso eliminado correctamente.', 'success');
+    loadMyResources();
+  } catch (err) {
+    console.error('[MyResources] Error eliminando:', err);
+    showToast('No se pudo eliminar el recurso.', 'error');
+  }
+}
+
+async function loadMyResources() {
+  const container = ListingsDOM.resourcesGrid();
+  const ownerId = getOwnerId();
+
+  if (!ownerId) return;
+
+  try {
+    const res = await fetch(`${API_BASE}/api/resources/owner`, { headers: { 'X-User-Id': ownerId } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const resources = await res.json();
+    container.innerHTML = '';
+
+    if (!resources.length) {
+      container.innerHTML = `<div class="col-span-full flex flex-col items-center justify-center py-20 gap-4"><p class="text-gray-500 text-sm">No has subido ningún recurso académico aún.</p></div>`;
+      return;
+    }
+    resources.forEach(r => container.appendChild(createMyResourceCard(r)));
+  } catch (err) {
+    console.error('[MyResources] Error:', err);
+    container.innerHTML = `<div class="col-span-full text-center py-12 text-sm text-red-500">Error al cargar recursos.</div>`;
+  }
+}
