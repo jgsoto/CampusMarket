@@ -71,49 +71,105 @@ function renderAction(product) {
 
     container.innerHTML = `
 <div class="bg-gray-50 border border-gray-100 rounded-xl p-5">
-    <h3 class="text-sm font-semibold text-uce-navy mb-4">
+
+    <h3 class="text-sm font-semibold text-uce-navy mb-5">
         Información del vendedor
     </h3>
 
-    <div class="flex flex-col gap-4">
+    <!-- Cabecera -->
+    <div class="flex items-center gap-4 pb-5 border-b border-gray-200">
 
-        <div class="pb-4 border-b border-gray-100">
-            <p class="text-lg font-bold text-gray-800">
+        ${
+        product.sellerPhotoUrl
+            ? `
+                    <img
+                        src="${product.sellerPhotoUrl}"
+                        alt="${product.sellerName}"
+                        class="w-16 h-16 rounded-full object-cover border border-gray-200 shadow-sm flex-shrink-0">
+                  `
+            : `
+                    <div
+                        class="w-16 h-16 rounded-full bg-gradient-to-br from-uce-navy to-uce-navy-light
+                               flex items-center justify-center text-uce-gold font-bold text-xl flex-shrink-0">
+                        ${product.sellerName?.charAt(0).toUpperCase() ?? "?"}
+                    </div>
+                  `
+    }
+
+        <div class="min-w-0 flex-1">
+
+            <h4 class="text-lg font-bold text-gray-800 truncate">
                 ${product.sellerName ?? 'No disponible'}
-            </p>
+            </h4>
 
             <p class="text-sm text-gray-500 mt-1">
                 Calificación del vendedor
             </p>
 
-            <div class="flex items-center gap-2 mt-1">
-                <span class="text-lg font-semibold text-uce-navy">
+            <div class="flex items-center gap-2 mt-2 flex-wrap">
+
+                <span class="text-xl font-bold text-uce-navy">
                     ${product.sellerReputation?.toFixed(1) ?? '0.0'}
                 </span>
 
-                <span class="text-gray-400">/ 5</span>
+                <span class="text-gray-400">
+                    / 5
+                </span>
 
                 <span class="text-sm text-gray-500">
                     (${product.sellerReviewCount ?? 0}
                     ${(product.sellerReviewCount ?? 0) === 1 ? 'reseña' : 'reseñas'})
                 </span>
+
             </div>
+
         </div>
 
-        ${renderContactRow('Correo', product.sellerEmail ?? 'No disponible')}
-        ${renderContactRow('Teléfono', product.sellerPhone ?? 'No disponible')}
-        ${renderContactRow('Ubicación', product.sellerAddress ?? 'No disponible')}
-        ${product.sellerSocialMedia ? renderContactRow('Redes', product.sellerSocialMedia) : ''}
+    </div>
 
-        ${product.sellerPhone ? `
+    <!-- Información -->
+    <div class="mt-5 space-y-4">
+
+        ${renderContactRow('Correo', product.sellerEmail ?? 'No disponible')}
+
+        ${renderContactRow('Teléfono', product.sellerPhone ?? 'No disponible')}
+
+        ${renderContactRow('Ubicación', product.sellerAddress ?? 'No disponible')}
+
+        ${
+        product.sellerSocialMedia
+            ? renderContactRow('Redes sociales', product.sellerSocialMedia)
+            : ''
+    }
+
+    </div>
+
+    ${
+        product.sellerPhone
+            ? `
                 <a href="https://wa.me/593${product.sellerPhone.replace(/^0/, '')}"
                    target="_blank"
                    rel="noopener noreferrer"
-                   class="mt-2 w-full bg-green-500 hover:bg-green-600 text-white font-semibold
-                          py-3 rounded-xl transition-colors text-center">
+                   class="mt-6 flex items-center justify-center gap-2 w-full
+                          bg-green-600 hover:bg-green-700
+                          text-white font-semibold
+                          py-3 rounded-xl
+                          transition-colors">
+
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         class="w-5 h-5"
+                         fill="currentColor"
+                         viewBox="0 0 24 24">
+                        <path d="M20.52 3.48A11.82 11.82 0 0 0 12.04 0C5.42 0 .04 5.38.04 12c0 2.12.56 4.2 1.62 6.03L0 24l6.14-1.61A11.9 11.9 0 0 0 12.04 24C18.66 24 24 18.62 24 12a11.82 11.82 0 0 0-3.48-8.52z"/>
+                    </svg>
+
                     Contactar por WhatsApp
-                </a>` : ''}
-    </div>
+
+                </a>
+            `
+            : ''
+    }
+
 </div>
 `;
 }

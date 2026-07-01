@@ -62,6 +62,7 @@ public class GetListingUseCase {
                 .sellerSocialMedia(seller != null ? seller.getSocialMedia() : "No disponible")
                 .sellerReputation(reputation)
                 .sellerReviewCount(totalReviews)
+                .sellerPhotoUrl(seller != null ? seller.getPhotoUrl() : null)
                 .build();
     }
 }

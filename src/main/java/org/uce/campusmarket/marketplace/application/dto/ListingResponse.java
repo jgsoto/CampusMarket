@@ -34,4 +34,5 @@ public class ListingResponse {
 
     private Double sellerReputation;
     private Integer sellerReviewCount;
+    private String sellerPhotoUrl;
 }
