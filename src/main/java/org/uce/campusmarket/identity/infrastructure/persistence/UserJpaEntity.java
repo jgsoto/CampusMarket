@@ -43,6 +43,9 @@ public class UserJpaEntity {
     @Column(name = "social_media", length = 255)
     private String socialMedia;
 
+    @Column(name = "photo_url")
+    private String photoUrl;
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 }

@@ -22,6 +22,7 @@ public class UserMapper {
                 .address(user.getAddress())
                 .description(user.getDescription())
                 .socialMedia(user.getSocialMedia())
+                .photoUrl(user.getPhotoUrl())
                 .createdAt(user.getCreatedAt())
                 .build();
     }
@@ -41,6 +42,7 @@ public class UserMapper {
                 .address(entity.getAddress())
                 .description(entity.getDescription())
                 .socialMedia(entity.getSocialMedia())
+                .photoUrl(entity.getPhotoUrl())
                 .createdAt(entity.getCreatedAt())
                 .build();
     }
