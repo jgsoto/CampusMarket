@@ -45,35 +45,26 @@ const DetailsAPI = Object.freeze({
     fetchOffer: (id) => fetch(`${API_BASE}/api/tutoring/${id}`),
     fetchReputation: (uid) => fetch(`${API_BASE}/api/reviews/users/${uid}/reputation`),
     fetchReviews: (uid) => fetch(`${API_BASE}/api/reviews/users/${uid}/reviews`),
-    fetchEnrolled: (id, uid) =>
-        fetch(`${API_BASE}/api/tutoring/${id}/enrolled`, {headers: {'X-User-Id': uid}}),
-    closeOffer: (id, uid) =>
-        fetch(`${API_BASE}/api/tutoring/${id}/close`, {method: 'POST', headers: {'X-User-Id': uid}}),
-    createReview: (payload, uid) =>
-        fetch(`${API_BASE}/api/reviews`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json', 'X-User-Id': uid},
-            body: JSON.stringify(payload),
-        }),
-    deleteReview: (reviewId, uid) =>
-        fetch(`${API_BASE}/api/reviews/${reviewId}`, {method: 'DELETE', headers: {'X-User-Id': uid}}),
-    updateReview: (reviewId, payload, uid) =>
-        fetch(`${API_BASE}/api/reviews/${reviewId}`, {
-            method: 'PUT',
-            headers: {'Content-Type': 'application/json', 'X-User-Id': uid},
-            body: JSON.stringify(payload),
-        }),
-    fetchStudents: (offerId) =>
-        fetch(`${API_BASE}/api/tutoring/${offerId}/students`),
+    fetchEnrolled: (id, uid) => fetch(`${API_BASE}/api/tutoring/${id}/enrolled`, {headers: {'X-User-Id': uid}}),
+    closeOffer: (id, uid) => fetch(`${API_BASE}/api/tutoring/${id}/close`, {
+        method: 'POST', headers: {'X-User-Id': uid}
+    }),
+    createReview: (payload, uid) => fetch(`${API_BASE}/api/reviews`, {
+        method: 'POST', headers: {'Content-Type': 'application/json', 'X-User-Id': uid}, body: JSON.stringify(payload),
+    }),
+    deleteReview: (reviewId, uid) => fetch(`${API_BASE}/api/reviews/${reviewId}`, {
+        method: 'DELETE', headers: {'X-User-Id': uid}
+    }),
+    updateReview: (reviewId, payload, uid) => fetch(`${API_BASE}/api/reviews/${reviewId}`, {
+        method: 'PUT', headers: {'Content-Type': 'application/json', 'X-User-Id': uid}, body: JSON.stringify(payload),
+    }),
+    fetchStudents: (offerId) => fetch(`${API_BASE}/api/tutoring/${offerId}/students`),
 
-    fetchUsersBulk: (ids) =>
-        fetch(`${API_BASE}/api/users/profile/bulk`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(ids)
-        }),
+    fetchUsersBulk: (ids) => fetch(`${API_BASE}/api/users/profile/bulk`, {
+        method: 'POST', headers: {
+            'Content-Type': 'application/json'
+        }, body: JSON.stringify(ids)
+    }),
 });
 
 function buildInitials(name) {
@@ -95,9 +86,7 @@ function showToast(message, type = 'success') {
     const container = DetailsDOM.toast();
     if (!container) return;
     const border = {
-        success: 'border-l-green-500',
-        error: 'border-l-red-500',
-        warning: 'border-l-yellow-500'
+        success: 'border-l-green-500', error: 'border-l-red-500', warning: 'border-l-yellow-500'
     }[type] ?? 'border-l-green-500';
     const toast = document.createElement('div');
     toast.className = `bg-uce-navy text-white px-5 py-3.5 rounded-xl shadow-xl text-sm border-l-4 ${border}`;
@@ -116,11 +105,22 @@ function renderOfferInfo(offer) {
     const badge = DetailsDOM.statusBadge();
     if (badge) {
         badge.textContent = isOpen ? 'Disponible' : 'Cerrada';
-        badge.className = `px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
-            isOpen ? 'bg-emerald-100 text-emerald-700 border border-emerald-200'
-                : 'bg-gray-100 text-gray-500 border border-gray-200'
-        }`;
+        badge.className = `px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${isOpen ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : 'bg-gray-100 text-gray-500 border border-gray-200'}`;
     }
+}
+
+function renderContactRow(label, value) {
+    return `
+        <div class="flex justify-between items-start gap-3">
+            <span class="text-sm text-gray-500">
+                ${label}
+            </span>
+
+            <span class="text-sm font-medium text-gray-800 text-right break-all">
+                ${value}
+            </span>
+        </div>
+    `;
 }
 
 function renderTutorPanel(offer) {
@@ -128,54 +128,92 @@ function renderTutorPanel(offer) {
     const score = Number(offer.averageRating ?? 0);
     const total = Number(offer.totalReviews ?? 0);
 
-    const reputationStars = DetailsDOM.reputationStars();
-    const reputationScore = DetailsDOM.reputationScore();
-    const reviewCount = document.getElementById('tutor-review-count');
+    const panel = DetailsDOM.contactPanel();
 
-    if (reputationStars) {
-        reputationStars.textContent = buildStarString(score);
-    }
+    if (!panel) return;
 
-    if (reputationScore) {
-        reputationScore.textContent = score.toFixed(1);
-    }
+    panel.innerHTML = `
 
-    if (reviewCount) {
-        reviewCount.textContent =
-            total > 0
-                ? `(${total})`
-                : 'Sin reseñas';
-    }
+<div class="bg-gray-50 border border-gray-100 rounded-xl p-5">
 
-    const name = offer.tutorName ?? 'Tutor UCE';
+    <h3 class="text-sm font-semibold text-uce-navy mb-4">
+        Información del tutor
+    </h3>
 
-    const photo = DetailsDOM.tutorPhoto();
-    const initials = DetailsDOM.tutorInitials();
+    <div class="flex items-center gap-4 pb-4 border-b border-gray-100">
 
-    if (offer.tutorPhotoUrl) {
+        ${offer.tutorPhotoUrl ? `
+                <img
+                    src="${offer.tutorPhotoUrl}"
+                    alt="${offer.tutorName}"
+                    class="w-16 h-16 rounded-full object-cover border border-gray-200 shadow-sm">
+                ` : `
+                <div
+                    class="w-16 h-16 rounded-full bg-gradient-to-br from-uce-navy to-uce-navy-light
+                           flex items-center justify-center text-white font-bold text-xl">
+                    ${buildInitials(offer.tutorName)}
+                </div>
+                `}
 
-        photo.src = offer.tutorPhotoUrl;
-        photo.classList.remove('hidden');
+        <div class="flex-1">
 
-        initials.classList.add('hidden');
+            <p class="text-lg font-bold text-gray-800">
+                ${offer.tutorName}
+            </p>
 
-    } else {
+            <p class="text-sm text-gray-500 mt-1">
+                Calificación del tutor
+            </p>
 
-        initials.textContent = buildInitials(name);
-        initials.classList.remove('hidden');
+            <div class="flex items-center gap-2 mt-1">
 
-        photo.classList.add('hidden');
+                <span class="text-lg font-semibold text-uce-navy">
+                    ${score.toFixed(1)}
+                </span>
 
-    }
+                <span class="text-gray-400">
+                    / 5
+                </span>
 
-    if (DetailsDOM.tutorName()) {
-        DetailsDOM.tutorName().textContent = name;
-    }
+                <span class="text-sm text-gray-500">
+                    (${total}
+                    ${total === 1 ? 'reseña' : 'reseñas'})
+                </span>
 
-    if (DetailsDOM.tutorEmail()) {
-        DetailsDOM.tutorEmail().textContent =
-            offer.tutorEmail ?? '—';
-    }
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="flex flex-col gap-4 mt-4">
+
+        ${renderContactRow('Correo', offer.tutorEmail ?? 'No disponible')}
+
+        ${renderContactRow('Teléfono', offer.tutorPhone ?? 'No disponible')}
+
+        ${renderContactRow('Ubicación', offer.tutorAddress ?? 'No disponible')}
+
+        ${offer.tutorSocialMedia ? renderContactRow('Redes', offer.tutorSocialMedia) : ''}
+
+        ${offer.tutorPhone ? `
+                <a
+                    href="https://wa.me/593${offer.tutorPhone.replace(/^0/, '')}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="mt-2 w-full bg-green-500 hover:bg-green-600
+                           text-white font-semibold py-3 rounded-xl
+                           transition-colors text-center">
+
+                    Contactar por WhatsApp
+
+                </a>
+                ` : ''}
+
+    </div>
+
+</div>
+`;
 
 }
 
@@ -262,8 +300,7 @@ function renderReviews(reviews, currentUserId) {
         const isOwner = review.reviewerId === currentUserId;
         const initials = buildInitials(review.reviewerName ?? 'U');
         const stars = buildStarString(review.rating ?? 0);
-        const ownerBtns = isOwner
-            ? `<div class="flex gap-2 mt-2">
+        const ownerBtns = isOwner ? `<div class="flex gap-2 mt-2">
            <button class="edit-review-btn text-[10px] font-semibold text-blue-500 hover:underline" data-id="${review.id}" data-rating="${review.rating}" data-comment="${encodeURIComponent(review.comment ?? '')}">Editar</button>
            <button class="delete-review-btn text-[10px] font-semibold text-red-400 hover:underline" data-id="${review.id}">Eliminar</button>
          </div>` : '';
@@ -294,9 +331,12 @@ function initReviewActions(currentUserId) {
     document.querySelectorAll('.delete-review-btn').forEach(btn => {
         btn.addEventListener('click', async () => {
             const confirmed = await Swal.fire({
-                text: '¿Eliminar tu reseña?', icon: 'warning',
-                showCancelButton: true, confirmButtonText: 'Eliminar',
-                confirmButtonColor: '#ef4444', cancelButtonText: 'Cancelar',
+                text: '¿Eliminar tu reseña?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Eliminar',
+                confirmButtonColor: '#ef4444',
+                cancelButtonText: 'Cancelar',
             });
             if (!confirmed.isConfirmed) return;
             const res = await DetailsAPI.deleteReview(btn.dataset.id, currentUserId);
@@ -316,7 +356,8 @@ function initReviewActions(currentUserId) {
             ${[1, 2, 3, 4, 5].map(n => `<option value="${n}" ${n == btn.dataset.rating ? 'selected' : ''}>${n} estrella${n > 1 ? 's' : ''}</option>`).join('')}
           </select>
           <textarea id="swal-comment" class="swal2-textarea" placeholder="Comentario">${decodeURIComponent(btn.dataset.comment)}</textarea>`,
-                showCancelButton: true, confirmButtonText: 'Guardar',
+                showCancelButton: true,
+                confirmButtonText: 'Guardar',
                 confirmButtonColor: '#0A1628',
                 preConfirm: () => ({
                     rating: parseInt(document.getElementById('swal-rating').value),
@@ -365,9 +406,7 @@ async function initReviewForm(offer, currentUserId) {
         const reviewsRes = await DetailsAPI.fetchReviews(offer.tutorId);
         const allReviews = reviewsRes.ok ? await reviewsRes.json() : [];
 
-        const alreadyReviewed = allReviews.some(
-            review => review.reviewerId === currentUserId && review.targetId === offer.id
-        );
+        const alreadyReviewed = allReviews.some(review => review.reviewerId === currentUserId && review.targetId === offer.id);
 
         if (alreadyReviewed) {
             section.classList.add('hidden');
@@ -396,11 +435,7 @@ async function initReviewForm(offer, currentUserId) {
         }
 
         const payload = {
-            reviewedUserId: offer.tutorId,
-            targetId: offer.id,
-            targetType: 'TUTORING',
-            rating,
-            comment,
+            reviewedUserId: offer.tutorId, targetId: offer.id, targetType: 'TUTORING', rating, comment,
         };
 
         const res = await DetailsAPI.createReview(payload, currentUserId);
@@ -432,9 +467,7 @@ async function initEnrollmentButton(offer, offerId, currentUserId) {
         try {
             const reviewsRes = await DetailsAPI.fetchReviews(offer.tutorId);
             const allReviews = reviewsRes.ok ? await reviewsRes.json() : [];
-            alreadyReviewed = allReviews.some(
-                review => review.reviewerId === currentUserId && review.targetId === offerId
-            );
+            alreadyReviewed = allReviews.some(review => review.reviewerId === currentUserId && review.targetId === offerId);
         } catch (e) {
             console.warn('[TutoringDetails] Error:', e);
         }
@@ -534,8 +567,11 @@ async function initOwnerActions(offer, offerId, currentUserId) {
             const confirmed = await Swal.fire({
                 title: '¿Cerrar esta tutoría?',
                 text: 'El anuncio dejará de aparecer disponible en el catálogo de alumnos.',
-                icon: 'warning', showCancelButton: true,
-                confirmButtonText: 'Sí, cerrar', cancelButtonText: 'No', confirmButtonColor: '#ef4444',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, cerrar',
+                cancelButtonText: 'No',
+                confirmButtonColor: '#ef4444',
             });
             if (!confirmed.isConfirmed) return;
             closeBtn.disabled = true;
@@ -557,7 +593,9 @@ async function initOwnerActions(offer, offerId, currentUserId) {
         <input id="swal-subject" class="swal2-input" placeholder="Título" value="${offer.subject}">
         <textarea id="swal-description" class="swal2-textarea" placeholder="Descripción">${offer.description ?? ''}</textarea>
         <input id="swal-rate" type="number" class="swal2-input" placeholder="Tarifa por hora ($)" value="${offer.hourlyRate}">`,
-            showCancelButton: true, confirmButtonText: 'Guardar cambios', confirmButtonColor: '#0A1628',
+            showCancelButton: true,
+            confirmButtonText: 'Guardar cambios',
+            confirmButtonColor: '#0A1628',
             preConfirm: () => ({
                 subject: document.getElementById('swal-subject').value.trim(),
                 description: document.getElementById('swal-description').value.trim(),
@@ -582,14 +620,16 @@ async function initOwnerActions(offer, offerId, currentUserId) {
         const confirmed = await Swal.fire({
             title: '¿Eliminar tutoría?',
             text: 'Esta acción borrará la publicación de forma permanente.',
-            icon: 'warning', showCancelButton: true,
-            confirmButtonText: 'Sí, eliminar', confirmButtonColor: '#ef4444', cancelButtonText: 'Cancelar'
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, eliminar',
+            confirmButtonColor: '#ef4444',
+            cancelButtonText: 'Cancelar'
         });
         if (!confirmed.isConfirmed) return;
 
         const res = await fetch(`${API_BASE}/api/tutoring/${offerId}`, {
-            method: 'DELETE',
-            headers: {'X-User-Id': currentUserId}
+            method: 'DELETE', headers: {'X-User-Id': currentUserId}
         });
         if (res.ok) {
             window.location.href = "/modules/tutoring/tutoring-catalog.html";
@@ -609,16 +649,9 @@ async function loadDetails(offerId, currentUserId) {
         const allReviews = revRes.ok ? await revRes.json() : [];
 
         const filteredReviews = allReviews.filter(review => review.targetId === offerId);
-        let localScore = 0;
-        if (filteredReviews.length > 0) {
-            const sum = filteredReviews.reduce((acc, r) => acc + r.rating, 0);
-            localScore = sum / filteredReviews.length;
-        }
-
-        const localReputation = {reputation: localScore};
 
         renderOfferInfo(offer);
-        renderTutorPanel(offer, localReputation);
+        renderTutorPanel(offer);
         renderReviews(filteredReviews, currentUserId);
         initRevealContact(offer);
 
@@ -643,9 +676,7 @@ window.addEventListener('load', async () => {
     // FIX: siempre hacer sync con el backend para obtener el UUID interno correcto
     // (no leer solo del localStorage, que puede estar vacío o desactualizado)
     const syncRes = await fetch(`${API_BASE}/api/v1/users/sync`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
+        method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({
             clerkUserId: Clerk.user.id,
             fullName: Clerk.user.fullName,
             email: Clerk.user.primaryEmailAddress?.emailAddress ?? '',
@@ -692,10 +723,7 @@ async function loadStudents(offerId) {
 
     } catch (err) {
 
-        console.error(
-            '[TutoringDetails] Error loading students:',
-            err
-        );
+        console.error('[TutoringDetails] Error loading students:', err);
 
     }
 }

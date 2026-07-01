@@ -60,41 +60,26 @@
 
         <div class="flex flex-col gap-6">
 
-            <!-- Info de la tutoría -->
             <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
                 <div class="flex flex-wrap items-start justify-between gap-3 mb-3">
-                    <h1 id="tutoring-subject" class="font-display text-2xl font-black text-uce-navy leading-tight">
-                        —</h1>
-                    <span id="status-badge"
-                          class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">—</span>
+                    <h1 id="tutoring-subject" class="font-display text-2xl font-black text-uce-navy leading-tight">—</h1>
+                    <span id="status-badge" class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">—</span>
                 </div>
                 <p id="tutoring-price" class="text-xl font-bold text-emerald-600 mb-4">—</p>
                 <p id="tutoring-description" class="text-gray-600 text-sm leading-relaxed">—</p>
             </div>
 
-
             <div id="review-section" class="hidden bg-white border border-uce-gold/30 rounded-2xl p-6 shadow-sm">
                 <h2 class="font-display text-base font-bold text-uce-navy mb-4">Dejar una reseña</h2>
                 <form id="review-form" class="flex flex-col gap-4" novalidate>
                     <div class="flex flex-col gap-1.5">
-                        <label class="text-sm font-medium text-gray-700">Calificación <span
-                                class="text-red-400">*</span></label>
+                        <label class="text-sm font-medium text-gray-700">Calificación <span class="text-red-400">*</span></label>
                         <div class="flex gap-2" id="star-rating" role="group" aria-label="Selecciona una calificación">
-                            <button type="button" class="star-btn text-gray-300 text-2xl" data-value="1"
-                                    aria-label="1 estrella">★
-                            </button>
-                            <button type="button" class="star-btn text-gray-300 text-2xl" data-value="2"
-                                    aria-label="2 estrellas">★
-                            </button>
-                            <button type="button" class="star-btn text-gray-300 text-2xl" data-value="3"
-                                    aria-label="3 estrellas">★
-                            </button>
-                            <button type="button" class="star-btn text-gray-300 text-2xl" data-value="4"
-                                    aria-label="4 estrellas">★
-                            </button>
-                            <button type="button" class="star-btn text-gray-300 text-2xl" data-value="5"
-                                    aria-label="5 estrellas">★
-                            </button>
+                            <button type="button" class="star-btn text-gray-300 text-2xl" data-value="1" aria-label="1 estrella">★</button>
+                            <button type="button" class="star-btn text-gray-300 text-2xl" data-value="2" aria-label="2 estrellas">★</button>
+                            <button type="button" class="star-btn text-gray-300 text-2xl" data-value="3" aria-label="3 estrellas">★</button>
+                            <button type="button" class="star-btn text-gray-300 text-2xl" data-value="4" aria-label="4 estrellas">★</button>
+                            <button type="button" class="star-btn text-gray-300 text-2xl" data-value="5" aria-label="5 estrellas">★</button>
                         </div>
                         <input type="hidden" id="review-rating" value=""/>
                     </div>
@@ -102,15 +87,11 @@
                         <label class="text-sm font-medium text-gray-700" for="review-comment">
                             Comentario <span class="text-red-400">*</span>
                         </label>
-                        <textarea id="review-comment" rows="3" maxlength="300"
-                                  placeholder="Describe tu experiencia con el tutor..."
-                                  class="px-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:border-uce-navy focus:outline-none transition-colors resize-none"></textarea>
+                        <textarea id="review-comment" rows="3" maxlength="300" placeholder="Describe tu experiencia con el tutor..." class="px-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:border-uce-navy focus:outline-none transition-colors resize-none"></textarea>
                     </div>
                     <div class="flex justify-end">
-                        <button type="submit"
-                                class="flex items-center gap-2 px-6 py-2.5 bg-uce-navy text-uce-gold font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-uce-navy-light transition-all shadow-sm">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                 stroke-width="2.5" aria-hidden="true">
+                        <button type="submit" class="flex items-center gap-2 px-6 py-2.5 bg-uce-navy text-uce-gold font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-uce-navy-light transition-all shadow-sm">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
                                 <path d="M22 2L11 13"/>
                                 <path d="M22 2L15 22 11 13 2 9l20-7z"/>
                             </svg>
@@ -120,43 +101,33 @@
                 </form>
             </div>
 
-            <!-- SECCIÓN DE OPINIONES: muestra las reseñas de esta tutoría con botones Editar/Eliminar para el autor -->
             <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
                 <h2 id="reviews-title" class="font-display text-base font-bold text-uce-navy mb-4">Opiniones (0)</h2>
                 <div id="reviews-container" class="flex flex-col gap-3"></div>
             </div>
 
-            <!-- Acciones del tutor dueño de la publicación -->
             <div id="owner-actions" class="hidden bg-white border border-red-100 rounded-2xl p-6 shadow-sm">
                 <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3">Esta es tu publicación</p>
                 <p class="text-sm text-gray-500 mb-4">Gestiona tu oferta académica desde aquí.</p>
                 <div class="flex flex-wrap gap-3">
-                    <button id="edit-offer-btn"
-                            class="flex items-center gap-2 px-5 py-2.5 bg-amber-500 text-white font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-amber-600 transition-all shadow-sm">
+                    <button id="edit-offer-btn" class="flex items-center gap-2 px-5 py-2.5 bg-amber-500 text-white font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-amber-600 transition-all shadow-sm">
                         🎨 Editar Tutoría
                     </button>
-                    <button id="close-offer-btn"
-                            class="flex items-center gap-2 px-5 py-2.5 bg-gray-500 text-white font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-gray-600 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                             stroke-width="2.5" aria-hidden="true">
+                    <button id="close-offer-btn" class="flex items-center gap-2 px-5 py-2.5 bg-gray-500 text-white font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-gray-600 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
                             <circle cx="12" cy="12" r="10"/>
                             <line x1="15" y1="9" x2="9" y2="15"/>
                             <line x1="9" y1="9" x2="15" y2="15"/>
                         </svg>
                         Marcar como Cerrada
                     </button>
-                    <button id="delete-offer-btn"
-                            class="flex items-center gap-2 px-5 py-2.5 bg-red-600 text-white font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-red-700 transition-all shadow-sm">
+                    <button id="delete-offer-btn" class="flex items-center gap-2 px-5 py-2.5 bg-red-600 text-white font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-red-700 transition-all shadow-sm">
                         🗑️ Eliminar Tutoría
                     </button>
                 </div>
                 <div id="students-panel" class="mt-6">
-                    <h3 class="font-bold text-lg mb-3">
-                        Estudiantes inscritos
-                    </h3>
-
-                    <div id="enrolled-students" class="flex flex-col gap-2">
-                    </div>
+                    <h3 class="font-bold text-lg mb-3">Estudiantes inscritos</h3>
+                    <div id="enrolled-students" class="flex flex-col gap-2"></div>
                 </div>
             </div>
 
@@ -166,109 +137,9 @@
 
             <div id="enroll-container" class="w-full"></div>
 
-            <div id="contact-panel" class="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
-                <div class="h-2 bg-gradient-to-r from-uce-navy to-uce-navy-light"></div>
-                <div class="p-5">
-                    <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-4">Información del
-                        Tutor</p>
+            <div id="contact-panel"></div>
 
-                    <div class="flex items-center gap-3 mb-5">
-                        <div class="relative">
-
-                            <img
-                                    id="tutor-photo"
-                                    class="hidden w-16 h-16 rounded-full object-cover border border-gray-200 shadow-sm"
-                                    alt="Tutor">
-
-                            <div
-                                    id="tutor-initials"
-                                    class="w-16 h-16 rounded-full bg-gradient-to-br from-uce-navy to-uce-navy-light
-               flex items-center justify-center text-white font-bold text-xl">
-                            </div>
-
-                        </div>
-                        <div>
-                            <p id="tutor-name" class="font-semibold text-uce-navy text-sm">—</p>
-                            <p id="tutor-email" class="text-xs text-gray-400 break-all">—</p>
-                        </div>
-                    </div>
-
-                    <div id="tutor-rating"
-                         class="border-t border-gray-100 pt-3 mb-5 hidden">
-
-                        <div class="flex items-center gap-2">
-
-    <span class="text-sm font-semibold text-gray-800">
-      Calificación del tutor
-    </span>
-
-                            <div class="flex items-center gap-1">
-      <span id="tutor-rating-stars"
-            class="text-amber-400 text-xs">
-      </span>
-
-                                <span id="tutor-rating-score"
-                                      class="text-xs text-gray-500">
-      </span>
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    <div id="contact-hidden" class="flex flex-col gap-3">
-                        <button id="reveal-contact-btn"
-                                class="w-full flex items-center justify-center gap-2 py-2.5 bg-uce-navy text-uce-gold font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-uce-navy-light transition-all shadow-sm">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                 stroke-width="2" aria-hidden="true">
-                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                                <circle cx="12" cy="12" r="3"/>
-                            </svg>
-                            Ver datos de contacto
-                        </button>
-                    </div>
-
-                    <div id="contact-revealed" class="hidden flex flex-col gap-3">
-                        <a id="contact-whatsapp" href="#" target="_blank" rel="noopener"
-                           class="flex items-center gap-3 px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-xl text-sm font-medium text-emerald-700 hover:bg-emerald-100 transition-colors hidden">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
-                                 class="text-emerald-600 shrink-0" aria-hidden="true">
-                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-                                <path d="M12 0C5.373 0 0 5.373 0 12c0 2.136.561 4.14 1.534 5.876L0 24l6.289-1.649A11.949 11.949 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.016-1.379l-.359-.213-3.73.978.996-3.638-.234-.374A9.818 9.818 0 1112 21.818z"/>
-                            </svg>
-                            <span id="contact-phone-text">—</span>
-                        </a>
-
-                        <a id="contact-email-link" href="#"
-                           class="flex items-center gap-3 px-4 py-3 bg-blue-50 border border-blue-200 rounded-xl text-sm font-medium text-blue-700 hover:bg-blue-100 transition-colors hidden">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                 stroke-width="2" class="text-blue-600 shrink-0" aria-hidden="true">
-                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                                <polyline points="22,6 12,13 2,6"/>
-                            </svg>
-                            <span id="contact-email-text" class="truncate">—</span>
-                        </a>
-
-                        <div id="contact-social-wrap"
-                             class="hidden flex items-center gap-3 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-700">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                 stroke-width="2" class="text-gray-500 shrink-0" aria-hidden="true">
-                                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
-                                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
-                            </svg>
-                            <span id="contact-social-text" class="break-all">—</span>
-                        </div>
-
-                        <p class="text-[10px] text-gray-400 text-center pt-1">
-                            Coordina horarios y modalidad directamente con el tutor.
-                        </p>
-                    </div>
-
-                </div>
-            </div>
-
-            <div id="owner-note"
-                 class="hidden bg-amber-50 border border-amber-200 rounded-2xl p-4 text-sm text-amber-800 font-medium text-center">
+            <div id="owner-note" class="hidden bg-amber-50 border border-amber-200 rounded-2xl p-4 text-sm text-amber-800 font-medium text-center">
                 Estás viendo tu propia publicación.
             </div>
 
