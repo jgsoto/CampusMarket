@@ -58,7 +58,11 @@ public class GetMyTutoringOffersUseCase {
                             tutor != null ? tutor.getSocialMedia() : "No disponible",
 
                             averageRating,
-                            totalReviews
+                            totalReviews,
+
+                            tutor != null
+                                    ? tutor.getPhotoUrl()
+                                    : null
                     );
                 })
                 .toList();
