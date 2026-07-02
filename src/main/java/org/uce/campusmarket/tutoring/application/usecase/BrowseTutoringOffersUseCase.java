@@ -80,7 +80,11 @@ public class BrowseTutoringOffersUseCase {
                                     : "No disponible",
 
                             averageRating,
-                            totalReviews
+                            totalReviews,
+
+                            tutor != null
+                                    ? tutor.getPhotoUrl()
+                                    : null
                     );
                 })
                 .collect(Collectors.toList());

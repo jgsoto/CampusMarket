@@ -12,5 +12,6 @@ public record UserProfileResponse(
         String address,
         String description,
         String socialMedia,
+        String photoUrl,
         LocalDateTime createdAt
 ) {}

@@ -257,7 +257,7 @@ window.addEventListener('load', async () => {
     return;
   }
 
-  MarketplaceLayout.mountNavbar('create', Clerk.user);
+  await MarketplaceLayout.mountNavbar('create', Clerk.user);
   initRealTimeValidation();
   initImageGallery();
   initDescCounter();

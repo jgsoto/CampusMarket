@@ -39,6 +39,7 @@ public class UserSyncController {
                 user.getAddress(),
                 user.getDescription(),
                 user.getSocialMedia(),
+                user.getPhotoUrl(),
                 user.getCreatedAt()
         );
     }

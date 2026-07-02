@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
 window.addEventListener('load', async () => {
     if (window.Clerk) {
         await window.Clerk.load();
-        MarketplaceLayout.mountNavbar('recursos', window.Clerk.user);
+        await MarketplaceLayout.mountNavbar('recursos', window.Clerk.user);
     }
 });
 

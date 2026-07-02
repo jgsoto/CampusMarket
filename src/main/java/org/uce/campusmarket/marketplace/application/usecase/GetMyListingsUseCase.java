@@ -60,6 +60,7 @@ public class GetMyListingsUseCase {
                             .sellerPhone(seller != null ? seller.getPhone() : "No disponible")
                             .sellerAddress(seller != null ? seller.getAddress() : "No disponible")
                             .sellerSocialMedia(seller != null ? seller.getSocialMedia() : "No disponible")
+                            .sellerPhotoUrl(seller != null ? seller.getPhotoUrl() : null)
                             .build();
                 })
                 .collect(Collectors.toList());
