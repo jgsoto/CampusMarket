@@ -86,22 +86,15 @@ function populateSidebar(profile) {
     const el = ProfileDOM;
     const image = ProfileDOM.profileImage();
 
+    image.classList.remove('hidden');
+    ProfileDOM.avatarInitials().classList.add('hidden');
+
     if (profile.photoUrl) {
-
-        image.src = profile.photoUrl;
-        image.classList.remove('hidden');
-
-        ProfileDOM.avatarInitials().classList.add('hidden');
-
+        image.src = profile.photoUrl; // Foto subida por el usuario
     } else {
-
-        image.classList.add('hidden');
-
-        ProfileDOM.avatarInitials().classList.remove('hidden');
-
-        ProfileDOM.avatarInitials().textContent = buildInitials(name);
-
+        image.src = "/assets/icons/perfil.png"; // Tu foto por defecto corregida
     }
+
     el.displayName().textContent = name;
     el.displayEmail().textContent = profile.email ?? '—';
 
