@@ -8,7 +8,7 @@ function getOwnerId() {
 
 const MarketplaceLayout = (() => {
 
-    function mountNavbar(activePage = '', clerkUser = null) {
+     async function mountNavbar(activePage = '', clerkUser = null) {
         const placeholder = document.getElementById('navbar-placeholder');
         if (!placeholder) return;
 
@@ -40,10 +40,34 @@ const MarketplaceLayout = (() => {
                     : 'text-white/70 hover:text-uce-gold'}">${label}</a>`;
         }).join('');
 
-        const userName = clerkUser?.fullName ?? 'Usuario';
-        const userEmail = clerkUser?.primaryEmailAddress?.emailAddress ?? '';
-        const initials = userName.split(' ').filter(Boolean).slice(0, 2)
-            .map(w => w[0].toUpperCase()).join('');
+         const userName = clerkUser?.fullName ?? 'Usuario';
+         const userEmail = clerkUser?.primaryEmailAddress?.emailAddress ?? '';
+         const userId = getOwnerId();
+
+         const initials = userName
+             .split(' ')
+             .filter(Boolean)
+             .slice(0, 2)
+             .map(w => w[0].toUpperCase())
+             .join('');
+
+         let profileImage = null;
+
+         try {
+             const ownerId = getOwnerId();
+
+             if (ownerId) {
+                 const response = await fetch(`${API_BASE}/api/users/profile/${userId}`);
+
+                 if (response.ok) {
+                     const profile = await response.json();
+
+                     profileImage = profile.photoUrl;
+                 }
+             }
+         } catch (e) {
+             console.error("No se pudo cargar la foto", e);
+         }
 
         const desktopActionsHtml = `
       <div class="hidden md:flex items-center gap-3">
@@ -52,9 +76,15 @@ const MarketplaceLayout = (() => {
                   class="flex items-center gap-2 pl-1 pr-3 py-1 rounded-xl
                          hover:bg-white/10 transition-colors group"
                   aria-haspopup="true" aria-expanded="false">
-            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-uce-navy to-uce-navy-light border-2 border-uce-gold
-                        flex items-center justify-center flex-shrink-0">
-              <span class="text-uce-gold text-xs font-bold font-display">${initials}</span>
+            <div class="w-8 h-8 rounded-full border-2 border-uce-gold overflow-hidden flex items-center justify-center bg-gradient-to-br from-uce-navy to-uce-navy-light">
+
+            ${profileImage
+                ? `<img src="${profileImage}"
+                        class="w-full h-full object-cover"
+                        alt="Perfil">`
+                : `<span class="text-uce-gold text-xs font-bold font-display">${initials}</span>`
+            }
+            
             </div>
             <span class="text-white/80 text-sm font-medium max-w-[120px] truncate
                          group-hover:text-white transition-colors">
@@ -73,9 +103,15 @@ const MarketplaceLayout = (() => {
                role="menu">
             <div class="px-4 py-4 bg-gray-50 border-b border-gray-100">
               <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-uce-navy to-uce-navy-light
-                            flex items-center justify-center flex-shrink-0 border-2 border-uce-gold">
-                  <span class="text-uce-gold text-sm font-bold">${initials}</span>
+                <div class="w-10 h-10 rounded-full border-2 border-uce-gold overflow-hidden flex items-center justify-center bg-gradient-to-br from-uce-navy to-uce-navy-light">
+
+                ${profileImage
+                ? `<img src="${profileImage}"
+                            class="w-full h-full object-cover"
+                            alt="Perfil">`
+                : `<span class="text-uce-gold text-sm font-bold">${initials}</span>`
+                }
+                
                 </div>
                 <div class="min-w-0">
                   <p class="text-sm font-semibold text-uce-navy truncate">${userName}</p>

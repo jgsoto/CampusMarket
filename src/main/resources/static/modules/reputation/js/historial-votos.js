@@ -100,6 +100,6 @@ window.addEventListener('load', async () => {
   const userId = new URLSearchParams(window.location.search).get('userId');
   if (!userId) return window.location.href = '/modules/marketplace/dashboard.html';
 
-  MarketplaceLayout.mountNavbar('', Clerk.user);
+   await MarketplaceLayout.mountNavbar('', Clerk.user);
   await loadHistorial(userId);
 });

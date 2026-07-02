@@ -257,7 +257,7 @@ window.addEventListener('load', async () => {
     return;
   }
 
-  MarketplaceLayout.mountNavbar('my-listings', Clerk.user);
+  await MarketplaceLayout.mountNavbar('my-listings', Clerk.user);
   initTabs();
   
   await Promise.all([loadMyListings(), loadMyTutoring()]);

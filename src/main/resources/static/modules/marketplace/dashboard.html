@@ -20,18 +20,39 @@
 
   <main class="max-w-6xl mx-auto px-6 py-8">
 
-    <div id="user-section" class="flex items-center gap-4 mb-8" style="display:none!important;">
-      <div
-        class="w-12 h-12 rounded-full bg-gradient-to-br from-uce-navy to-uce-navy-light border-2 border-uce-gold flex items-center justify-center flex-shrink-0">
-        <span id="user-initials" class="font-display text-base font-bold text-uce-gold"></span>
+      <div id="user-section" class="flex items-center gap-4 mb-8">
+
+          <div
+                  class="w-12 h-12 rounded-full border-2 border-uce-gold overflow-hidden flex items-center justify-center flex-shrink-0">
+
+              <img
+                      id="user-photo"
+                      class="hidden w-full h-full object-cover"
+                      alt="Foto de perfil">
+
+              <div
+                      id="user-avatar"
+                      class="w-full h-full bg-gradient-to-br from-uce-navy to-uce-navy-light flex items-center justify-center">
+
+            <span
+                    id="user-initials"
+                    class="font-display text-base font-bold text-uce-gold">
+            </span>
+
+              </div>
+
+          </div>
+
+          <div>
+              <h1 class="font-display text-2xl font-bold text-uce-navy leading-tight">
+                  Bienvenido,
+                  <span id="user-name" class="text-uce-gold"></span>
+              </h1>
+
+              <p id="user-email" class="text-sm text-gray-400"></p>
+          </div>
+
       </div>
-      <div>
-        <h1 class="font-display text-2xl font-bold text-uce-navy leading-tight">
-          Bienvenido, <span id="user-name" class="text-uce-gold"></span>
-        </h1>
-        <p id="user-email" class="text-sm text-gray-400"></p>
-      </div>
-    </div>
 
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-8">
       <div>

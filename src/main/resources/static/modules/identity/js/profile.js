@@ -251,7 +251,7 @@ window.addEventListener('load', async () => {
     }
 
     await Clerk.load();
-    MarketplaceLayout.mountNavbar('profile', Clerk.user);
+    await MarketplaceLayout.mountNavbar('profile', Clerk.user);
     await loadProfile(userId);
 
     ProfileDOM.form()?.addEventListener('submit', e => {

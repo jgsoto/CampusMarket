@@ -204,7 +204,7 @@ window.addEventListener('load', async () => {
     return;
   }
 
-  MarketplaceLayout.mountNavbar('tutorias', Clerk.user);
+  await MarketplaceLayout.mountNavbar('tutorias', Clerk.user);
   styleFilterBtns();
 
   CatalogDOM.filterBtns().forEach(btn => {

@@ -257,10 +257,10 @@ window.addEventListener('load', async () => {
                 authenticatedUser = Clerk.user;
             }
         }
-        MarketplaceLayout.mountNavbar('dashboard', authenticatedUser);
+        await MarketplaceLayout.mountNavbar('dashboard', authenticatedUser);
     } catch (clerkError) {
         console.warn('[ProductDetails] Error cargando Clerk Navbar:', clerkError);
-        MarketplaceLayout.mountNavbar('dashboard', null);
+        await MarketplaceLayout.mountNavbar('dashboard', null);
     }
 
     const productId = new URLSearchParams(window.location.search).get('id');

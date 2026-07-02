@@ -127,7 +127,7 @@ window.addEventListener('load', async () => {
     const data = await res.json();
     const userId = data.id;
 
-    MarketplaceLayout.mountNavbar('reputation', Clerk.user);
+    await MarketplaceLayout.mountNavbar('reputation', Clerk.user);
     
     RepDOM.filterBtns().forEach(btn => btn.addEventListener('click', () => {
       _activeFilter = btn.dataset.type;
