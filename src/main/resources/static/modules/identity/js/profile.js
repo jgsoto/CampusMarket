@@ -49,10 +49,11 @@ const ProfileAPI = Object.freeze({
         }),
 });
 
-function buildInitials(name) {
-    if (!name) return '?';
-    return name.split(' ').filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('');
-}
+
+const ProfileCache = {
+    profile: new Map(),
+    stats: new Map()
+};
 
 function setLoadingState(isLoading) {
     const loading = ProfileDOM.loading();
@@ -123,12 +124,40 @@ function readFormPayload() {
     };
 }
 
+function renderStats(stats) {
+
+    if (ProfileDOM.statListings()) {
+        ProfileDOM.statListings().textContent = stats.publicaciones;
+    }
+
+    if (ProfileDOM.statTutorings()) {
+        ProfileDOM.statTutorings().textContent = stats.inscritas;
+    }
+
+    if (ProfileDOM.statReviews()) {
+        ProfileDOM.statReviews().textContent = stats.reviews;
+    }
+
+    if (ProfileDOM.trustScore()) {
+        ProfileDOM.trustScore().textContent = `${stats.reputation.toFixed(1)} / 5.0`;
+    }
+
+}
+
 async function loadUserStats(userId) {
+
+    const cached = ProfileCache.stats.get(userId);
+
+    if (cached) {
+        renderStats(cached);
+        return;
+    }
+
     try {
 
         const [listingsRes, tutoringRes, repRes, revRes] = await Promise.all([
-            fetch(`${API_BASE}/api/listings/user/${userId}`),
-            fetch(`${API_BASE}/api/tutoring/user/${userId}`),
+            ProfileAPI.fetchAllListings(),
+            ProfileAPI.fetchTutoring(),
             ProfileAPI.fetchReputation(userId),
             ProfileAPI.fetchReviews(userId)
         ]);
@@ -136,29 +165,24 @@ async function loadUserStats(userId) {
         const listings = listingsRes.ok ? await listingsRes.json() : [];
         const tutorings = tutoringRes.ok ? await tutoringRes.json() : [];
 
-        // 🔥 YA NO FILTRAS EN FRONT
-        const totalPublicaciones = listings.length + tutorings.length;
+        const myListings = listings.filter(item =>
+            item.ownerId === userId || item.userId === userId
+        );
 
-        if (ProfileDOM.statListings()) {
-            ProfileDOM.statListings().textContent = totalPublicaciones;
-        }
+        const myTutorings = tutorings.filter(t =>
+            t.teacherId === userId
+        );
+
+        const totalPublicaciones = myListings.length + myTutorings.length;
+
+        let reputation = 0;
 
         if (repRes.ok) {
-            const { reputation = 0 } = await repRes.json();
-            if (ProfileDOM.trustScore()) {
-                ProfileDOM.trustScore().textContent = `${reputation.toFixed(1)} / 5.0`;
-            }
+            ({ reputation = 0 } = await repRes.json());
         }
 
-        if (revRes.ok) {
-            const reviews = await revRes.json();
-            if (ProfileDOM.statReviews()) {
-                ProfileDOM.statReviews().textContent = reviews.length;
-            }
-        }
+        const reviews = revRes.ok ? await revRes.json() : [];
 
-        // ⚠️ ESTE ES EL PEOR CUELLO DE BOTELLA
-        // SOLO MANTENER SI ES NECESARIO
         const enrollmentChecks = await Promise.all(
             tutorings.map(async (t) => {
                 try {
@@ -172,29 +196,64 @@ async function loadUserStats(userId) {
 
         const totalInscritas = enrollmentChecks.filter(Boolean).length;
 
-        if (ProfileDOM.statTutorings()) {
-            ProfileDOM.statTutorings().textContent = totalInscritas;
-        }
+        const stats = {
+            publicaciones: totalPublicaciones,
+            inscritas: totalInscritas,
+            reviews: reviews.length,
+            reputation
+        };
+
+        ProfileCache.stats.set(userId, stats);
+
+        renderStats(stats);
 
     } catch (err) {
-        console.error('[Profile] Error loading metrics:', err);
+        console.error(err);
     }
+
 }
 
 async function loadProfile(userId) {
+
+    const cached = ProfileCache.profile.get(userId);
+
+    if (cached) {
+
+        populateForm(cached);
+        populateSidebar(cached);
+
+        await loadUserStats(userId);
+
+        return;
+    }
+
     setLoadingState(true);
+
     try {
+
         const res = await ProfileAPI.fetchProfile(userId);
+
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
         const profile = await res.json();
+
+        ProfileCache.profile.set(userId, profile);
+
         populateForm(profile);
         populateSidebar(profile);
+
         await loadUserStats(userId);
+
     } catch (err) {
-        console.error('[Profile] Error loading profile:', err);
+
+        console.error(err);
+
     } finally {
+
         setLoadingState(false);
+
     }
+
 }
 
 async function saveProfile(userId) {
@@ -203,6 +262,8 @@ async function saveProfile(userId) {
         const res = await ProfileAPI.updateProfile(userId, readFormPayload());
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         showToast('Perfil actualizado correctamente.', 'success');
+        ProfileCache.profile.delete(userId);
+        ProfileCache.stats.delete(userId);
         await loadProfile(userId);
     } catch (err) {
         console.error('[Profile] Error saving profile:', err);
@@ -230,6 +291,7 @@ async function uploadPhoto(userId, file) {
         }
 
         showToast("Foto actualizada correctamente.", "success");
+        ProfileCache.profile.delete(userId);
 
         await loadProfile(userId);
 
