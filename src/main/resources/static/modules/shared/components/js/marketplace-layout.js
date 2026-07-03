@@ -1,9 +1,8 @@
 'use strict';
 
 const API_BASE = '';
-
-let _navbarCache = null;
-let _navbarInitialized = false;
+let navbarMounted = false;
+let navbarHtmlCache = null;
 
 async function getUserProfile() {
     const cached = sessionStorage.getItem('campusMarketProfile');
@@ -39,35 +38,18 @@ const MarketplaceLayout = (() => {
         const placeholder = document.getElementById('navbar-placeholder');
         if (!placeholder) return;
 
-        if (_navbarInitialized) {
-            updateActivePage(activePage);
+        if (navbarMounted && navbarHtmlCache) {
+
+            placeholder.outerHTML = navbarHtmlCache;
+
+            updateActive(activePage);
+
+            _initToggle();
+            _initDropdown();
+            _initLogout();
+
             return;
         }
-
-        const userName = clerkUser?.fullName ?? 'Usuario';
-        const userEmail = clerkUser?.primaryEmailAddress?.emailAddress ?? '';
-        const userId = getOwnerId();
-
-        let profileImage = null;
-
-        try {
-            if (userId) {
-                const response = await fetch(`${API_BASE}/api/users/profile/${userId}`);
-                if (response.ok) {
-                    const profile = await response.json();
-                    profileImage = profile.photoUrl;
-                }
-            }
-        } catch (e) {
-            console.error("No se pudo cargar la foto", e);
-        }
-
-        const initials = userName
-            .split(' ')
-            .filter(Boolean)
-            .slice(0, 2)
-            .map(w => w[0].toUpperCase())
-            .join('');
 
         const links = [
             { id: 'dashboard', href: '/modules/marketplace/dashboard.html', label: 'Marketplace' },
@@ -76,90 +58,176 @@ const MarketplaceLayout = (() => {
             { id: 'reputation', href: '/modules/reputation/reputation.html', label: 'Reputación' },
         ];
 
-        const navLinks = renderLinks(links, activePage);
-        const mobileLinks = renderMobileLinks(links, activePage);
+        const navLinks = links.map(({ id, href, label }) => {
+            const isActive = id === activePage;
+            return `
+        <a href="${href}"
+           class="text-sm transition-colors ${isActive
+                ? 'text-uce-gold font-semibold'
+                : 'text-white/70 hover:text-uce-gold'}"
+           ${isActive ? 'aria-current="page"' : ''}>
+          ${label}
+        </a>`;
+        }).join('');
 
-        const html = `
-        <header class="bg-uce-navy sticky top-0 z-50 border-b border-uce-gold/15 w-full">
-            <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between gap-8">
+        const mobileLinks = links.map(({ id, href, label }) => {
+            const isActive = id === activePage;
+            return `
+        <a href="${href}"
+           class="py-2.5 text-sm transition-colors ${isActive
+                ? 'text-uce-gold font-bold bg-white/5 px-3 rounded-lg'
+                : 'text-white/70 hover:text-uce-gold'}">${label}</a>`;
+        }).join('');
 
-                <a href="/modules/marketplace/dashboard.html" class="flex items-center gap-3">
-                    <img src="/assets/icons/logo.png" class="w-9 h-9 rounded-lg"/>
-                    <span class="font-bold text-white">Campus<span class="text-uce-gold">Market</span></span>
-                </a>
+        const userName = clerkUser?.fullName ?? 'Usuario';
+        const userEmail = clerkUser?.primaryEmailAddress?.emailAddress ?? '';
+        const userId = getOwnerId();
 
-                <nav class="hidden md:flex gap-6">${navLinks}</nav>
+        const initials = userName
+            .split(' ')
+            .filter(Boolean)
+            .slice(0, 2)
+            .map(w => w[0].toUpperCase())
+            .join('');
 
-                ${renderUser(profileImage, initials, userName, userEmail, activePage)}
+        const profile = await getUserProfile();
 
-                <button id="nav-toggle" class="md:hidden">☰</button>
+        const profileImage = profile?.photoUrl ?? null;
 
+        const desktopActionsHtml = `
+      <div class="hidden md:flex items-center gap-3">
+        <div class="relative" id="profile-dropdown-wrapper">
+          <button id="profile-dropdown-btn"
+                  class="flex items-center gap-2 pl-1 pr-3 py-1 rounded-xl
+                         hover:bg-white/10 transition-colors group"
+                  aria-haspopup="true" aria-expanded="false">
+            <div class="w-8 h-8 rounded-full border-2 border-uce-gold overflow-hidden flex items-center justify-center bg-gradient-to-br from-uce-navy to-uce-navy-light">
+
+            ${profileImage
+            ? `<img src="${profileImage}"
+                        class="w-full h-full object-cover"
+                        alt="Perfil">`
+            : `<span class="text-uce-gold text-xs font-bold font-display">${initials}</span>`
+        }
+            
+            </div>
+            <span class="text-white/80 text-sm font-medium max-w-[120px] truncate
+                         group-hover:text-white transition-colors">
+              ${userName.split(' ')[0]}
+            </span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2.5" class="text-white/50 transition-transform duration-200"
+                 id="dropdown-chevron" aria-hidden="true">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </button>
+
+          <div id="profile-dropdown-menu"
+               class="absolute right-0 top-full mt-2 w-64 bg-white rounded-2xl shadow-xl
+                      border border-gray-100 overflow-hidden z-50 hidden"
+               role="menu">
+            <div class="px-4 py-4 bg-gray-50 border-b border-gray-100">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full border-2 border-uce-gold overflow-hidden flex items-center justify-center bg-gradient-to-br from-uce-navy to-uce-navy-light">
+
+                ${profileImage
+            ? `<img src="${profileImage}"
+                            class="w-full h-full object-cover"
+                            alt="Perfil">`
+            : `<span class="text-uce-gold text-sm font-bold">${initials}</span>`
+        }
+                
+                </div>
+                <div class="min-w-0">
+                  <p class="text-sm font-semibold text-uce-navy truncate">${userName}</p>
+                  <p class="text-xs text-gray-400 truncate">${userEmail}</p>
+                </div>
+              </div>
             </div>
 
-            <nav id="mobile-menu" class="hidden flex-col px-6 pb-5">
-                ${mobileLinks}
-            </nav>
-        </header>
-    `;
+            <div class="py-2">
+              <a href="/modules/identity/profile.html"
+                 class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700
+                        hover:bg-gray-50 transition-colors ${activePage === 'profile' ? 'text-uce-navy font-semibold' : ''}"
+                 role="menuitem">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" class="text-gray-400" aria-hidden="true">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+                Mi Perfil
+              </a>
+              <a href="/modules/marketplace/my-listings.html"
+                 class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700
+                        hover:bg-gray-50 transition-colors ${activePage === 'my-listings' ? 'text-uce-navy font-semibold' : ''}"
+                 role="menuitem">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" class="text-gray-400" aria-hidden="true">
+                  <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+                  <line x1="3" y1="6" x2="21" y2="6"/>
+                  <path d="M16 10a4 4 0 0 1-8 0"/>
+                </svg>
+                Mis Publicaciones
+              </a>
+            </div>
+
+            <div class="border-t border-gray-100 py-2">
+              <button id="logout-btn"
+                      class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-500
+                             hover:bg-red-50 transition-colors"
+                      role="menuitem">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" aria-hidden="true">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                  <polyline points="16 17 21 12 16 7"/>
+                  <line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+                Cerrar Sesión
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+
+        const mobileButtonHtml = `
+      <a href="/modules/marketplace/my-listings.html" class="py-2 text-sm text-white/70 hover:text-uce-gold transition-colors">Mis Publicaciones</a>
+      <a href="/modules/identity/profile.html" class="py-2 text-sm text-white/70 hover:text-uce-gold transition-colors">Mi Perfil</a>
+      <button id="logout-btn-mobile" class="mt-1 w-full flex items-center justify-center gap-2 py-2.5 border border-white/20 text-white/70 text-sm rounded-lg hover:bg-white/10 transition-all">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        Cerrar Sesión
+      </button>`;
+
+        const html = `
+      <header class="bg-uce-navy sticky top-0 z-50 border-b border-uce-gold/15 w-full">
+        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between gap-8">
+          <a href="/modules/marketplace/dashboard.html" class="flex items-center gap-3 flex-shrink-0">
+            <img src="/assets/icons/logo.png" alt="CampusMarket" class="w-9 h-9 rounded-lg object-cover" />
+            <span class="font-display text-lg font-bold text-white tracking-tight">Campus<span class="text-uce-gold">Market</span></span>
+          </a>
+          <nav class="hidden md:flex items-center gap-6">${navLinks}</nav>
+          ${desktopActionsHtml}
+          <button id="nav-toggle" aria-label="Abrir menú" aria-expanded="false" class="md:hidden flex flex-col justify-center items-center gap-1 w-10 h-10 rounded-lg hover:bg-white/10 transition-colors">
+            <span class="block w-5 h-0.5 bg-white transition-all duration-300"></span>
+            <span class="block w-5 h-0.5 bg-white transition-all duration-300"></span>
+            <span class="block w-5 h-0.5 bg-white transition-all duration-300"></span>
+          </button>
+        </div>
+        <nav id="mobile-menu" class="hidden flex-col gap-1 px-6 pb-5 bg-uce-navy border-t border-uce-gold/10">
+          ${mobileLinks}${mobileButtonHtml}
+        </nav>
+      </header>`;
+
+        navbarHtmlCache = html;
 
         placeholder.outerHTML = html;
 
-        _navbarInitialized = true;
+        navbarMounted = true;
 
         _initToggle();
         _initDropdown();
         _initLogout();
-    }
-
-    function updateActivePage(activePage) {
-        document.querySelectorAll("nav a").forEach(a => {
-            a.classList.remove("text-uce-gold", "font-semibold");
-            a.classList.add("text-white/70");
-
-            if (a.dataset.id === activePage) {
-                a.classList.add("text-uce-gold", "font-semibold");
-            }
-        });
-    }
-
-    function renderLinks(links, activePage) {
-        return links.map(l => `
-        <a href="${l.href}"
-           data-id="${l.id}"
-           class="${l.id === activePage
-            ? 'text-uce-gold font-semibold'
-            : 'text-white/70 hover:text-uce-gold'}">
-            ${l.label}
-        </a>
-    `).join('');
-    }
-
-    function renderMobileLinks(links, activePage) {
-        return links.map(l => `
-        <a href="${l.href}"
-           class="py-2 text-sm ${l.id === activePage ? 'text-uce-gold' : 'text-white/70'}">
-            ${l.label}
-        </a>
-    `).join('');
-    }
-
-    function renderUser(photo, initials, name, email, activePage) {
-        return `
-        <div class="flex items-center gap-3">
-
-            <div class="w-8 h-8 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
-
-                ${photo
-            ? `<img src="${photo}" class="w-full h-full object-cover">`
-            : `<span class="text-xs font-bold">${initials}</span>`
-        }
-
-            </div>
-
-            <span class="text-white/80 text-sm">${name.split(' ')[0]}</span>
-
-        </div>
-    `;
     }
 
     function _initToggle() {
@@ -209,6 +277,65 @@ const MarketplaceLayout = (() => {
         };
         document.getElementById('logout-btn')?.addEventListener('click', signOut);
         document.getElementById('logout-btn-mobile')?.addEventListener('click', signOut);
+    }
+
+    function updateActive(activePage) {
+
+        document.querySelectorAll("header nav a").forEach(link => {
+
+            const href = link.getAttribute("href");
+
+            link.classList.remove(
+                "text-uce-gold",
+                "font-semibold",
+                "font-bold",
+                "bg-white/5"
+            );
+
+            if (
+                href.includes("marketplace") &&
+                activePage === "dashboard"
+            ) {
+                link.classList.add("text-uce-gold","font-semibold");
+            }
+
+            if (
+                href.includes("tutoring") &&
+                activePage === "tutorias"
+            ) {
+                link.classList.add("text-uce-gold","font-semibold");
+            }
+
+            if (
+                href.includes("resources") &&
+                activePage === "recursos"
+            ) {
+                link.classList.add("text-uce-gold","font-semibold");
+            }
+
+            if (
+                href.includes("reputation") &&
+                activePage === "reputation"
+            ) {
+                link.classList.add("text-uce-gold","font-semibold");
+            }
+
+            if (
+                href.includes("profile") &&
+                activePage === "profile"
+            ) {
+                link.classList.add("text-uce-gold","font-semibold");
+            }
+
+            if (
+                href.includes("my-listings") &&
+                activePage === "my-listings"
+            ) {
+                link.classList.add("text-uce-gold","font-semibold");
+            }
+
+        });
+
     }
 
     return { mountNavbar };

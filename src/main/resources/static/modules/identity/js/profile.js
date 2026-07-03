@@ -125,41 +125,42 @@ function readFormPayload() {
 
 async function loadUserStats(userId) {
     try {
+
         const [listingsRes, tutoringRes, repRes, revRes] = await Promise.all([
-            ProfileAPI.fetchAllListings(),
-            ProfileAPI.fetchTutoring(),
+            fetch(`${API_BASE}/api/listings/user/${userId}`),
+            fetch(`${API_BASE}/api/tutoring/user/${userId}`),
             ProfileAPI.fetchReputation(userId),
             ProfileAPI.fetchReviews(userId)
         ]);
 
-        let totalPublicaciones = 0;
-        if (listingsRes.ok) {
-            const allListings = await listingsRes.json();
-            const myProducts = allListings.filter(item => item.ownerId === userId || item.userId === userId);
-            totalPublicaciones += myProducts.length;
-        }
+        const listings = listingsRes.ok ? await listingsRes.json() : [];
+        const tutorings = tutoringRes.ok ? await tutoringRes.json() : [];
 
-        let allTutoringOffers = [];
-        if (tutoringRes.ok) {
-            allTutoringOffers = await tutoringRes.json();
-            const myTutorings = allTutoringOffers.filter(t => t.tutorId === userId);
-            totalPublicaciones += myTutorings.length;
-        }
+        // 🔥 YA NO FILTRAS EN FRONT
+        const totalPublicaciones = listings.length + tutorings.length;
 
-        if (ProfileDOM.statListings()) ProfileDOM.statListings().textContent = totalPublicaciones;
+        if (ProfileDOM.statListings()) {
+            ProfileDOM.statListings().textContent = totalPublicaciones;
+        }
 
         if (repRes.ok) {
-            const {reputation = 0} = await repRes.json();
-            if (ProfileDOM.trustScore()) ProfileDOM.trustScore().textContent = `${reputation.toFixed(1)} / 5.0`;
+            const { reputation = 0 } = await repRes.json();
+            if (ProfileDOM.trustScore()) {
+                ProfileDOM.trustScore().textContent = `${reputation.toFixed(1)} / 5.0`;
+            }
         }
 
         if (revRes.ok) {
             const reviews = await revRes.json();
-            if (ProfileDOM.statReviews()) ProfileDOM.statReviews().textContent = reviews.length;
+            if (ProfileDOM.statReviews()) {
+                ProfileDOM.statReviews().textContent = reviews.length;
+            }
         }
 
+        // ⚠️ ESTE ES EL PEOR CUELLO DE BOTELLA
+        // SOLO MANTENER SI ES NECESARIO
         const enrollmentChecks = await Promise.all(
-            allTutoringOffers.map(async (t) => {
+            tutorings.map(async (t) => {
                 try {
                     const check = await ProfileAPI.fetchEnrolled(t.id, userId);
                     return check.ok ? await check.json() : false;
@@ -170,7 +171,10 @@ async function loadUserStats(userId) {
         );
 
         const totalInscritas = enrollmentChecks.filter(Boolean).length;
-        if (ProfileDOM.statTutorings()) ProfileDOM.statTutorings().textContent = totalInscritas;
+
+        if (ProfileDOM.statTutorings()) {
+            ProfileDOM.statTutorings().textContent = totalInscritas;
+        }
 
     } catch (err) {
         console.error('[Profile] Error loading metrics:', err);
