@@ -3,14 +3,17 @@
 const API_BASE = '';
 
 async function getUserProfile() {
-    const cached = sessionStorage.getItem('campusMarketProfile');
+
+    const userId = getOwnerId();
+    if (!userId) return null;
+
+    const cacheKey = `campusMarketProfile_${userId}`;
+
+    const cached = sessionStorage.getItem(cacheKey);
 
     if (cached) {
         return JSON.parse(cached);
     }
-
-    const userId = getOwnerId();
-    if (!userId) return null;
 
     const response = await fetch(`${API_BASE}/api/users/profile/${userId}`);
 
@@ -19,7 +22,7 @@ async function getUserProfile() {
     const profile = await response.json();
 
     sessionStorage.setItem(
-        'campusMarketProfile',
+        cacheKey,
         JSON.stringify(profile)
     );
 
@@ -184,7 +187,7 @@ const MarketplaceLayout = (() => {
         Cerrar Sesión
       </button>`;
 
-        placeholder.outerHTML = `
+        const html = `
       <header class="bg-uce-navy sticky top-0 z-50 border-b border-uce-gold/15 w-full">
         <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between gap-8">
           <a href="/modules/marketplace/dashboard.html" class="flex items-center gap-3 flex-shrink-0">
@@ -203,6 +206,8 @@ const MarketplaceLayout = (() => {
           ${mobileLinks}${mobileButtonHtml}
         </nav>
       </header>`;
+
+        placeholder.outerHTML = html;
 
         _initToggle();
         _initDropdown();
