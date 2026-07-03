@@ -1,11 +1,5 @@
 'use strict';
 
-// ══════════════════════════════════════════════════════════════
-// MÓDULO: TutoringCatalog
-// Responsabilidad: listar, filtrar y buscar ofertas de tutoría.
-// ══════════════════════════════════════════════════════════════
-
-// ── 1. Selectores ────────────────────────────────────────────
 const CatalogDOM = Object.freeze({
   grid:         () => document.getElementById('tutoring-catalog'),
   searchInput:  () => document.getElementById('search-input'),
@@ -13,18 +7,15 @@ const CatalogDOM = Object.freeze({
   resultsCount: () => document.getElementById('results-count'),
 });
 
-// ── 2. Estado local ──────────────────────────────────────────
 let _allOffers     = [];
 let _activeFilter  = 'ALL';
 let _searchQuery   = '';
 
-// ── 3. API ───────────────────────────────────────────────────
 const CatalogAPI = Object.freeze({
   fetchOffers:     ()        => fetch(`${API_BASE}/api/tutoring`),
   fetchReputation: (tutorId) => fetch(`${API_BASE}/api/reviews/users/${tutorId}/reputation`),
 });
 
-// ── 4. Utilidades ────────────────────────────────────────────
 function buildInitials(name) {
   if (!name) return '?';
   return name.split(' ').filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('');
@@ -40,7 +31,6 @@ function truncate(text, max = 120) {
   return text.length <= max ? text : text.slice(0, max) + '…';
 }
 
-// ── 5. Renderizado de tarjeta ────────────────────────────────
 function buildCardHTML(offer, reputation) {
   const isOpen    = offer.status !== 'CLOSED';
   const badgeCls  = isOpen
@@ -108,6 +98,9 @@ function applyFilters() {
   });
 
   const grid = CatalogDOM.grid();
+  if (!grid) return;
+
+  grid.innerHTML = '';
   const count = CatalogDOM.resultsCount();
 
   if (!grid) return;
@@ -155,47 +148,54 @@ function styleFilterBtns() {
   });
 }
 
-// ── 7. Carga de datos ────────────────────────────────────────
 async function loadOffers() {
   const grid = CatalogDOM.grid();
+
   try {
     const res = await CatalogAPI.fetchOffers();
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
     const offers = await res.json();
 
     if (!offers.length) {
       grid.innerHTML = `
         <div class="col-span-full py-16 text-center">
           <p class="text-gray-400 text-sm">No hay tutorías publicadas aún.</p>
-          <a href="/modules/tutoring/create-tutoring.html" class="mt-3 inline-block text-uce-navy text-xs font-semibold underline hover:no-underline">
-            Sé el primero en publicar
-          </a>
         </div>`;
       return;
     }
 
-    const withRep = await Promise.all(
-      offers.map(async offer => {
-        try {
-          const r = await CatalogAPI.fetchReputation(offer.tutorId);
-          const d = r.ok ? await r.json() : { reputation: 0 };
-          return { offer, reputation: d.reputation ?? 0 };
-        } catch {
-          return { offer, reputation: 0 };
-        }
-      })
+    // 🔥 1 SOLO FETCH PARA REPUTACIÓN POR USUARIO (CACHE SIMPLE)
+    const uniqueTutors = [...new Set(offers.map(o => o.tutorId))];
+
+    const reputationMap = {};
+
+    await Promise.all(
+        uniqueTutors.map(async (tutorId) => {
+          try {
+            const r = await CatalogAPI.fetchReputation(tutorId);
+            const d = r.ok ? await r.json() : { reputation: 0 };
+            reputationMap[tutorId] = d.reputation ?? 0;
+          } catch {
+            reputationMap[tutorId] = 0;
+          }
+        })
     );
 
-    _allOffers = withRep;
+    // 🔥 ARMAMOS DATA YA LISTA (SIN FETCH POR ITEM)
+    _allOffers = offers.map(offer => ({
+      offer,
+      reputation: reputationMap[offer.tutorId] ?? 0
+    }));
+
     applyFilters();
 
   } catch (err) {
     console.error('[TutoringCatalog] Error cargando ofertas:', err);
-    grid.innerHTML = `<p class="col-span-full text-sm text-red-400 text-center py-10">Error al cargar las tutorías.</p>`;
+    grid.innerHTML = `<p class="text-red-400 text-center py-10">Error al cargar las tutorías.</p>`;
   }
 }
 
-// ── 8. Bootstrap ─────────────────────────────────────────────
 window.addEventListener('load', async () => {
   await Clerk.load();
 
