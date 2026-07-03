@@ -2,13 +2,37 @@
 
 const API_BASE = '';
 
+async function getUserProfile() {
+    const cached = sessionStorage.getItem('campusMarketProfile');
+
+    if (cached) {
+        return JSON.parse(cached);
+    }
+
+    const userId = getOwnerId();
+    if (!userId) return null;
+
+    const response = await fetch(`${API_BASE}/api/users/profile/${userId}`);
+
+    if (!response.ok) return null;
+
+    const profile = await response.json();
+
+    sessionStorage.setItem(
+        'campusMarketProfile',
+        JSON.stringify(profile)
+    );
+
+    return profile;
+}
+
 function getOwnerId() {
     return localStorage.getItem('campusMarketUserId');
 }
 
 const MarketplaceLayout = (() => {
 
-     async function mountNavbar(activePage = '', clerkUser = null) {
+    async function mountNavbar(activePage = '', clerkUser = null) {
         const placeholder = document.getElementById('navbar-placeholder');
         if (!placeholder) return;
 
@@ -24,8 +48,8 @@ const MarketplaceLayout = (() => {
             return `
         <a href="${href}"
            class="text-sm transition-colors ${isActive
-                    ? 'text-uce-gold font-semibold'
-                    : 'text-white/70 hover:text-uce-gold'}"
+                ? 'text-uce-gold font-semibold'
+                : 'text-white/70 hover:text-uce-gold'}"
            ${isActive ? 'aria-current="page"' : ''}>
           ${label}
         </a>`;
@@ -36,38 +60,24 @@ const MarketplaceLayout = (() => {
             return `
         <a href="${href}"
            class="py-2.5 text-sm transition-colors ${isActive
-                    ? 'text-uce-gold font-bold bg-white/5 px-3 rounded-lg'
-                    : 'text-white/70 hover:text-uce-gold'}">${label}</a>`;
+                ? 'text-uce-gold font-bold bg-white/5 px-3 rounded-lg'
+                : 'text-white/70 hover:text-uce-gold'}">${label}</a>`;
         }).join('');
 
-         const userName = clerkUser?.fullName ?? 'Usuario';
-         const userEmail = clerkUser?.primaryEmailAddress?.emailAddress ?? '';
-         const userId = getOwnerId();
+        const userName = clerkUser?.fullName ?? 'Usuario';
+        const userEmail = clerkUser?.primaryEmailAddress?.emailAddress ?? '';
+        const userId = getOwnerId();
 
-         const initials = userName
-             .split(' ')
-             .filter(Boolean)
-             .slice(0, 2)
-             .map(w => w[0].toUpperCase())
-             .join('');
+        const initials = userName
+            .split(' ')
+            .filter(Boolean)
+            .slice(0, 2)
+            .map(w => w[0].toUpperCase())
+            .join('');
 
-         let profileImage = null;
+        const profile = await getUserProfile();
 
-         try {
-             const ownerId = getOwnerId();
-
-             if (ownerId) {
-                 const response = await fetch(`${API_BASE}/api/users/profile/${userId}`);
-
-                 if (response.ok) {
-                     const profile = await response.json();
-
-                     profileImage = profile.photoUrl;
-                 }
-             }
-         } catch (e) {
-             console.error("No se pudo cargar la foto", e);
-         }
+        const profileImage = profile?.photoUrl ?? null;
 
         const desktopActionsHtml = `
       <div class="hidden md:flex items-center gap-3">
@@ -79,11 +89,11 @@ const MarketplaceLayout = (() => {
             <div class="w-8 h-8 rounded-full border-2 border-uce-gold overflow-hidden flex items-center justify-center bg-gradient-to-br from-uce-navy to-uce-navy-light">
 
             ${profileImage
-                ? `<img src="${profileImage}"
+            ? `<img src="${profileImage}"
                         class="w-full h-full object-cover"
                         alt="Perfil">`
-                : `<span class="text-uce-gold text-xs font-bold font-display">${initials}</span>`
-            }
+            : `<span class="text-uce-gold text-xs font-bold font-display">${initials}</span>`
+        }
             
             </div>
             <span class="text-white/80 text-sm font-medium max-w-[120px] truncate
@@ -106,11 +116,11 @@ const MarketplaceLayout = (() => {
                 <div class="w-10 h-10 rounded-full border-2 border-uce-gold overflow-hidden flex items-center justify-center bg-gradient-to-br from-uce-navy to-uce-navy-light">
 
                 ${profileImage
-                ? `<img src="${profileImage}"
+            ? `<img src="${profileImage}"
                             class="w-full h-full object-cover"
                             alt="Perfil">`
-                : `<span class="text-uce-gold text-sm font-bold">${initials}</span>`
-                }
+            : `<span class="text-uce-gold text-sm font-bold">${initials}</span>`
+        }
                 
                 </div>
                 <div class="min-w-0">
