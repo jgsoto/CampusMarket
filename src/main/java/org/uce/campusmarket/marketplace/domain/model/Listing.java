@@ -69,6 +69,17 @@ public class Listing {
             Price price,
             Category category,
             UUID ownerId) {
+        if (title == null) {
+            throw new DomainException("La publicación debe tener un título");
+        }
+
+        if (description == null) {
+            throw new DomainException("La publicación debe tener una descripción");
+        }
+
+        if (price == null) {
+            throw new DomainException("La publicación debe tener un precio");
+        }
 
         if (category == null) {
             throw new DomainException("La publicación debe tener una categoría");

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import org.uce.campusmarket.tutoring.domain.model.TutoringEnrollment;
 import org.uce.campusmarket.tutoring.domain.repository.TutoringEnrollmentRepository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -56,5 +57,17 @@ public class TutoringEnrollmentRepositoryImpl
                                                 .studentId(
                                                                 entity.getStudentId())
                                                 .build());
+        }
+
+        @Override
+        public List<TutoringEnrollment> findByTutoringOfferId(UUID tutoringOfferId) {
+                return repository.findByTutoringOfferId(tutoringOfferId)
+                        .stream()
+                        .map(entity -> TutoringEnrollment.builder()
+                                .id(entity.getId())
+                                .tutoringOfferId(entity.getTutoringOfferId())
+                                .studentId(entity.getStudentId())
+                                .build())
+                        .toList();
         }
 }

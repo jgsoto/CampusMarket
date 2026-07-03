@@ -8,12 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import org.uce.campusmarket.tutoring.application.dto.CreateTutoringOfferRequest;
 import org.uce.campusmarket.tutoring.application.dto.TutoringOfferResponse;
 
-import org.uce.campusmarket.tutoring.application.usecase.BrowseTutoringOffersUseCase;
-import org.uce.campusmarket.tutoring.application.usecase.CloseTutoringOfferUseCase;
-import org.uce.campusmarket.tutoring.application.usecase.CreateTutoringOfferUseCase;
-import org.uce.campusmarket.tutoring.application.usecase.EnrollInTutoringUseCase;
-import org.uce.campusmarket.tutoring.application.usecase.GetMyTutoringOffersUseCase;
-import org.uce.campusmarket.tutoring.application.usecase.GetTutoringOfferUseCase;
+import org.uce.campusmarket.tutoring.application.usecase.*;
 import org.uce.campusmarket.tutoring.domain.repository.TutoringEnrollmentRepository;
 
 import java.util.List;
@@ -25,32 +20,25 @@ import java.util.UUID;
 @CrossOrigin(origins = "*")
 public class TutoringController {
 
-    private final CreateTutoringOfferUseCase
-            createTutoringOfferUseCase;
+    private final CreateTutoringOfferUseCase createTutoringOfferUseCase;
 
-    private final BrowseTutoringOffersUseCase
-            browseTutoringOffersUseCase;
+    private final BrowseTutoringOffersUseCase browseTutoringOffersUseCase;
 
-    private final GetTutoringOfferUseCase
-            getTutoringOfferUseCase;
+    private final GetTutoringOfferUseCase getTutoringOfferUseCase;
 
-    private final GetMyTutoringOffersUseCase
-            getMyTutoringOffersUseCase;
+    private final GetMyTutoringOffersUseCase getMyTutoringOffersUseCase;
 
-    private final CloseTutoringOfferUseCase
-            closeTutoringOfferUseCase;
+    private final CloseTutoringOfferUseCase closeTutoringOfferUseCase;
 
-    private final EnrollInTutoringUseCase
-            enrollInTutoringUseCase;
+    private final EnrollInTutoringUseCase enrollInTutoringUseCase;
 
-    private final org.uce.campusmarket.tutoring.application.usecase.UpdateTutoringOfferUseCase
-            updateTutoringOfferUseCase;
+    private final UpdateTutoringOfferUseCase updateTutoringOfferUseCase;
 
-    private final org.uce.campusmarket.tutoring.application.usecase.DeleteTutoringOfferUseCase
-            deleteTutoringOfferUseCase;
+    private final DeleteTutoringOfferUseCase deleteTutoringOfferUseCase;
 
-    private final TutoringEnrollmentRepository
-            tutoringEnrollmentRepository;
+    private final TutoringEnrollmentRepository tutoringEnrollmentRepository;
+
+    private final GetEnrolledStudentsUseCase getEnrolledStudentsUseCase;
 
     @PostMapping
     public ResponseEntity<TutoringOfferResponse>
@@ -194,5 +182,13 @@ public class TutoringController {
     ) {
         deleteTutoringOfferUseCase.execute(offerId, requesterId);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{id}/students")
+    public ResponseEntity<List<UUID>> getStudents(
+            @PathVariable UUID id) {
+
+        return ResponseEntity.ok(
+                getEnrolledStudentsUseCase.execute(id));
     }
 }

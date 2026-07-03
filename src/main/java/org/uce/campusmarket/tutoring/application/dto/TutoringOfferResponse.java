@@ -39,4 +39,6 @@ public class TutoringOfferResponse {
     private Double averageRating;
 
     private Integer totalReviews;
+
+    private String tutorPhotoUrl;
 }

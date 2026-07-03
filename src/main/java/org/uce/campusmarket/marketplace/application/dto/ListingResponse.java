@@ -32,4 +32,7 @@ public class ListingResponse {
     private String sellerAddress;
     private String sellerSocialMedia;
 
+    private Double sellerReputation;
+    private Integer sellerReviewCount;
+    private String sellerPhotoUrl;
 }

@@ -30,6 +30,7 @@ public class GetUserProfileUseCase {
                 user.getAddress(),
                 user.getDescription(),
                 user.getSocialMedia(),
+                user.getPhotoUrl(),
                 user.getCreatedAt()
         );
     }

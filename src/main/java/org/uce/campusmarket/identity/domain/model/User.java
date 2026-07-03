@@ -33,6 +33,8 @@ public class User {
 
     private String socialMedia;
 
+    private String photoUrl;
+
     private LocalDateTime createdAt;
 
     public static User create(
@@ -70,6 +72,9 @@ public class User {
         this.socialMedia = normalizeOptional(socialMedia);
     }
 
+    public void updatePhoto(String photoUrl) {
+        this.photoUrl = normalizeOptional(photoUrl);
+    }
 
     private String normalizeOptional(String value) {
         return value == null || value.isBlank()

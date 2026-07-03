@@ -57,6 +57,7 @@ public class UpdateTutoringOfferUseCase {
                 tutor.getSocialMedia(),
                 
                 null, 
+                null,
                 null
         );
     }
