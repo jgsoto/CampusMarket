@@ -1,4 +1,86 @@
 document.addEventListener('DOMContentLoaded', async () => {
+
+    async function renderOwner(ownerId, ownerName) {
+
+        let photoUrl = "/assets/icons/perfil.png";
+        let reputation = 0;
+        let reviewCount = 0;
+
+        try {
+
+            const [profileRes, reputationRes, reviewsRes] = await Promise.all([
+                fetch(`/api/users/profile/${ownerId}`),
+                fetch(`/api/reviews/users/${ownerId}/reputation`),
+                fetch(`/api/reviews/users/${ownerId}/reviews`)
+            ]);
+
+            if (profileRes.ok) {
+                const profile = await profileRes.json();
+
+                if (profile.photoUrl) {
+                    photoUrl = profile.photoUrl;
+                }
+            }
+
+            if (reputationRes.ok) {
+                const rep = await reputationRes.json();
+                reputation = Number(rep.reputation ?? 0);
+            }
+
+            if (reviewsRes.ok) {
+                const reviews = await reviewsRes.json();
+                reviewCount = reviews.length;
+            }
+
+        } catch (e) {
+            console.error(e);
+        }
+
+        document.getElementById("res-owner").innerHTML = `
+        <div class="flex items-center gap-2">
+        
+            <img
+                src="${photoUrl}"
+                alt="${ownerName}"
+                class="w-8 h-8 rounded-full object-cover border border-gray-200 flex-shrink-0">
+        
+            <div class="leading-tight">
+        
+                <div class="flex items-center gap-1 text-sm">
+        
+                    <span class="text-gray-500">
+                        Compartido por
+                    </span>
+        
+                    <span class="font-semibold text-gray-800">
+                        ${ownerName}
+                    </span>
+        
+                </div>
+        
+                <div class="flex items-center gap-1 text-xs text-gray-500">
+        
+                    <span class="font-medium text-uce-navy">
+                        ${reputation.toFixed(1)}
+                    </span>
+        
+                    <span>/ 5</span>
+        
+                    <span>•</span>
+        
+                    <span>
+                        ${reviewCount}
+                        ${reviewCount === 1 ? "reseña" : "reseñas"}
+                    </span>
+        
+                </div>
+        
+            </div>
+        
+        </div>
+        `;
+    }
+
     const urlParams = new URLSearchParams(window.location.search);
     const resourceId = urlParams.get('id');
 
@@ -32,7 +114,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         resTitle.textContent = resource.title;
         resCategory.textContent = resource.category;
         resDesc.textContent = resource.description;
-        resOwner.textContent = `Compartido por: ${resource.ownerName}`;
+        await renderOwner(resource.ownerId, resource.ownerName);
 
         // Archivos
         if (resource.files && resource.files.length > 0) {
