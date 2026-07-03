@@ -1,18 +1,19 @@
 'use strict';
 
 const API_BASE = '';
-let navbarMounted = false;
-let navbarHtmlCache = null;
 
 async function getUserProfile() {
-    const cached = sessionStorage.getItem('campusMarketProfile');
+
+    const userId = getOwnerId();
+    if (!userId) return null;
+
+    const cacheKey = `campusMarketProfile_${userId}`;
+
+    const cached = sessionStorage.getItem(cacheKey);
 
     if (cached) {
         return JSON.parse(cached);
     }
-
-    const userId = getOwnerId();
-    if (!userId) return null;
 
     const response = await fetch(`${API_BASE}/api/users/profile/${userId}`);
 
@@ -21,7 +22,7 @@ async function getUserProfile() {
     const profile = await response.json();
 
     sessionStorage.setItem(
-        'campusMarketProfile',
+        cacheKey,
         JSON.stringify(profile)
     );
 
@@ -37,19 +38,6 @@ const MarketplaceLayout = (() => {
     async function mountNavbar(activePage = '', clerkUser = null) {
         const placeholder = document.getElementById('navbar-placeholder');
         if (!placeholder) return;
-
-        if (navbarMounted && navbarHtmlCache) {
-
-            placeholder.outerHTML = navbarHtmlCache;
-
-            updateActive(activePage);
-
-            _initToggle();
-            _initDropdown();
-            _initLogout();
-
-            return;
-        }
 
         const links = [
             { id: 'dashboard', href: '/modules/marketplace/dashboard.html', label: 'Marketplace' },
@@ -219,11 +207,7 @@ const MarketplaceLayout = (() => {
         </nav>
       </header>`;
 
-        navbarHtmlCache = html;
-
         placeholder.outerHTML = html;
-
-        navbarMounted = true;
 
         _initToggle();
         _initDropdown();
@@ -277,65 +261,6 @@ const MarketplaceLayout = (() => {
         };
         document.getElementById('logout-btn')?.addEventListener('click', signOut);
         document.getElementById('logout-btn-mobile')?.addEventListener('click', signOut);
-    }
-
-    function updateActive(activePage) {
-
-        document.querySelectorAll("header nav a").forEach(link => {
-
-            const href = link.getAttribute("href");
-
-            link.classList.remove(
-                "text-uce-gold",
-                "font-semibold",
-                "font-bold",
-                "bg-white/5"
-            );
-
-            if (
-                href.includes("marketplace") &&
-                activePage === "dashboard"
-            ) {
-                link.classList.add("text-uce-gold","font-semibold");
-            }
-
-            if (
-                href.includes("tutoring") &&
-                activePage === "tutorias"
-            ) {
-                link.classList.add("text-uce-gold","font-semibold");
-            }
-
-            if (
-                href.includes("resources") &&
-                activePage === "recursos"
-            ) {
-                link.classList.add("text-uce-gold","font-semibold");
-            }
-
-            if (
-                href.includes("reputation") &&
-                activePage === "reputation"
-            ) {
-                link.classList.add("text-uce-gold","font-semibold");
-            }
-
-            if (
-                href.includes("profile") &&
-                activePage === "profile"
-            ) {
-                link.classList.add("text-uce-gold","font-semibold");
-            }
-
-            if (
-                href.includes("my-listings") &&
-                activePage === "my-listings"
-            ) {
-                link.classList.add("text-uce-gold","font-semibold");
-            }
-
-        });
-
     }
 
     return { mountNavbar };
