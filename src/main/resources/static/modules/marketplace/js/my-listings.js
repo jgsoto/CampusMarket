@@ -179,6 +179,96 @@ function openEditModal(id, title, desc, price) {
   modal.classList.add('flex');
 }
 
+async function improveEditDescription() {
+
+  const textarea = document.getElementById("edit-desc");
+
+  if (!textarea.value.trim()) {
+    showToast("Escribe una descripción primero.", "warning");
+    return;
+  }
+
+  const response = await fetch(`${API_BASE}/api/listings/ai/improve-description`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      text: textarea.value
+    })
+  });
+
+  if (!response.ok) {
+    showToast("Error usando IA.", "error");
+    return;
+  }
+
+  const data = await response.json();
+
+  textarea.value = data.result;
+
+}
+
+async function correctEditDescription() {
+
+  const textarea = document.getElementById("edit-desc");
+
+  if (!textarea.value.trim()) {
+    showToast("Escribe una descripción primero.", "warning");
+    return;
+  }
+
+  const response = await fetch(`${API_BASE}/api/listings/ai/correct-text`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      text: textarea.value
+    })
+  });
+
+  if (!response.ok) {
+    showToast("Error usando IA.", "error");
+    return;
+  }
+
+  const data = await response.json();
+
+  textarea.value = data.result;
+
+}
+
+async function generateEditTitle() {
+
+  const description = document.getElementById("edit-desc").value;
+
+  if (!description.trim()) {
+    showToast("Primero escribe una descripción.", "warning");
+    return;
+  }
+
+  const response = await fetch(`${API_BASE}/api/listings/ai/generate-title`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      text: description
+    })
+  });
+
+  if (!response.ok) {
+    showToast("Error usando IA.", "error");
+    return;
+  }
+
+  const data = await response.json();
+
+  document.getElementById("edit-title").value = data.result;
+
+}
+
 function closeEditModal() {
   const modal = document.getElementById('edit-modal');
   modal.classList.add('hidden');
@@ -283,6 +373,17 @@ window.addEventListener('load', async () => {
   await Promise.all([loadMyListings(), loadMyTutoring(), loadMyResources()]);
 
   document.getElementById('edit-listing-form').addEventListener('submit', handleEditSubmit);
+  document
+      .getElementById("btn-ai-improve")
+      ?.addEventListener("click", improveEditDescription);
+
+  document
+      .getElementById("btn-ai-correct")
+      ?.addEventListener("click", correctEditDescription);
+
+  document
+      .getElementById("btn-ai-title")
+      ?.addEventListener("click", generateEditTitle);
   document.getElementById('edit-modal').addEventListener('click', e => {
     if (e.target === e.currentTarget) closeEditModal();
   });

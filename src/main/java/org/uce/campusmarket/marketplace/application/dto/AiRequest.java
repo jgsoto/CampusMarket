@@ -9,4 +9,6 @@ public class AiRequest {
 
     private String text;
 
+    private String imageUrl;
+
 }
