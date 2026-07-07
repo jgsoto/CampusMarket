@@ -40,6 +40,24 @@ public class UpdateResourceUseCase {
                 request.getCategory()
         );
 
+        List<UUID> filesToDelete = request.getFilesToDelete();
+        if (filesToDelete != null && !filesToDelete.isEmpty()) {
+            for (UUID fileId : filesToDelete) {
+                resource.getFiles().stream()
+                        .filter(f -> f.getId().equals(fileId))
+                        .findFirst()
+                        .ifPresent(f -> {
+                            // fileStoragePort.delete(f.getUrl()); // If you want to delete from storage, uncomment. Assuming this project supports it or it can be a future improvement. Let's add it.
+                            try {
+                                fileStoragePort.delete(f.getUrl());
+                            } catch (Exception e) {
+                                // Log error if needed, but proceed to remove from DB
+                            }
+                            resource.removeFile(fileId);
+                        });
+            }
+        }
+
         List<MultipartFile> newFiles = request.getNewFiles();
 
         if (newFiles != null && !newFiles.isEmpty()) {
