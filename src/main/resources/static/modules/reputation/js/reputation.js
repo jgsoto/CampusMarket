@@ -20,7 +20,6 @@ let _activeFilter = 'ALL';
 
 const Utils = {
   buildStars: (score) => '★'.repeat(Math.round(score)).padEnd(5, '☆'),
-  
   normalizeType: (type) => (type || 'TUTORING').toString().toUpperCase().trim(),
   
   initBarContainer: () => {
@@ -56,6 +55,19 @@ const Utils = {
     </article>`
 };
 
+function updateFilterButtonStyles() {
+  RepDOM.filterBtns().forEach(btn => {
+    const isActive = btn.dataset.type === _activeFilter;
+    if (isActive) {
+      btn.classList.add('bg-uce-navy', 'text-uce-gold', 'border-uce-navy');
+      btn.classList.remove('bg-white', 'text-gray-600', 'border-gray-200');
+    } else {
+      btn.classList.remove('bg-uce-navy', 'text-uce-gold', 'border-uce-navy');
+      btn.classList.add('bg-white', 'text-gray-600', 'border-gray-200');
+    }
+  });
+}
+
 function applyReviewFilter() {
   const container = RepDOM.reviewsContainer();
   const title = RepDOM.reviewsTitle();
@@ -89,7 +101,6 @@ async function loadReputation(userId) {
       fetch(`${API_BASE}/api/reviews/users/${userId}/reputation`).then(r => r.json()),
       fetch(`${API_BASE}/api/reviews/users/${userId}/reviews`).then(r => r.json())
     ]);
-
 
     const reputation = repRes.reputation || repRes.score || 0;
     
@@ -137,8 +148,12 @@ window.addEventListener('load', async () => {
 
     await MarketplaceLayout.mountNavbar('reputation', Clerk.user);
     
+    // Ejecutar una vez al cargar para aplicar estilos iniciales
+    updateFilterButtonStyles();
+    
     RepDOM.filterBtns().forEach(btn => btn.addEventListener('click', () => {
       _activeFilter = btn.dataset.type;
+      updateFilterButtonStyles();
       applyReviewFilter();
     }));
 
