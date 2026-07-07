@@ -90,10 +90,9 @@ async function loadReputation(userId) {
       fetch(`${API_BASE}/api/reviews/users/${userId}/reviews`).then(r => r.json())
     ]);
 
-    // Corregido: Definimos reputation correctamente
+
     const reputation = repRes.reputation || repRes.score || 0;
     
-    // Normalizamos reseñas
     _allReviews = rawReviews.map(r => ({ 
         ...r, 
         targetType: Utils.normalizeType(r.targetType) 
