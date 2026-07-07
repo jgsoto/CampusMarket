@@ -10,13 +10,24 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchCategories(categorySelect);
 
     let selectedFiles = [];
+    const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB en bytes
+    const MAX_FILE_SIZE_TEXT = '50 MB';
 
     // Manejar selección de archivos para mostrarlos en la UI
     fileInput.addEventListener('change', (e) => {
         const newFiles = Array.from(e.target.files);
         if (newFiles.length === 0) return;
 
-        selectedFiles = selectedFiles.concat(newFiles);
+        let validFiles = [];
+        newFiles.forEach(file => {
+            if (file.size > MAX_FILE_SIZE) {
+                showToast(`El archivo "${file.name}" es demasiado grande. El límite es ${MAX_FILE_SIZE_TEXT}.`, 'error');
+            } else {
+                validFiles.push(file);
+            }
+        });
+
+        selectedFiles = selectedFiles.concat(validFiles);
         fileInput.value = ''; // Limpiar el input para permitir seleccionar el mismo archivo
 
         renderFileList();
@@ -65,7 +76,15 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
             const newFiles = Array.from(e.dataTransfer.files);
-            selectedFiles = selectedFiles.concat(newFiles);
+            let validFiles = [];
+            newFiles.forEach(file => {
+                if (file.size > MAX_FILE_SIZE) {
+                    showToast(`El archivo "${file.name}" es demasiado grande. El límite es ${MAX_FILE_SIZE_TEXT}.`, 'error');
+                } else {
+                    validFiles.push(file);
+                }
+            });
+            selectedFiles = selectedFiles.concat(validFiles);
             renderFileList();
         }
     });
@@ -92,6 +111,15 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (selectedFiles.length === 0) {
             showToast('Debes adjuntar al menos un archivo.', 'warning');
+            return;
+        }
+
+        let totalSize = 0;
+        for (let file of selectedFiles) {
+            totalSize += file.size;
+        }
+        if (totalSize > MAX_FILE_SIZE) {
+            showToast(`El tamaño total de los archivos supera el máximo permitido de ${MAX_FILE_SIZE_TEXT}.`, 'error');
             return;
         }
 
