@@ -9,20 +9,44 @@ document.addEventListener('DOMContentLoaded', () => {
     // Cargar las categorías dinámicamente
     fetchCategories(categorySelect);
 
+    let selectedFiles = [];
+
     // Manejar selección de archivos para mostrarlos en la UI
     fileInput.addEventListener('change', (e) => {
-        fileListContainer.innerHTML = '';
-        const files = Array.from(e.target.files);
-        
-        if (files.length === 0) return;
+        const newFiles = Array.from(e.target.files);
+        if (newFiles.length === 0) return;
 
-        files.forEach(file => {
-            const p = document.createElement('p');
-            p.className = "text-sm text-gray-700 bg-gray-100 p-2 rounded-lg";
-            p.textContent = `📄 ${file.name} (${(file.size / (1024 * 1024)).toFixed(2)} MB)`;
-            fileListContainer.appendChild(p);
-        });
+        selectedFiles = selectedFiles.concat(newFiles);
+        fileInput.value = ''; // Limpiar el input para permitir seleccionar el mismo archivo
+
+        renderFileList();
     });
+
+    function renderFileList() {
+        fileListContainer.innerHTML = '';
+        
+        selectedFiles.forEach((file, index) => {
+            const div = document.createElement('div');
+            div.className = "flex justify-between items-center bg-gray-100 p-2 rounded-lg text-sm text-gray-700";
+            
+            const fileInfo = document.createElement('span');
+            fileInfo.textContent = `📄 ${file.name} (${(file.size / (1024 * 1024)).toFixed(2)} MB)`;
+            
+            const removeBtn = document.createElement('button');
+            removeBtn.type = "button";
+            removeBtn.className = "text-red-500 hover:text-red-700 font-bold px-2 text-lg leading-none";
+            removeBtn.innerHTML = "&times;";
+            removeBtn.onclick = () => {
+                selectedFiles.splice(index, 1);
+                renderFileList();
+            };
+            
+            div.appendChild(fileInfo);
+            div.appendChild(removeBtn);
+            fileListContainer.appendChild(div);
+        });
+    }
+
 
     // Drag & Drop logic
     uploadZone.addEventListener('dragover', (e) => {
@@ -40,8 +64,9 @@ document.addEventListener('DOMContentLoaded', () => {
         uploadZone.classList.remove('border-uce-navy', 'bg-slate-100');
         
         if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-            fileInput.files = e.dataTransfer.files;
-            fileInput.dispatchEvent(new Event('change'));
+            const newFiles = Array.from(e.dataTransfer.files);
+            selectedFiles = selectedFiles.concat(newFiles);
+            renderFileList();
         }
     });
 
@@ -50,8 +75,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 1. Verificar sesión con Clerk
         if (!window.Clerk || !window.Clerk.user) {
-            alert("Debes iniciar sesión para compartir recursos.");
-            window.Clerk.openSignIn();
+            showToast('Debes iniciar sesión para compartir recursos.', 'warning');
+            setTimeout(() => {
+                window.Clerk.openSignIn();
+            }, 1000);
             return;
         }
 
@@ -63,14 +90,13 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append('description', document.getElementById('resource-desc').value);
         formData.append('category', document.getElementById('resource-category').value);
         
-        const files = fileInput.files;
-        if (files.length === 0) {
-            alert("Debes adjuntar al menos un archivo.");
+        if (selectedFiles.length === 0) {
+            showToast('Debes adjuntar al menos un archivo.', 'warning');
             return;
         }
 
-        for (let i = 0; i < files.length; i++) {
-            formData.append('files', files[i]);
+        for (let i = 0; i < selectedFiles.length; i++) {
+            formData.append('files', selectedFiles[i]);
         }
 
         submitBtn.disabled = true;
@@ -89,20 +115,24 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) {
                 const errorData = await response.json();
                 if (errorData.message === "No se proporcionaron archivos.") {
-                    alert('Ocurrió un error al subir los archivos al servidor.');
+                    showToast('Ocurrió un error al subir los archivos al servidor.', 'error');
                 } else {
-                    alert(`Error al crear: ${errorData.message}`);
+                    showToast(`Error al crear: ${errorData.message}`, 'error');
                 }
                 throw new Error(errorData.message || 'Error al subir el recurso');
             }
 
             const data = await response.json();
-            alert("¡Recurso compartido exitosamente!");
-            window.location.href = `/modules/resources/resource-details.html?id=${data.id}`;
+            showToast('¡Recurso compartido exitosamente!', 'success');
+            setTimeout(() => {
+                window.location.href = `/modules/resources/resource-details.html?id=${data.id}`;
+            }, 1500);
 
         } catch (error) {
             console.error('Error:', error);
-            alert("Ocurrió un error: " + error.message);
+            if (error.message !== 'Error al subir el recurso') {
+                showToast("Ocurrió un error: " + error.message, 'error');
+            }
             submitBtn.disabled = false;
             submitBtn.textContent = 'Compartir Recurso';
         }

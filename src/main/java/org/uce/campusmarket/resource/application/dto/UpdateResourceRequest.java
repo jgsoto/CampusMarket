@@ -16,4 +16,5 @@ public class UpdateResourceRequest {
     private String category;
     
     private List<MultipartFile> newFiles;
+    private List<UUID> filesToDelete;
 }
