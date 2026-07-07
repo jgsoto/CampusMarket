@@ -21,6 +21,8 @@ let _activeFilter = 'ALL';
 const Utils = {
   buildStars: (score) => '★'.repeat(Math.round(score)).padEnd(5, '☆'),
   
+  normalizeType: (type) => (type || 'TUTORING').toString().toUpperCase().trim(),
+  
   initBarContainer: () => {
     const container = RepDOM.barsContainer();
     if (!container) return;
@@ -36,9 +38,7 @@ const Utils = {
     });
   },
 
-  // Tarjeta limpia sin badges de categorías
-  buildReviewCard: (r) => {
-    return `
+  buildReviewCard: (r) => `
     <article class="flex gap-3 items-start p-4 rounded-xl border border-gray-100 bg-white">
       <div class="w-9 h-9 rounded-full bg-uce-navy/10 flex items-center justify-center font-bold text-xs text-uce-navy">
         ${r.reviewerName?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2) || 'U'}
@@ -53,14 +53,17 @@ const Utils = {
         </div>
         <p class="text-gray-600 text-sm mt-1 italic">"${r.comment || ''}"</p>
       </div>
-    </article>`;
-  }
+    </article>`
 };
 
 function applyReviewFilter() {
   const container = RepDOM.reviewsContainer();
   const title = RepDOM.reviewsTitle();
-  const visible = _activeFilter === 'ALL' ? _allReviews : _allReviews.filter(r => r.targetType === _activeFilter);
+  const filter = _activeFilter.toUpperCase();
+  
+  const visible = filter === 'ALL' 
+    ? _allReviews 
+    : _allReviews.filter(r => r.targetType === filter);
 
   if (title) title.textContent = `Opiniones recibidas (${visible.length})`;
   
@@ -82,30 +85,36 @@ function updateStats(reviews) {
 
 async function loadReputation(userId) {
   try {
-    const [repRes, revRes] = await Promise.all([
+    const [repRes, rawReviews] = await Promise.all([
       fetch(`${API_BASE}/api/reviews/users/${userId}/reputation`).then(r => r.json()),
       fetch(`${API_BASE}/api/reviews/users/${userId}/reviews`).then(r => r.json())
     ]);
 
-    const reputation = repRes.reputation || 0;
+    // Corregido: Definimos reputation correctamente
+    const reputation = repRes.reputation || repRes.score || 0;
     
-    RepDOM.globalScore().textContent = reputation.toFixed(1);
+    // Normalizamos reseñas
+    _allReviews = rawReviews.map(r => ({ 
+        ...r, 
+        targetType: Utils.normalizeType(r.targetType) 
+    }));
+    
+    RepDOM.globalScore().textContent = Number(reputation).toFixed(1);
     RepDOM.globalStars().textContent = Utils.buildStars(reputation);
-    RepDOM.globalCount().textContent = `(${revRes.length} reseña${revRes.length !== 1 ? 's' : ''})`;
+    RepDOM.globalCount().textContent = `(${_allReviews.length} reseña${_allReviews.length !== 1 ? 's' : ''})`;
     
-    updateStats(revRes);
+    updateStats(_allReviews);
     
     const dist = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
-    revRes.forEach(r => dist[Math.max(1, Math.min(5, Math.round(r.rating)))]++);
+    _allReviews.forEach(r => dist[Math.max(1, Math.min(5, Math.round(r.rating)))]++);
     Object.entries(dist).forEach(([s, count]) => {
-      const pct = revRes.length > 0 ? (count / revRes.length) * 100 : 0;
+      const pct = _allReviews.length > 0 ? (count / _allReviews.length) * 100 : 0;
       const bar = document.getElementById(`bar-${s}`);
       if (bar) bar.style.width = `${pct}%`;
       const cnt = document.getElementById(`cnt-${s}`);
       if (cnt) cnt.textContent = count;
     });
 
-    _allReviews = revRes;
     applyReviewFilter();
     
     RepDOM.loading().classList.add('hidden');
