@@ -123,7 +123,7 @@ public class GroqAiClient {
     private String executePrompt(String prompt) {
 
         GroqRequest request = new GroqRequest(
-                "openai/gpt-oss-120b",
+                "llama-3.3-70b-versatile",
                 List.of(
                         new GroqRequest.Message(
                                 "user",
