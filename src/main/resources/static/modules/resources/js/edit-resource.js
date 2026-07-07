@@ -24,6 +24,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     let existingFiles = [];
     let filesToDelete = [];
     let selectedFiles = [];
+    const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB
+    const MAX_FILE_SIZE_TEXT = '50 MB';
     
     const existingFileListContainer = document.getElementById('existing-file-list');
 
@@ -92,7 +94,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         const newFiles = Array.from(e.target.files);
         if (newFiles.length === 0) return;
 
-        selectedFiles = selectedFiles.concat(newFiles);
+        let validFiles = [];
+        newFiles.forEach(file => {
+            if (file.size > MAX_FILE_SIZE) {
+                showToast(`El archivo "${file.name}" es demasiado grande. El límite es ${MAX_FILE_SIZE_TEXT}.`, 'error');
+            } else {
+                validFiles.push(file);
+            }
+        });
+
+        selectedFiles = selectedFiles.concat(validFiles);
         fileInput.value = ''; // Limpiar el input para permitir seleccionar el mismo archivo
         
         renderNewFileList();
@@ -140,7 +151,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
             const newFiles = Array.from(e.dataTransfer.files);
-            selectedFiles = selectedFiles.concat(newFiles);
+            let validFiles = [];
+            newFiles.forEach(file => {
+                if (file.size > MAX_FILE_SIZE) {
+                    showToast(`El archivo "${file.name}" es demasiado grande. El límite es ${MAX_FILE_SIZE_TEXT}.`, 'error');
+                } else {
+                    validFiles.push(file);
+                }
+            });
+            selectedFiles = selectedFiles.concat(validFiles);
             renderNewFileList();
         }
     });
@@ -166,6 +185,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (existingFiles.length === 0 && selectedFiles.length === 0) {
             showToast('El recurso debe tener al menos un archivo.', 'warning');
+            return;
+        }
+
+        let totalSize = 0;
+        for (let file of selectedFiles) {
+            totalSize += file.size;
+        }
+        if (totalSize > MAX_FILE_SIZE) {
+            showToast(`El tamaño total de los archivos nuevos supera el máximo permitido de ${MAX_FILE_SIZE_TEXT}.`, 'error');
             return;
         }
 
