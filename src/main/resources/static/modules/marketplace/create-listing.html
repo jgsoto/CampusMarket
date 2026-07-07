@@ -1,202 +1,199 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CampusMarket | Vender Producto</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="/js/tailwind-config.js"></script>
-  <link rel="stylesheet" href="/css/styles.css" />
-  <script async crossorigin="anonymous"
-    data-clerk-publishable-key="pk_test_ZnVubnktbXVza294LTU5LmNsZXJrLmFjY291bnRzLmRldiQ"
-    src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js/dist/clerk.browser.js">
-  </script>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>CampusMarket | Vender Producto</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/js/tailwind-config.js"></script>
+    <link rel="stylesheet" href="/css/styles.css"/>
+    <script async crossorigin="anonymous"
+            data-clerk-publishable-key="pk_test_ZnVubnktbXVza294LTU5LmNsZXJrLmFjY291bnRzLmRldiQ"
+            src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js/dist/clerk.browser.js">
+    </script>
 </head>
 
 <body class="bg-gray-50 min-h-screen">
 
-  <div id="navbar-placeholder"></div>
+<div id="navbar-placeholder"></div>
 
-  <main class="max-w-2xl mx-auto px-6 py-10 pb-20">
+<main class="max-w-6xl mx-auto px-6 py-10 pb-20">
 
     <nav class="flex items-center gap-2 text-sm text-gray-400 mb-8">
-      <a href="/modules/marketplace/dashboard.html" class="hover:text-uce-navy transition-colors">Catálogo</a>
-      <span class="text-gray-300">›</span>
-      <span class="text-gray-700 font-medium">Vender Producto</span>
+        <a href="/modules/marketplace/dashboard.html" class="hover:text-uce-navy transition-colors">Catálogo</a>
+        <span class="text-gray-300">›</span>
+        <span class="text-gray-700 font-medium">Vender Producto</span>
     </nav>
 
     <div class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
 
-      <div class="px-8 py-6 border-b border-gray-100">
-        <h1 class="font-display text-2xl font-bold text-uce-navy">Publicar un producto</h1>
-        <p class="text-sm text-gray-400 mt-1">Completa la información de lo que deseas vender.</p>
-      </div>
-
-      <form id="create-listing-form" class="px-8 py-6 flex flex-col gap-6" novalidate>
-
-        <div class="flex flex-col gap-1.5">
-          <label class="text-sm font-medium text-gray-700" for="listing-title">
-            Título <span class="text-red-400">*</span>
-          </label>
-          <input id="listing-title" type="text"
-                 placeholder="Ej: Laptop HP Core i5 8va generación"
-                 required maxlength="100"
-                 class="px-4 py-3 border-2 border-gray-200 rounded-xl text-sm
-                        focus:border-uce-navy focus:outline-none focus:ring-2
-                        focus:ring-uce-navy/10 transition-colors" />
+        <div class="px-8 py-6 border-b border-gray-100">
+            <h1 class="font-display text-2xl font-bold text-uce-navy">Publicar un producto</h1>
+            <p class="text-sm text-gray-400 mt-1">Completa la información de lo que deseas vender.</p>
         </div>
 
-        <div class="flex flex-col gap-1.5">
-          <label class="text-sm font-medium text-gray-700" for="listing-desc">
-            Descripción <span class="text-red-400">*</span>
-          </label>
-          <textarea id="listing-desc" rows="4" required maxlength="500"
-                    placeholder="Describe el estado, características y cualquier detalle relevante..."
-                    class="px-4 py-3 border-2 border-gray-200 rounded-xl text-sm
-                           focus:border-uce-navy focus:outline-none focus:ring-2
-                           focus:ring-uce-navy/10 transition-colors resize-none"></textarea>
-          <div class="flex flex-wrap gap-2 mt-3">
+        <form id="create-listing-form" class="px-8 py-6" novalidate>
+            <div class="grid lg:grid-cols-3 gap-8">
 
-            <button
-                    type="button"
-                    id="btn-ai-improve"
-                    class="px-3 py-2 rounded-lg bg-purple-600 text-white text-sm hover:bg-purple-700">
-              Mejorar descripción
-            </button>
+                <div class="lg:col-span-2 flex flex-col gap-6">
 
-            <button
-                    type="button"
-                    id="btn-ai-title"
-                    class="px-3 py-2 rounded-lg bg-blue-600 text-white text-sm hover:bg-blue-700">
-              Generar título
-            </button>
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-sm font-medium text-gray-700" for="listing-title">
+                            Título <span class="text-red-400">*</span>
+                        </label>
+                        <input id="listing-title" type="text"
+                               placeholder="Ej: Laptop HP Core i5 8va generación"
+                               required maxlength="100"
+                               class="px-4 py-3 border-2 border-gray-200 rounded-xl text-sm
+                                    focus:border-uce-navy focus:outline-none focus:ring-2
+                                    focus:ring-uce-navy/10 transition-colors"/>
+                    </div>
 
-            <button
-                    type="button"
-                    id="btn-ai-correct"
-                    class="px-3 py-2 rounded-lg bg-green-600 text-white text-sm hover:bg-green-700">
-              Corregir texto
-            </button>
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-sm font-medium text-gray-700" for="listing-desc">
+                            Descripción <span class="text-red-400">*</span>
+                        </label>
+                        <textarea id="listing-desc" rows="4" required maxlength="500"
+                                  placeholder="Describe el estado, características y cualquier detalle relevante..."
+                                  class="px-4 py-3 border-2 border-gray-200 rounded-xl text-sm
+                                       focus:border-uce-navy focus:outline-none focus:ring-2
+                                       focus:ring-uce-navy/10 transition-colors resize-none"></textarea>
+                        <span class="text-xs text-gray-400 text-right">
+                                <span id="desc-count">0</span>/500 caracteres
+                            </span>
+                    </div>
 
-            <button
-                    id="btn-ai-image"
-                    type="button"
-                    class="px-3 py-2 rounded-lg bg-indigo-600 text-white text-sm hover:bg-indigo-700 transition">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-sm font-medium text-gray-700" for="listing-price">
+                                Precio (USD) <span class="text-red-400">*</span>
+                            </label>
+                            <div class="relative">
+                                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium text-sm">$</span>
+                                <input id="listing-price" type="number" step="0.01" min="0.01" required
+                                       placeholder="0.00"
+                                       class="w-full pl-8 pr-4 py-3 border-2 border-gray-200 rounded-xl text-sm
+                                            focus:border-uce-navy focus:outline-none focus:ring-2
+                                            focus:ring-uce-navy/10 transition-colors"/>
+                            </div>
+                        </div>
 
-              Generar descripción desde imagen
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-sm font-medium text-gray-700" for="listing-category">
+                                Categoría <span class="text-red-400">*</span>
+                            </label>
+                            <select id="listing-category" required
+                                    class="px-4 py-3 border-2 border-gray-200 rounded-xl text-sm
+                                         focus:border-uce-navy focus:outline-none focus:ring-2
+                                         focus:ring-uce-navy/10 transition-colors bg-white">
+                                <option value="" disabled selected>Selecciona...</option>
+                                <option value="123e4567-e89b-12d3-a456-426614174001">Libros y Apuntes</option>
+                                <option value="123e4567-e89b-12d3-a456-426614174002">Electronica y Dispositivos</option>
+                                <option value="123e4567-e89b-12d3-a456-426614174004">Insumos Universitarios</option>
+                            </select>
+                        </div>
+                    </div>
 
-            </button>
+                    <div class="flex flex-col gap-4">
+                        <div class="flex items-center justify-between">
+                            <label class="text-sm font-medium text-gray-700">
+                                Imágenes <span class="text-xs text-gray-400 font-normal ml-1">(opcional, máx. 5)</span>
+                            </label>
+                            <span id="image-count" class="text-xs text-gray-400">0 / 5</span>
+                        </div>
 
-          </div>
-          <span class="text-xs text-gray-400 text-right">
-            <span id="desc-count">0</span>/500 caracteres
-          </span>
-        </div>
+                        <div id="main-preview-container" class="hidden">
+                            <div class="relative rounded-2xl overflow-hidden bg-gray-100 aspect-[4/3] w-full shadow-sm">
+                                <img id="main-preview-img" src="" alt="Vista previa principal" class="w-full h-full object-contain bg-white"/>
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent pointer-events-none"></div>
+                                <span class="absolute bottom-3 left-3 text-white text-xs font-medium bg-black/40 px-2 py-1 rounded-full backdrop-blur-sm">
+                                        Imagen principal
+                                    </span>
+                            </div>
+                        </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-          <div class="flex flex-col gap-1.5">
-            <label class="text-sm font-medium text-gray-700" for="listing-price">
-              Precio (USD) <span class="text-red-400">*</span>
-            </label>
-            <div class="relative">
-              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium text-sm">$</span>
-              <input id="listing-price" type="number" step="0.01" min="0.01" required
-                     placeholder="0.00"
-                     class="w-full pl-8 pr-4 py-3 border-2 border-gray-200 rounded-xl text-sm
-                            focus:border-uce-navy focus:outline-none focus:ring-2
-                            focus:ring-uce-navy/10 transition-colors" />
+                        <div id="thumbnails-row" class="hidden grid grid-cols-5 gap-2"></div>
+
+                        <label for="listing-images" id="upload-zone"
+                               class="flex flex-col items-center justify-center gap-3 p-8
+                                    border-2 border-dashed border-gray-200 rounded-xl cursor-pointer
+                                    hover:border-uce-navy hover:bg-uce-navy/2 transition-colors group">
+                            <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center group-hover:bg-uce-navy/10 transition-colors">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-gray-400 group-hover:text-uce-navy transition-colors" aria-hidden="true">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="17 8 12 3 7 8"/>
+                                    <line x1="12" y1="3" x2="12" y2="15"/>
+                                </svg>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-sm font-medium text-gray-600">Haz clic para subir imágenes</p>
+                                <p class="text-xs text-gray-400 mt-0.5">PNG, JPG hasta 5MB · Puedes subir hasta 5 fotos</p>
+                            </div>
+                            <input id="listing-images" type="file" multiple accept="image/*" class="sr-only"/>
+                        </label>
+
+                        <button type="button" id="btn-clear-images" class="hidden text-xs text-red-400 hover:text-red-600 transition-colors underline underline-offset-2 w-fit">
+                            Eliminar todas las imágenes
+                        </button>
+                    </div>
+
+                    <div class="flex gap-4 pt-4 border-t border-gray-100">
+                        <button type="button" id="btn-draft" class="flex-1 py-3 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
+                            Guardar borrador
+                        </button>
+                        <button type="submit" id="btn-publish" class="flex-1 py-3 rounded-xl text-sm font-bold bg-uce-navy text-uce-gold hover:bg-uce-navy-light transition-colors shadow-sm">
+                            Publicar ahora
+                        </button>
+                    </div>
+
+                </div>
+
+                <aside class="lg:col-span-1">
+                    <div class="sticky top-6 rounded-2xl border border-indigo-100 bg-indigo-50 p-5">
+
+                        <div class="flex items-center gap-2 mb-2">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-indigo-600">
+                                <path d="M12 2v4"/>
+                                <path d="M12 18v4"/>
+                                <path d="M2 12h4"/>
+                                <path d="M18 12h4"/>
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                            <h3 class="font-bold text-indigo-700">Asistente IA</h3>
+                        </div>
+
+                        <p class="text-sm text-gray-600 mb-5">
+                            Mejora automáticamente tu publicación utilizando inteligencia artificial.
+                        </p>
+
+                        <div class="space-y-3">
+                            <button type="button" id="btn-ai-improve" class="w-full py-2.5 rounded-lg text-sm font-semibold bg-uce-navy text-uce-gold hover:bg-uce-navy-light transition">
+                                Mejorar descripción
+                            </button>
+                            <button type="button" id="btn-ai-title" class="w-full py-2.5 rounded-lg text-sm font-semibold bg-uce-navy text-uce-gold hover:bg-uce-navy-light transition">
+                                Generar título
+                            </button>
+                            <button type="button" id="btn-ai-correct" class="w-full py-2.5 rounded-lg text-sm font-semibold bg-uce-navy text-uce-gold hover:bg-uce-navy-light transition">
+                                Corregir ortografía
+                            </button>
+                            <button type="button" id="btn-ai-image" class="w-full py-2.5 rounded-lg text-sm font-semibold bg-uce-navy text-uce-gold hover:bg-uce-navy-light transition">
+                                Descripción desde imagen
+                            </button>
+                        </div>
+
+                    </div>
+                </aside>
+
             </div>
-          </div>
+        </form>
 
-          <div class="flex flex-col gap-1.5">
-            <label class="text-sm font-medium text-gray-700" for="listing-category">
-              Categoría <span class="text-red-400">*</span>
-            </label>
-            <select id="listing-category" required
-                    class="px-4 py-3 border-2 border-gray-200 rounded-xl text-sm
-                           focus:border-uce-navy focus:outline-none focus:ring-2
-                           focus:ring-uce-navy/10 transition-colors bg-white">
-              <option value="" disabled selected>Selecciona...</option>
-              <option value="123e4567-e89b-12d3-a456-426614174001">Libros y Apuntes</option>
-              <option value="123e4567-e89b-12d3-a456-426614174002">Electronica y Dispositivos</option>
-              <option value="123e4567-e89b-12d3-a456-426614174004">Insumos Universitarios</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="flex flex-col gap-4">
-          <div class="flex items-center justify-between">
-            <label class="text-sm font-medium text-gray-700">
-              Imágenes
-              <span class="text-xs text-gray-400 font-normal ml-1">(opcional, máx. 5)</span>
-            </label>
-            <span id="image-count" class="text-xs text-gray-400">0 / 5</span>
-          </div>
-
-          <div id="main-preview-container" class="hidden">
-            <div class="relative rounded-2xl overflow-hidden bg-gray-100 aspect-[4/3] w-full shadow-sm">
-              <img id="main-preview-img" src="" alt="Vista previa principal"
-                   class="w-full h-full object-contain bg-white" />
-              <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent pointer-events-none"></div>
-              <span class="absolute bottom-3 left-3 text-white text-xs font-medium
-                           bg-black/40 px-2 py-1 rounded-full backdrop-blur-sm">
-                Imagen principal
-              </span>
-            </div>
-          </div>
-
-          <div id="thumbnails-row" class="hidden grid grid-cols-5 gap-2"></div>
-
-          <label for="listing-images" id="upload-zone"
-                 class="flex flex-col items-center justify-center gap-3 p-8
-                        border-2 border-dashed border-gray-200 rounded-xl cursor-pointer
-                        hover:border-uce-navy hover:bg-uce-navy/2 transition-colors group">
-            <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center
-                        group-hover:bg-uce-navy/10 transition-colors">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                   stroke-width="1.5" class="text-gray-400 group-hover:text-uce-navy transition-colors" aria-hidden="true">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                <polyline points="17 8 12 3 7 8"/>
-                <line x1="12" y1="3" x2="12" y2="15"/>
-              </svg>
-            </div>
-            <div class="text-center">
-              <p class="text-sm font-medium text-gray-600">Haz clic para subir imágenes</p>
-              <p class="text-xs text-gray-400 mt-0.5">PNG, JPG hasta 5MB · Puedes subir hasta 5 fotos</p>
-            </div>
-            <input id="listing-images" type="file" multiple accept="image/*" class="sr-only" />
-          </label>
-
-          <button type="button" id="btn-clear-images"
-                  class="hidden text-xs text-red-400 hover:text-red-600 transition-colors
-                         underline underline-offset-2 w-fit">
-            Eliminar todas las imágenes
-          </button>
-        </div>
-
-        <div class="flex gap-4 pt-4 border-t border-gray-100">
-          <button type="button" id="btn-draft"
-                  class="flex-1 py-3 rounded-xl text-sm font-semibold
-                         bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
-            Guardar borrador
-          </button>
-          <button type="button" id="btn-publish"
-                  class="flex-1 py-3 rounded-xl text-sm font-bold
-                         bg-uce-navy text-uce-gold hover:bg-uce-navy-light
-                         transition-colors shadow-sm">
-            Publicar ahora
-          </button>
-        </div>
-
-      </form>
     </div>
+</main>
 
-  </main>
+<div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 max-w-sm" aria-live="polite"></div>
 
-  <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 max-w-sm" aria-live="polite"></div>
-
-  <script src="/modules/shared/components/js/marketplace-layout.js"></script>
-  <script src="/modules/marketplace/js/create-listing.js"></script>
+<script src="/modules/shared/components/js/marketplace-layout.js"></script>
+<script src="/modules/marketplace/js/create-listing.js"></script>
 
 </body>
 </html>
