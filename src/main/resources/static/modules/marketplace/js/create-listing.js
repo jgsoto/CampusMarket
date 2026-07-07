@@ -53,6 +53,36 @@ const AI = {
         if (!response.ok) throw new Error();
 
         return response.json();
+    },
+
+    generateFromImage: async () => {
+
+        if (_selectedFiles.length === 0) {
+            throw new Error("NO_IMAGE");
+        }
+
+        const formData = new FormData();
+        formData.append("image", _selectedFiles[0]);
+
+        const uploadResponse = await fetch(`${API_BASE}/api/listings/ai/upload-image`, {
+            method: "POST", body: formData
+        });
+
+        if (!uploadResponse.ok) throw new Error();
+
+        const uploadResult = await uploadResponse.json();
+
+        const response = await fetch(`${API_BASE}/api/listings/ai/generate-from-image`, {
+            method: "POST", headers: {
+                "Content-Type": "application/json"
+            }, body: JSON.stringify({
+                imageUrl: uploadResult.imageUrl
+            })
+        });
+
+        if (!response.ok) throw new Error();
+
+        return response.json();
     }
 };
 
@@ -334,6 +364,44 @@ async function correctText() {
 
 }
 
+async function generateDescriptionFromImage() {
+
+    if (_selectedFiles.length === 0) {
+        showToast("Primero selecciona una imagen.", "warning");
+        return;
+    }
+
+    const button = document.getElementById("btn-ai-image");
+
+    try {
+
+        button.disabled = true;
+        button.innerHTML = "Analizando imagen...";
+
+        const response = await AI.generateFromImage();
+
+        FIELDS.desc().value = response.result;
+
+        document.getElementById("desc-count").textContent =
+            response.result.length;
+
+        showToast("Descripción generada desde la imagen.", "success");
+
+    } catch (e) {
+
+        console.error(e);
+
+        showToast("No se pudo generar la descripción.", "error");
+
+    } finally {
+
+        button.disabled = false;
+        button.innerHTML = "Generar desde imagen";
+
+    }
+
+}
+
 async function submitForm(isPublish) {
     if (!validateAll()) {
         document.querySelector('[id^="error-listing"]')
@@ -413,6 +481,10 @@ window.addEventListener('load', async () => {
     document
         .getElementById("btn-ai-correct")
         ?.addEventListener("click", correctText);
+
+    document
+        .getElementById("btn-ai-image")
+        ?.addEventListener("click", generateDescriptionFromImage);
 
     document.getElementById('btn-draft').addEventListener('click', () => submitForm(false));
     document.getElementById('btn-publish').addEventListener('click', () => submitForm(true));

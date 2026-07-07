@@ -120,6 +120,73 @@ public class GroqAiClient {
 
     }
 
+    public String generateDescriptionFromImage(String imageUrl) {
+
+        String prompt = """
+            Observa la imagen del producto.
+
+            Genera una descripción para publicarla en un marketplace universitario.
+
+            Reglas:
+
+            - Describe únicamente lo que realmente observas.
+            - No inventes características técnicas.
+            - No inventes estado si no es visible.
+            - Usa un tono profesional.
+            - Máximo 120 palabras.
+            - Devuelve únicamente la descripción.
+            """;
+
+        GroqVisionRequest request = new GroqVisionRequest(
+                "meta-llama/llama-4-scout-17b-16e-instruct",
+                List.of(
+                        new GroqVisionRequest.Message(
+                                "user",
+                                List.of(
+                                        new GroqVisionRequest.TextContent(
+                                                "text",
+                                                prompt
+                                        ),
+                                        new GroqVisionRequest.ImageContent(
+                                                "image_url",
+                                                new GroqVisionRequest.ImageUrl(imageUrl)
+                                        )
+                                )
+                        )
+                ),
+                0.5
+        );
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(apiKey);
+
+        HttpEntity<GroqVisionRequest> entity =
+                new HttpEntity<>(request, headers);
+
+        ResponseEntity<GroqResponse> response =
+                restTemplate.exchange(
+                        URL,
+                        HttpMethod.POST,
+                        entity,
+                        GroqResponse.class
+                );
+
+        if (response.getBody() == null
+                || response.getBody().getChoices() == null
+                || response.getBody().getChoices().isEmpty()) {
+
+            throw new RuntimeException("Groq returned an empty response.");
+        }
+
+        return response.getBody()
+                .getChoices()
+                .get(0)
+                .getMessage()
+                .getContent()
+                .trim();
+    }
+
     private String executePrompt(String prompt) {
 
         GroqRequest request = new GroqRequest(
