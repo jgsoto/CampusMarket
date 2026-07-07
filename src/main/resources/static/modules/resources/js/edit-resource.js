@@ -3,8 +3,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const resourceId = urlParams.get('id');
 
     if (!resourceId) {
-        alert("Recurso no encontrado");
-        window.location.href = '/modules/resources/resources-catalog.html';
+        showToast('Recurso no encontrado', 'error');
+        setTimeout(() => {
+            window.location.href = '/modules/resources/resources-catalog.html';
+        }, 1500);
         return;
     }
 
@@ -19,6 +21,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     btnCancel.href = `/modules/resources/resource-details.html?id=${resourceId}`;
 
     let currentResource = null;
+    let existingFiles = [];
+    let filesToDelete = [];
+    let selectedFiles = [];
+    
+    const existingFileListContainer = document.getElementById('existing-file-list');
 
     // 1. Cargar datos del recurso
     try {
@@ -34,28 +41,87 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('resource-desc').value = currentResource.description;
         document.getElementById('resource-category').value = currentResource.category;
 
+        if (currentResource.files) {
+            existingFiles = [...currentResource.files];
+            renderExistingFileList();
+        }
+
         loader.classList.add('hidden');
         form.classList.remove('hidden');
 
     } catch (error) {
-        alert(error.message);
-        window.location.href = '/modules/resources/resources-catalog.html';
+        showToast(error.message, 'error');
+        setTimeout(() => {
+            window.location.href = '/modules/resources/resources-catalog.html';
+        }, 1500);
+    }
+
+    function renderExistingFileList() {
+        existingFileListContainer.innerHTML = '';
+        if (existingFiles.length === 0) {
+            existingFileListContainer.innerHTML = '<p class="text-sm text-gray-400 italic">No hay archivos actuales.</p>';
+            return;
+        }
+
+        existingFiles.forEach((file, index) => {
+            const div = document.createElement('div');
+            div.className = "flex justify-between items-center bg-gray-100 p-2 rounded-lg text-sm text-gray-700";
+            
+            const fileInfo = document.createElement('span');
+            fileInfo.textContent = `📄 ${file.filename} (${(file.size / (1024 * 1024)).toFixed(2)} MB)`;
+            
+            const removeBtn = document.createElement('button');
+            removeBtn.type = "button";
+            removeBtn.className = "text-red-500 hover:text-red-700 font-bold px-2 text-lg leading-none";
+            removeBtn.title = "Eliminar archivo";
+            removeBtn.innerHTML = "&times;";
+            removeBtn.onclick = () => {
+                filesToDelete.push(file.id);
+                existingFiles.splice(index, 1);
+                renderExistingFileList();
+            };
+            
+            div.appendChild(fileInfo);
+            div.appendChild(removeBtn);
+            existingFileListContainer.appendChild(div);
+        });
     }
 
     // 2. Manejar selección de archivos para mostrarlos en la UI
     fileInput.addEventListener('change', (e) => {
-        fileListContainer.innerHTML = '';
-        const files = Array.from(e.target.files);
+        const newFiles = Array.from(e.target.files);
+        if (newFiles.length === 0) return;
 
-        if (files.length === 0) return;
-
-        files.forEach(file => {
-            const p = document.createElement('p');
-            p.className = "text-sm text-gray-700 bg-gray-100 p-2 rounded-lg";
-            p.textContent = `📄 ${file.name} (Se reemplazará el anterior)`;
-            fileListContainer.appendChild(p);
-        });
+        selectedFiles = selectedFiles.concat(newFiles);
+        fileInput.value = ''; // Limpiar el input para permitir seleccionar el mismo archivo
+        
+        renderNewFileList();
     });
+
+    function renderNewFileList() {
+        fileListContainer.innerHTML = '';
+        
+        selectedFiles.forEach((file, index) => {
+            const div = document.createElement('div');
+            div.className = "flex justify-between items-center bg-blue-50 p-2 rounded-lg text-sm text-blue-800";
+            
+            const fileInfo = document.createElement('span');
+            fileInfo.textContent = `📄 ${file.name} (Nuevo) - ${(file.size / (1024 * 1024)).toFixed(2)} MB`;
+            
+            const removeBtn = document.createElement('button');
+            removeBtn.type = "button";
+            removeBtn.className = "text-red-500 hover:text-red-700 font-bold px-2 text-lg leading-none";
+            removeBtn.innerHTML = "&times;";
+            removeBtn.onclick = () => {
+                selectedFiles.splice(index, 1);
+                renderNewFileList();
+            };
+            
+            div.appendChild(fileInfo);
+            div.appendChild(removeBtn);
+            fileListContainer.appendChild(div);
+        });
+    }
 
     // Drag & Drop logic
     uploadZone.addEventListener('dragover', (e) => {
@@ -73,8 +139,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         uploadZone.classList.remove('border-uce-navy', 'bg-slate-100');
 
         if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-            fileInput.files = e.dataTransfer.files;
-            fileInput.dispatchEvent(new Event('change'));
+            const newFiles = Array.from(e.dataTransfer.files);
+            selectedFiles = selectedFiles.concat(newFiles);
+            renderNewFileList();
         }
     });
 
@@ -83,12 +150,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         e.preventDefault();
 
         if (!window.Clerk || !window.Clerk.user) {
-            alert("Debes iniciar sesión.");
+            showToast('Debes iniciar sesión.', 'warning');
             return;
         }
 
         if (getOwnerId() !== currentResource.ownerId) {
-            alert("No tienes permiso para editar este recurso.");
+            showToast('No tienes permiso para editar este recurso.', 'error');
             return;
         }
 
@@ -97,9 +164,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         formData.append('description', document.getElementById('resource-desc').value);
         formData.append('category', document.getElementById('resource-category').value);
 
-        const files = fileInput.files;
-        for (let i = 0; i < files.length; i++) {
-            formData.append('newFiles', files[i]); // El backend espera 'newFiles'
+        if (existingFiles.length === 0 && selectedFiles.length === 0) {
+            showToast('El recurso debe tener al menos un archivo.', 'warning');
+            return;
+        }
+
+        filesToDelete.forEach(id => {
+            formData.append('filesToDelete', id);
+        });
+
+        for (let i = 0; i < selectedFiles.length; i++) {
+            formData.append('newFiles', selectedFiles[i]);
         }
 
         submitBtn.disabled = true;
@@ -119,13 +194,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                 throw new Error(errorText || 'Error al actualizar');
             }
 
-            alert("¡Cambios guardados!");
-            window.location.href = '/modules/marketplace/my-listings.html';
+            showToast('¡Cambios guardados!', 'success');
+            setTimeout(() => {
+                window.location.href = '/modules/marketplace/my-listings.html';
+            }, 1500);
 
 
         } catch (error) {
             console.error('Error:', error);
-            alert("Ocurrió un error: " + error.message);
+            if (error.message !== 'Error al actualizar') {
+                showToast("Ocurrió un error: " + error.message, 'error');
+            }
             submitBtn.disabled = false;
             submitBtn.textContent = 'Guardar Cambios';
         }

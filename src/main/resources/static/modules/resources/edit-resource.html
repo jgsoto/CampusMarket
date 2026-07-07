@@ -29,7 +29,7 @@
 
       <div class="px-8 py-6 border-b border-gray-100">
         <h1 class="font-display text-2xl font-bold text-uce-navy">Editar recurso</h1>
-        <p class="text-sm text-gray-400 mt-1">Actualiza la información y/o sube nuevos archivos (los nuevos archivos reemplazarán a los anteriores en esta versión simplificada).</p>
+        <p class="text-sm text-gray-400 mt-1">Actualiza la información y sube nuevos archivos o elimina los existentes.</p>
       </div>
       
       <div id="loader" class="text-center py-10 text-gray-400">Cargando datos...</div>
@@ -72,6 +72,13 @@
         <div class="flex flex-col gap-4">
           <div class="flex items-center justify-between">
             <label class="text-sm font-medium text-gray-700">
+              Archivos Actuales
+            </label>
+          </div>
+          <div id="existing-file-list" class="text-sm text-gray-600 flex flex-col gap-1 mb-4"></div>
+          
+          <div class="flex items-center justify-between">
+            <label class="text-sm font-medium text-gray-700">
               Nuevos Archivos (Opcional)
             </label>
           </div>
@@ -82,7 +89,7 @@
                         hover:border-uce-navy hover:bg-uce-navy/2 transition-colors group">
             <div class="text-center">
               <p class="text-sm font-medium text-gray-600">Haz clic si deseas subir archivos nuevos</p>
-              <p class="text-xs text-gray-400 mt-0.5">Si subes archivos aquí, los anteriores serán borrados y reemplazados.</p>
+              <p class="text-xs text-gray-400 mt-0.5">Si subes archivos aquí, se añadirán a los existentes.</p>
             </div>
             <input id="resource-files" type="file" multiple class="sr-only" />
           </label>
