@@ -46,6 +46,38 @@ const AI = {
         });
         if (!response.ok) throw new Error();
         return response.json();
+    },
+
+    generateFromImage: async () => {
+        let targetImageUrl = null;
+
+        if (_selectedFiles.length > 0) {
+            const formData = new FormData();
+            formData.append("image", _selectedFiles[0]);
+
+            const uploadResponse = await fetch(`${API_BASE}/api/listings/ai/upload-image`, {
+                method: "POST", body: formData
+            });
+
+            if (!uploadResponse.ok) throw new Error("Upload failed");
+            const uploadResult = await uploadResponse.json();
+            targetImageUrl = uploadResult.imageUrl;
+        } else if (_retainedImages.length > 0) {
+            targetImageUrl = _retainedImages[0].url;
+        } else {
+            throw new Error("NO_IMAGE");
+        }
+
+        const response = await fetch(`${API_BASE}/api/listings/ai/generate-from-image`, {
+            method: "POST", headers: {
+                "Content-Type": "application/json"
+            }, body: JSON.stringify({
+                imageUrl: targetImageUrl
+            })
+        });
+
+        if (!response.ok) throw new Error();
+        return response.json();
     }
 };
 
@@ -306,6 +338,33 @@ async function correctText() {
     }
 }
 
+async function generateDescriptionFromImage() {
+    if (_selectedFiles.length === 0 && _retainedImages.length === 0) {
+        showToast("Primero selecciona o mantén una imagen.", "warning");
+        return;
+    }
+
+    const button = document.getElementById("btn-ai-image");
+    try {
+        button.disabled = true;
+        button.innerHTML = "Analizando imagen...";
+
+        const response = await AI.generateFromImage();
+
+        FIELDS.desc().value = response.result;
+        const countEl = document.getElementById("desc-count");
+        if (countEl) countEl.textContent = response.result.length;
+
+        showToast("Descripción generada desde la imagen.", "success");
+    } catch (e) {
+        console.error(e);
+        showToast("No se pudo generar la descripción.", "error");
+    } finally {
+        button.disabled = false;
+        button.innerHTML = "Descripción desde imagen";
+    }
+}
+
 async function submitForm(e) {
     e.preventDefault();
     if (!validateAll()) {
@@ -452,6 +511,7 @@ window.addEventListener('load', async () => {
     document.getElementById("btn-ai-improve")?.addEventListener("click", improveDescription);
     document.getElementById("btn-ai-title")?.addEventListener("click", generateTitle);
     document.getElementById("btn-ai-correct")?.addEventListener("click", correctText);
+    document.getElementById("btn-ai-image")?.addEventListener("click", generateDescriptionFromImage);
 
     document.getElementById('edit-listing-form').addEventListener('submit', submitForm);
 });
