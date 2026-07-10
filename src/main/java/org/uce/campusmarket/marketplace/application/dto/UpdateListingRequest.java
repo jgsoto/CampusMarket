@@ -17,4 +17,5 @@ public class UpdateListingRequest {
     private String description;
     private double price;
     private List<MultipartFile> images;
+    private List<String> retainedImageUrls;
 }
