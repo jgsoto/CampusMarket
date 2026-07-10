@@ -586,34 +586,8 @@ async function initOwnerActions(offer, offerId, currentUserId) {
         });
     }
 
-    editBtn?.addEventListener('click', async () => {
-        const {value: formValues} = await Swal.fire({
-            title: 'Editar Tutoría',
-            html: `
-        <input id="swal-subject" class="swal2-input" placeholder="Título" value="${offer.subject}">
-        <textarea id="swal-description" class="swal2-textarea" placeholder="Descripción">${offer.description ?? ''}</textarea>
-        <input id="swal-rate" type="number" class="swal2-input" placeholder="Tarifa por hora ($)" value="${offer.hourlyRate}">`,
-            showCancelButton: true,
-            confirmButtonText: 'Guardar cambios',
-            confirmButtonColor: '#0A1628',
-            preConfirm: () => ({
-                subject: document.getElementById('swal-subject').value.trim(),
-                description: document.getElementById('swal-description').value.trim(),
-                hourlyRate: parseFloat(document.getElementById('swal-rate').value),
-            }),
-        });
-        if (!formValues || !formValues.subject || isNaN(formValues.hourlyRate)) return;
-        const res = await fetch(`${API_BASE}/api/tutoring/${offerId}`, {
-            method: 'PUT',
-            headers: {'Content-Type': 'application/json', 'X-User-Id': currentUserId},
-            body: JSON.stringify(formValues),
-        });
-
-        if (res.ok) {
-            location.reload();
-        } else {
-            showToast('Error al actualizar la tutoría.', 'error');
-        }
+    editBtn?.addEventListener('click', () => {
+        window.location.href = `/modules/tutoring/edit-tutoring.html?id=${offerId}`;
     });
 
     deleteBtn?.addEventListener('click', async () => {

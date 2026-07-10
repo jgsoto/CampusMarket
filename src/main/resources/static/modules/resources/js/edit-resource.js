@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btnCancel = document.getElementById('btn-cancel');
     const uploadZone = document.getElementById('upload-zone');
 
-    btnCancel.href = `/modules/resources/resource-details.html?id=${resourceId}`;
+    btnCancel.href = `/modules/marketplace/my-listings.html`;
 
     let currentResource = null;
     let existingFiles = [];
