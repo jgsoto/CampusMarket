@@ -86,7 +86,7 @@ function createMyListingCard(listing) {
       <span class="font-display text-xl font-bold text-uce-navy mt-1">$${listing.price.toFixed(2)}</span>
     </div>
     <div class="px-5 pb-5 flex flex-wrap gap-2">
-      ${!isSold ? `<button onclick="openEditModal('${listing.id}', \`${listing.title.replace(/`/g, '\\`')}\`, \`${listing.description.replace(/`/g, '\\`')}\`, ${listing.price})" class="flex-1 py-2 rounded-lg text-xs font-semibold bg-yellow-50 text-yellow-700 hover:bg-yellow-100 transition-colors">Editar</button>` : ''}
+      ${!isSold ? `<button onclick="window.location.href='/modules/marketplace/edit-listing.html?id=${listing.id}'" class="flex-1 py-2 rounded-lg text-xs font-semibold bg-yellow-50 text-yellow-700 hover:bg-yellow-100 transition-colors">Editar</button>` : ''}
       ${listing.status === 'BORRADOR' ? `<button onclick="publishListing('${listing.id}')" class="flex-1 py-2 rounded-lg text-xs font-semibold bg-green-500 text-white hover:bg-green-600 transition-colors">Publicar</button>` : ''}
       ${listing.status === 'PUBLICADA' ? `<button onclick="markAsSold('${listing.id}')" class="flex-1 py-2 rounded-lg text-xs font-semibold bg-purple-600 text-white hover:bg-purple-700 transition-colors">Marcar vendido</button>` : ''}
       ${isSold ? `<span class="flex-1 py-2 rounded-lg text-xs font-semibold text-center bg-gray-100 text-gray-400">Vendido</span>` : ''}
@@ -169,142 +169,7 @@ async function loadMyTutoring() {
   }
 }
 
-function openEditModal(id, title, desc, price) {
-  document.getElementById('edit-id').value = id;
-  document.getElementById('edit-title').value = title;
-  document.getElementById('edit-desc').value = desc;
-  document.getElementById('edit-price').value = price;
-  const modal = document.getElementById('edit-modal');
-  modal.classList.remove('hidden');
-  modal.classList.add('flex');
-}
 
-async function improveEditDescription() {
-
-  const textarea = document.getElementById("edit-desc");
-
-  if (!textarea.value.trim()) {
-    showToast("Escribe una descripción primero.", "warning");
-    return;
-  }
-
-  const response = await fetch(`${API_BASE}/api/listings/ai/improve-description`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      text: textarea.value
-    })
-  });
-
-  if (!response.ok) {
-    showToast("Error usando IA.", "error");
-    return;
-  }
-
-  const data = await response.json();
-
-  textarea.value = data.result;
-
-}
-
-async function correctEditDescription() {
-
-  const textarea = document.getElementById("edit-desc");
-
-  if (!textarea.value.trim()) {
-    showToast("Escribe una descripción primero.", "warning");
-    return;
-  }
-
-  const response = await fetch(`${API_BASE}/api/listings/ai/correct-text`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      text: textarea.value
-    })
-  });
-
-  if (!response.ok) {
-    showToast("Error usando IA.", "error");
-    return;
-  }
-
-  const data = await response.json();
-
-  textarea.value = data.result;
-
-}
-
-async function generateEditTitle() {
-
-  const description = document.getElementById("edit-desc").value;
-
-  if (!description.trim()) {
-    showToast("Primero escribe una descripción.", "warning");
-    return;
-  }
-
-  const response = await fetch(`${API_BASE}/api/listings/ai/generate-title`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      text: description
-    })
-  });
-
-  if (!response.ok) {
-    showToast("Error usando IA.", "error");
-    return;
-  }
-
-  const data = await response.json();
-
-  document.getElementById("edit-title").value = data.result;
-
-}
-
-function closeEditModal() {
-  const modal = document.getElementById('edit-modal');
-  modal.classList.add('hidden');
-  modal.classList.remove('flex');
-  document.getElementById('edit-images').value = '';
-}
-
-async function handleEditSubmit(e) {
-  e.preventDefault();
-  const ownerId = getOwnerId();
-  const id = document.getElementById('edit-id').value;
-
-  const formData = new FormData();
-  formData.append('title', document.getElementById('edit-title').value.trim());
-  formData.append('description', document.getElementById('edit-desc').value.trim());
-  formData.append('price', parseFloat(document.getElementById('edit-price').value));
-
-  const files = document.getElementById('edit-images').files;
-  for (const file of files) formData.append('images', file);
-
-  try {
-    const res = await fetch(`${API_BASE}/api/listings/${id}`, {
-      method: 'PUT',
-      headers: { 'X-User-Id': ownerId },
-      body: formData,
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-    showToast('Publicación actualizada correctamente.', 'success');
-    closeEditModal();
-    loadMyListings();
-  } catch (err) {
-    console.error('[MyListings] Error editando:', err);
-    showToast('No se pudo actualizar la publicación.', 'error');
-  }
-}
 
 async function deleteListing(id) {
   const ok = await showConfirm('¿Eliminar esta publicación? Esta acción no se puede deshacer.', 'Eliminar');
@@ -372,21 +237,7 @@ window.addEventListener('load', async () => {
   
   await Promise.all([loadMyListings(), loadMyTutoring(), loadMyResources()]);
 
-  document.getElementById('edit-listing-form').addEventListener('submit', handleEditSubmit);
-  document
-      .getElementById("btn-ai-improve")
-      ?.addEventListener("click", improveEditDescription);
 
-  document
-      .getElementById("btn-ai-correct")
-      ?.addEventListener("click", correctEditDescription);
-
-  document
-      .getElementById("btn-ai-title")
-      ?.addEventListener("click", generateEditTitle);
-  document.getElementById('edit-modal').addEventListener('click', e => {
-    if (e.target === e.currentTarget) closeEditModal();
-  });
 });
 
 function createMyResourceCard(resource) {

@@ -61,36 +61,48 @@ public class UpdateListingUseCase {
                 newDescription,
                 newPrice);
 
+        List<String> retainedUrls = request.getRetainedImageUrls() != null ? request.getRetainedImageUrls() : new java.util.ArrayList<>();
         List<MultipartFile> newImages = request.getImages();
+
+        List<ListingImage> currentImages = new java.util.ArrayList<>(listing.getImages());
+        List<ListingImage> keptImages = new java.util.ArrayList<>();
+
+        for (ListingImage img : currentImages) {
+            if (retainedUrls.contains(img.getUrl())) {
+                keptImages.add(img);
+            } else {
+                imageStoragePort.delete(img.getUrl());
+            }
+        }
 
         boolean hasRealFiles = newImages != null &&
                 newImages.stream().anyMatch(file -> !file.isEmpty());
 
         if (hasRealFiles) {
-
-            listing.getImages().forEach(image -> imageStoragePort.delete(image.getUrl()));
-
-            List<ListingImage> uploadedImages = new java.util.ArrayList<>();
-
-            for (int i = 0; i < newImages.size(); i++) {
-
-                MultipartFile file = newImages.get(i);
-
+            for (MultipartFile file : newImages) {
                 if (!file.isEmpty()) {
-
                     String imageUrl = imageStoragePort.upload(file);
-
                     ListingImage listingImage = new ListingImage(
                             UUID.randomUUID(),
                             imageUrl,
-                            i == 0);
-
-                    uploadedImages.add(listingImage);
+                            false);
+                    keptImages.add(listingImage);
                 }
             }
-
-            listing.replaceImages(uploadedImages);
         }
+
+        List<ListingImage> finalImages = new java.util.ArrayList<>();
+        for (int i = 0; i < keptImages.size(); i++) {
+            ListingImage img = keptImages.get(i);
+            boolean isThumbnail = (i == 0);
+            if (img.isThumbnail() != isThumbnail) {
+                finalImages.add(new ListingImage(img.getId(), img.getUrl(), isThumbnail));
+            } else {
+                finalImages.add(img);
+            }
+        }
+
+        listing.replaceImages(finalImages);
 
         Listing updatedListing = listingRepository.save(listing);
 
