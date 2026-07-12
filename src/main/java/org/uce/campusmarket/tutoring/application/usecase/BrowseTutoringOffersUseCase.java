@@ -16,6 +16,9 @@ import org.uce.campusmarket.tutoring.domain.repository.TutoringOfferRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +31,10 @@ public class BrowseTutoringOffersUseCase {
 
     public List<TutoringOfferResponse> execute() {
 
+        Map<UUID, User> tutorCache = new HashMap<>();
+        Map<UUID, Double> ratingCache = new HashMap<>();
+        Map<UUID, Integer> reviewCountCache = new HashMap<>();
+
         return repository.findAll()
                 .stream()
                 .filter(offer ->
@@ -36,19 +43,22 @@ public class BrowseTutoringOffersUseCase {
                 )
                 .map(offer -> {
 
-                    User tutor = userRepository
-                            .findById(offer.getTutorId())
-                            .orElse(null);
+                    UUID tutorId = offer.getTutorId();
 
-                    Double averageRating =
-                            reviewRepository.getAverageRatingByReviewedUserId(
-                                    offer.getTutorId()
-                            );
+                    User tutor = tutorCache.computeIfAbsent(
+                            tutorId,
+                            id -> userRepository.findById(id).orElse(null)
+                    );
 
-                    Integer totalReviews =
-                            reviewRepository.countByReviewedUserId(
-                                    offer.getTutorId()
-                            );
+                    Double averageRating = ratingCache.computeIfAbsent(
+                            tutorId,
+                            reviewRepository::getAverageRatingByReviewedUserId
+                    );
+
+                    Integer totalReviews = reviewCountCache.computeIfAbsent(
+                            tutorId,
+                            reviewRepository::countByReviewedUserId
+                    );
 
                     return new TutoringOfferResponse(
                             offer.getId(),
