@@ -12,7 +12,10 @@ import org.uce.campusmarket.identity.domain.model.User;
 import org.uce.campusmarket.identity.domain.repository.UserRepository;
 import org.uce.campusmarket.reputation.domain.repository.ReviewRepository;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,6 +30,9 @@ public class BrowseListingsUseCase {
     public List<ListingResponse> execute() {
 
         List<Listing> listings = listingRepository.findAll();
+        Map<UUID, User> sellerCache = new HashMap<>();
+        Map<UUID, Double> reputationCache = new HashMap<>();
+        Map<UUID, Integer> reviewCountCache = new HashMap<>();
 
         return listings.stream()
                 .filter(listing -> listing
@@ -42,15 +48,22 @@ public class BrowseListingsUseCase {
                                     img.isThumbnail()))
                             .toList();
 
-                    User seller = userRepository
-                            .findById(listing.getOwnerId())
-                            .orElse(null);
+                    UUID ownerId = listing.getOwnerId();
 
-                    double reputation = reviewRepository
-                            .getAverageRatingByReviewedUserId(listing.getOwnerId());
+                    User seller = sellerCache.computeIfAbsent(
+                            ownerId,
+                            id -> userRepository.findById(id).orElse(null)
+                    );
 
-                    int reviewCount = reviewRepository
-                            .countByReviewedUserId(listing.getOwnerId());
+                    double reputation = reputationCache.computeIfAbsent(
+                            ownerId,
+                            reviewRepository::getAverageRatingByReviewedUserId
+                    );
+
+                    int reviewCount = reviewCountCache.computeIfAbsent(
+                            ownerId,
+                            reviewRepository::countByReviewedUserId
+                    );
 
                     return ListingResponse.builder()
                             .id(listing.getId())
