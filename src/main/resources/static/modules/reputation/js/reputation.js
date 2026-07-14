@@ -16,7 +16,7 @@ const RepDOM = Object.freeze({
 });
 
 let _allReviews = [];
-let _activeFilter = 'ALL';
+let _activeFilter = 'TUTORING';
 
 const Utils = {
   buildStars: (score) => '★'.repeat(Math.round(score)).padEnd(5, '☆'),

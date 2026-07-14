@@ -62,25 +62,57 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            resources.forEach(resource => {
+            resources.forEach((resource, index) => {
                 const card = document.createElement('a');
                 card.href = `/modules/resources/resource-details.html?id=${resource.id}`;
-                card.className = "bg-white border border-gray-100 rounded-2xl p-5 hover:shadow-md transition-shadow flex flex-col h-full";
+                // Modificado para tener 'overflow-hidden' y quitar el padding general para que la imagen ocupe todo el ancho arriba,
+                // o mantener el padding pero que la imagen se vea bien dentro. Mantendremos el padding para el texto pero no para la imagen.
+                card.className = "bg-white border border-gray-100 rounded-2xl hover:shadow-md transition-shadow flex flex-col h-full overflow-hidden";
                 
                 const fileCount = resource.files ? resource.files.length : 0;
                 const categoryColor = getCategoryColor(resource.category);
 
+                // ==========================================
+                // Asignación de imágenes (MOCK)
+                // ==========================================
+                const mockImages = [
+                    '/assets/images_resources/recurso1.png',
+                    '/assets/images_resources/recurso2.png',
+                    '/assets/images_resources/recurso3.png',
+                    '/assets/images_resources/recurso4.png',
+                    '/assets/images_resources/recurso5.png',
+                    '/assets/images_resources/recurso6.png',
+                    '/assets/images_resources/recurso7.png'
+                ];
+                const currentImage = mockImages[index % mockImages.length];
+
                 card.innerHTML = `
-                    <div class="flex items-center gap-2 mb-3">
-                        <span class="px-2.5 py-1 rounded-md text-xs font-medium ${categoryColor}">
-                            ${resource.category}
-                        </span>
+                    <!-- ========================================== -->
+                    <!-- 🖼️ ZONA DE IMÁGENES (MOCK)                 -->
+                    <!-- Reemplaza la URL del 'src' por tu imagen   -->
+                    <!-- ========================================== -->
+                    <div class="w-full h-40 bg-gray-100 relative group shrink-0 border-b border-gray-100">
+                        <img 
+                            src="${currentImage}" 
+                            alt="Recurso académico" 
+                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
+                        />
+                        <div class="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors"></div>
                     </div>
-                    <h3 class="font-bold text-gray-900 mb-2 line-clamp-2">${resource.title}</h3>
-                    <p class="text-sm text-gray-500 mb-4 line-clamp-3 flex-1">${resource.description}</p>
-                    <div class="pt-4 border-t border-gray-50 flex items-center justify-between text-xs text-gray-400">
-                        <span>Por: ${resource.ownerName}</span>
-                        <span class="flex items-center gap-1">📎 ${fileCount} archivo(s)</span>
+                    <!-- ========================================== -->
+                    
+                    <div class="p-5 flex flex-col flex-1">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="px-2.5 py-1 rounded-md text-xs font-medium ${categoryColor}">
+                                ${resource.category}
+                            </span>
+                        </div>
+                        <h3 class="font-bold text-gray-900 mb-2 line-clamp-2">${resource.title}</h3>
+                        <p class="text-sm text-gray-500 mb-4 line-clamp-3 flex-1">${resource.description}</p>
+                        <div class="pt-4 border-t border-gray-50 flex items-center justify-between text-xs text-gray-400">
+                            <span>Por: ${resource.ownerName}</span>
+                            <span class="flex items-center gap-1">📎 ${fileCount} archivo(s)</span>
+                        </div>
                     </div>
                 `;
                 grid.appendChild(card);
